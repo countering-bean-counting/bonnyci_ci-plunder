@@ -3,12 +3,8 @@ CI usage data plundering
 
 Roadmap:
 
-1) Initial Questions (need to be refined)
-- How do open source projects use TravisCI?
-- What is the current error rate for new code in projects that use TravisCI compared to projects that don't use any CI?
-- Would the features BonnyCI proposes decrease errors in new code for current users of TravisCI?
-- What is the current overall CI complexity of a project that uses TravisCI, including CI workflows that fall outside of TravisCI?
-- How would BonnyCI's current proposed features impact the overall CI complexity for projects that currently use TravisCI?
+1) Initial Questions:
+- see wiki
 
 2) Data Exploration:
 - available data set: https://travistorrent.testroots.org/
