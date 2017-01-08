@@ -1,26 +1,12 @@
 # ci-plunder
 CI usage data plundering
 
-Roadmap:
+The goal of this research is to determine what value BonnyCI brings to its target audience.
 
-1) Initial Questions:
-- see wiki
+These steps involve:
 
-2) Data Exploration:
-- available data set: https://travistorrent.testroots.org/
-- verify the data, is it sufficient to answer our questions?
+1) Identifying the target audience (projects impacted by the problems that BonnyCI wants to solve)
 
-3) Iteration on 1 and 2
-- until we have clear questions that we know we can answer given our data set
+2) Determining the value of CI for the target audience (identifying and measuring)
 
-4) Statistical models to summarize the data
-- tbd based on the questions
-
-5) Form Hypotheses and test them against a larger data set
-
-6) iteration on steps 4 and 5
-
-7) Present results
-- How do the results of this research compare with BonnyCI assumptions and features?
-- What further questions do we have as a result of this research?
-
+3) Predicting how BonnyCI will affect those measures of values (positive, negative, or not at all)
