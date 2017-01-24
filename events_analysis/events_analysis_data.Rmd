@@ -1,0 +1,441 @@
+---
+title: "Data Supporting Participation Rates of GitHub Projects"
+output: html_notebook
+---
+
+<h2>Initial Setup</h2>
+```{r}
+library(dplyr)
+library(bigrquery)
+
+project <- "bonnyci-github-archive"
+```
+
+
+Query used to pull the projects out of the Github Archive:
+
+```
+SELECT type, repo.name, actor.login, org.login, created_at, STRFTIME_UTC_USEC(created_at, '%b') as month
+FROM [githubarchive:year.2016]
+WHERE created_at > TIMESTAMP("2016-06-01") AND created_at < TIMESTAMP("2017-01-01")
+```
+
+Query is available here:
+https://bigquery.cloud.google.com:443/savedquery/787787545662:1515b1399b524edcb0a09ea7cd309499
+
+The datasets are saved in Google BigQuery here:
+https://bigquery.cloud.google.com/table/bonnyci-github-archive:ci_plunder_events.githubarchive_2016_06
+
+<h2>Event Demographics</h2>
+
+<h3>Overall Event Totals</h3>
+
+The count of events, repositories, and actors was determined using the following SQL query in Google BigQuery:
+```
+SELECT month, 
+  COUNT(*) as num_events, 
+  EXACT_COUNT_DISTINCT(actor_login) as num_actors,
+  EXACT_COUNT_DISTINCT(repo_name) as num_repos,
+FROM [bonnyci-github-archive:ci_plunder_events.githubarchive_2016_06]
+GROUP BY month
+```
+Query is available here:
+https://bigquery.cloud.google.com:443/savedquery/787787545662:453372ae56034badbaada655159141b5
+
+
+```{r}
+
+event_totals_sql <- 'select * from [bonnyci-github-archive:ci_plunder_events.overall_event_totals]'
+
+event_totals <- query_exec(event_totals_sql, project = project)
+
+saveRDS(event_totals, "event_totals.rds")
+
+```
+
+<h3>Event Type Totals</h3>
+
+The count of events, repositories, and actors grouped by event type was determined using the following SQL query in Google BigQuery:
+```
+SELECT type,
+  COUNT(*) as num_events, 
+  EXACT_COUNT_DISTINCT(actor_login) as num_actors,
+  EXACT_COUNT_DISTINCT(repo_name) as num_repos,
+FROM [bonnyci-github-archive:ci_plunder_events.githubarchive_2016_06]
+GROUP BY type
+```
+
+Query is available here:
+https://bigquery.cloud.google.com:443/savedquery/787787545662:bd0603a65c3141a2bb7c2da210b20412
+
+Because these numbers are so large and variable, I've proposed two ratios, events to actor and actors to repo Events to actor is the total number of events for that type divided by the number of unique actors that generated that event type. Actors to project is the total number of unique actors that generatated the event type divided by the number of unique repositories that had an event of that type.
+
+```{r}
+
+event_type_totals_sql <- 'select * from [bonnyci-github-archive:ci_plunder_events.overall_event_type_totals_ratio]'
+
+event_type_totals <- query_exec(event_type_totals_sql, project = project)
+
+saveRDS(event_type_totals, "event_type_totals.rds")
+```
+
+<h3>Event Type Totals Per Month</h3>
+
+The count of events, repositories, and actors grouped by month and event type was determined using the following SQL query in Google BigQuery:
+```
+SELECT month, type,
+  COUNT(*) as num_events, 
+  EXACT_COUNT_DISTINCT(actor_login) as num_actors,
+  EXACT_COUNT_DISTINCT(repo_name) as num_repos,
+FROM [bonnyci-github-archive:ci_plunder_events.githubarchive_2016_06]
+GROUP BY month, type
+```
+
+Query is available here:
+https://bigquery.cloud.google.com:443/savedquery/787787545662:95f9bf32252a4005b8a7c40a6bdfcfd7
+
+This data also includes the events to actor and actors to repo ratios discussed above.
+
+```{r}
+
+month_event_type_totals_sql <- 'select * from [bonnyci-github-archive:ci_plunder_events.month_event_type_totals_ratio]'
+
+month_event_type_totals <- query_exec(month_event_type_totals_sql, project = project)
+
+saveRDS(month_event_type_totals, "month_event_type_totals.rds")
+```
+
+
+<h2>Participation Rate</h2>
+
+<h3>Participation Rate Distributions</h3>
+
+This is a test to see how much variation exists in each category for the number of actors involved in each projects at each participation level.
+
+<h4>Low Participation: Actors</h4>
+```{r}
+
+low_participation_num_actors_freq_sql <- 
+  'select * from [bonnyci-github-archive:ci_plunder_events.low_participation_num_actors_freq]'
+
+low_participation_num_actors_freq <- query_exec(low_participation_num_actors_freq_sql, project = project)
+
+low_participation_num_actors_freq_grouped <- low_participation_num_actors_freq %>%
+mutate(actors_group = ifelse(num_actors <= 10, 'Tier 0: < 10', actors_group)) %>% 
+  group_by(actors_group) %>%
+  summarise(actor_freq = sum(actor_freq))
+
+saveRDS(low_participation_num_actors_freq_grouped, "low_participation_num_actors_freq.rds")
+
+```
+
+
+<h4>Medium Participation: Actors</h4>
+
+```{r}
+
+med_participation_num_actors_freq_sql <- 
+  'select * from [bonnyci-github-archive:ci_plunder_events.med_participation_num_actors_freq]'
+
+med_participation_num_actors_freq <- query_exec(med_participation_num_actors_freq_sql, project = project)
+
+med_participation_num_actors_freq_grouped <- med_participation_num_actors_freq %>% 
+  mutate(actors_group = ifelse(num_actors > 1000, 'Tier 4: 1000 +', '')) %>% 
+  mutate(actors_group = ifelse(num_actors > 500 & num_actors <= 1000, 'Tier 3: 500 - 1000', actors_group)) %>% 
+  mutate(actors_group = ifelse(num_actors > 100 & num_actors <= 500, 'Tier 2: 100 - 500', actors_group)) %>% 
+  mutate(actors_group = ifelse(num_actors > 10 & num_actors <= 100, 'Tier 1: 10 - 100', actors_group)) %>% 
+  mutate(actors_group = ifelse(num_actors <= 10, 'Tier 0: < 10', actors_group)) %>% 
+  group_by(actors_group) %>%
+  summarise(actor_freq = sum(actor_freq))
+
+saveRDS(med_participation_num_actors_freq_grouped, "med_participation_num_actors_freq.rds")
+
+```
+
+<h4>High Participation: Actors</h4>
+
+```{r}
+
+high_participation_num_actors_freq_sql <- 
+  'select * from [bonnyci-github-archive:ci_plunder_events.high_participation_num_actors_freq]'
+
+high_participation_num_actors_freq <- query_exec(high_participation_num_actors_freq_sql, project = project)
+
+high_participation_num_actors_freq_grouped <- high_participation_num_actors_freq %>% 
+  mutate(actors_group = ifelse(num_actors > 1000, 'Tier 4: 1000 +', '')) %>% 
+  mutate(actors_group = ifelse(num_actors > 500 & num_actors <= 1000, 'Tier 3: 500 - 1000', actors_group)) %>% 
+  mutate(actors_group = ifelse(num_actors > 100 & num_actors <= 500, 'Tier 2: 100 - 500', actors_group)) %>% 
+  mutate(actors_group = ifelse(num_actors > 10 & num_actors <= 100, 'Tier 1: 10 - 100', actors_group)) %>% 
+  mutate(actors_group = ifelse(num_actors <= 10, 'Tier 0: < 10', actors_group)) %>% 
+  group_by(actors_group) %>%
+  summarise(actor_freq = sum(actor_freq))
+
+saveRDS(high_participation_num_actors_freq_grouped, "high_participation_num_actors_freq.rds")
+
+```
+
+Check the distribution of the number of events per project
+
+<h4>Low Participation: Events</h4>
+```{r}
+
+low_participation_num_events_freq_sql <-
+  'select * from [bonnyci-github-archive:ci_plunder_events.low_participaton_num_events_freq]'
+
+low_participation_num_events_freq <- query_exec(low_participation_num_events_freq_sql, project = project)
+
+low_participation_num_events_freq_grouped <- low_participation_num_events_freq %>%
+  mutate(events_group = ifelse(num_events > 1000, 'Tier 4: 1000 +', '')) %>%
+  mutate(events_group = ifelse(num_events > 500 & num_events <= 1000, 'Tier 3: 500 - 1000', events_group)) %>%
+  mutate(events_group = ifelse(num_events > 100 & num_events <= 500, 'Tier 2: 100 - 500', events_group)) %>%
+  mutate(events_group = ifelse(num_events > 10 & num_events <= 100, 'Tier 1: 10 - 100', events_group)) %>%
+  mutate(events_group = ifelse(num_events <= 10, 'Tier 0: < 10', events_group)) %>%
+  group_by(events_group) %>%
+  summarise(events_freq = sum(events_freq))
+
+saveRDS(low_participation_num_events_freq_grouped, "low_participation_num_events_freq.rds")
+
+```
+
+<h4>Medium Participation: Events per Project</h4>
+```{r}
+
+med_participation_num_events_freq_sql <- 
+  'select * from [bonnyci-github-archive:ci_plunder_events.med_participaton_num_events_freq]'
+
+med_participation_num_events_freq <- query_exec(med_participation_num_events_freq_sql, project = project)
+med_participation_num_events_freq_grouped <- med_participation_num_events_freq %>% 
+  mutate(events_group = ifelse(num_events > 1000, 'Tier 4: 1000 +', '')) %>% 
+  mutate(events_group = ifelse(num_events > 500 & num_events <= 1000, 'Tier 3: 500 - 1000', events_group)) %>% 
+  mutate(events_group = ifelse(num_events > 100 & num_events <= 500, 'Tier 2: 100 - 500', events_group)) %>% 
+  mutate(events_group = ifelse(num_events > 10 & num_events <= 100, 'Tier 1: 10 - 100', events_group)) %>% 
+  mutate(events_group = ifelse(num_events <= 10, 'Tier 0: < 10', events_group)) %>% 
+  group_by(events_group) %>%
+  summarise(events_freq = sum(events_freq))
+
+saveRDS(med_participation_num_events_freq_grouped, "med_participation_num_events_freq.rds")
+
+```
+
+<h4>High Participation: Events</h4>
+```{r}
+
+high_participation_num_events_freq_sql <- 
+  'select * from [bonnyci-github-archive:ci_plunder_events.high_participation_num_events_freq]'
+
+high_participation_num_events_freq <- query_exec(high_participation_num_events_freq_sql, project = project)
+
+high_participation_num_events_freq_grouped <- high_participation_num_events_freq %>%
+  mutate(events_group = ifelse(num_events > 1000, 'Tier 4: 1000 +', '')) %>%
+  mutate(events_group = ifelse(num_events > 500 & num_events <= 1000, 'Tier 3: 500 - 1000', events_group)) %>%
+  mutate(events_group = ifelse(num_events > 100 & num_events <= 500, 'Tier 2: 100 - 500', events_group)) %>% 
+  mutate(events_group = ifelse(num_events > 10 & num_events <= 100, 'Tier 1: 10 - 100', events_group)) %>%
+  mutate(events_group = ifelse(num_events <= 10, 'Tier 0: < 10', events_group)) %>%
+  group_by(events_group) %>%
+  summarise(events_freq = sum(events_freq))
+
+saveRDS(high_participation_num_events_freq_grouped, "high_participation_num_events_freq.rds")
+
+```
+
+
+Check the distribution of the number of events per actor
+
+<h4>Low Participation: Events per Actor</h4>
+```{r}
+
+low_participation_events_to_actor_freq_sql <- 
+  'select * from [bonnyci-github-archive:ci_plunder_events.low_participation_events_to_actor_freq]'
+
+low_participation_events_to_actor_freq <- query_exec(low_participation_events_to_actor_freq_sql, project = project)
+
+low_participation_events_to_actor_freq_grouped <- low_participation_events_to_actor_freq %>%
+  mutate(events_to_actor_group = ifelse(events_to_actor > 1000, 'Tier 4: 1000 +', '')) %>%
+  mutate(events_to_actor_group = ifelse(events_to_actor > 500 & events_to_actor <= 1000, 'Tier 3: 500 - 1000', events_to_actor_group)) %>%
+  mutate(events_to_actor_group = ifelse(events_to_actor > 100 & events_to_actor <= 500, 'Tier 2: 100 - 500', events_to_actor_group)) %>%
+  mutate(events_to_actor_group = ifelse(events_to_actor > 10 & events_to_actor <= 100, 'Tier 1: 10 - 100', events_to_actor_group)) %>%
+  mutate(events_to_actor_group = ifelse(events_to_actor <= 10, 'Tier 0: < 10', events_to_actor_group)) %>%
+  group_by(events_to_actor_group) %>%
+  summarise(events_to_actor_freq = sum(events_to_actor_freq))
+
+saveRDS(low_participation_events_to_actor_freq_grouped, "low_participation_events_to_actor_freq.rds")
+
+```
+
+<h4>Medium Participation: Events per Actor</h4>
+```{r}
+
+med_participation_events_to_actor_freq_sql <- 
+  'select * from [bonnyci-github-archive:ci_plunder_events.med_participation_events_to_actor_freq]'
+
+med_participation_events_to_actor_freq <- query_exec(med_participation_events_to_actor_freq_sql, project = project)
+
+med_participation_events_to_actor_freq_grouped <- med_participation_events_to_actor_freq %>%
+  mutate(events_to_actor_group = ifelse(events_to_actor > 1000, 'Tier 4: 1000 +', '')) %>%
+  mutate(events_to_actor_group = ifelse(events_to_actor > 500 & events_to_actor <= 1000, 'Tier 3: 500 - 1000', events_to_actor_group)) %>%
+  mutate(events_to_actor_group = ifelse(events_to_actor > 100 & events_to_actor <= 500, 'Tier 2: 100 - 500', events_to_actor_group)) %>%
+  mutate(events_to_actor_group = ifelse(events_to_actor > 10 & events_to_actor <= 100, 'Tier 1: 10 - 100', events_to_actor_group)) %>%
+  mutate(events_to_actor_group = ifelse(events_to_actor <= 10, 'Tier 0: < 10', events_to_actor_group)) %>%
+  group_by(events_to_actor_group) %>%
+  summarise(events_to_actor_freq = sum(events_to_actor_freq))
+
+saveRDS(med_participation_events_to_actor_freq_grouped, "med_participation_events_to_actor_freq.rds")
+
+```
+
+<h4>High Participation: Events per Actor</h4>
+```{r}
+
+high_participation_events_to_actor_freq_sql <- 
+  'select * from [bonnyci-github-archive:ci_plunder_events.high_participation_events_to_actor_freq]'
+
+high_participation_events_to_actor_freq <- query_exec(high_participation_events_to_actor_freq_sql, project = project)
+
+high_participation_events_to_actor_freq_grouped <- high_participation_events_to_actor_freq %>%
+  mutate(events_to_actor_group = ifelse(events_to_actor > 1000, 'Tier 4: 1000 +', '')) %>%
+  mutate(events_to_actor_group = ifelse(events_to_actor > 500 & events_to_actor <= 1000, 'Tier 3: 500 - 1000', events_to_actor_group)) %>%
+  mutate(events_to_actor_group = ifelse(events_to_actor > 100 & events_to_actor <= 500, 'Tier 2: 100 - 500', events_to_actor_group)) %>%
+  mutate(events_to_actor_group = ifelse(events_to_actor > 10 & events_to_actor <= 100, 'Tier 1: 10 - 100', events_to_actor_group)) %>%
+  mutate(events_to_actor_group = ifelse(events_to_actor <= 10, 'Tier 0: < 10', events_to_actor_group)) %>%
+  group_by(events_to_actor_group) %>%
+  summarise(events_to_actor_freq = sum(events_to_actor_freq))
+
+saveRDS(high_participation_events_to_actor_freq_grouped, "high_participation_events_to_actor_freq.rds")
+
+```
+
+
+<h3>Participation Rate Overall</h3>
+
+The full participation rates broken down by repo are available in the same data under ci_plunder_events.participation_rate. The data set is huge, hence the summary.
+
+
+https://bigquery.cloud.google.com:443/savedquery/787787545662:6ad718ecc0a94650b605f2baa0ddd58d
+
+```
+SELECT repo_name, num_events, num_actors,
+ ROUND(num_events/num_actors, 5) as events_per_actor,
+ ROUND((num_events/num_actors)/num_events, 1) as participation_rate
+FROM (
+  SELECT repo_name,
+   count(*) as num_events, 
+   EXACT_COUNT_DISTINCT(actor_login) as num_actors,
+  FROM [ci_plunder_events.githubarchive_2016_06]
+  GROUP BY repo_name
+)
+```
+
+Summarized for this graph: https://bigquery.cloud.google.com:443/savedquery/787787545662:f1d9cbf5955240af8baf4dc206e508e6
+
+```
+SELECT participation_rate, COUNT(repo_name)
+FROM [bonnyci-github-archive:ci_plunder_events.total_participation_rate_per_repo]
+GROUP BY participation_rate
+```
+
+
+```{r}
+
+participation_rate_sql <- 'select * from [bonnyci-github-archive:ci_plunder_events.participation_rate_summary]'
+
+participation_rate_summary <- query_exec(participation_rate_sql, project = project)
+
+participation_rate_summary <-
+    mutate(participation_rate_summary, 
+           participation_level = ifelse(participation_rate < 1 & participation_rate > 0, 'Medium', ''))
+
+participation_rate_summary <- 
+  mutate(participation_rate_summary, participation_level = ifelse(participation_rate == 0, 'High', participation_level))
+
+participation_rate_summary <-  
+  mutate(participation_rate_summary, participation_level = ifelse(participation_rate == 1, 'Low', participation_level))
+
+participation_rate_summary <- participation_rate_summary %>%
+  group_by(participation_level) %>%
+  summarise(num_actors=sum(num_actors), num_events=sum(num_events), num_repos=sum(num_repos))
+
+saveRDS(participation_rate_summary, "participation_rate_summary.rds")
+
+```
+
+
+Participation Rate by month:
+
+https://bigquery.cloud.google.com:443/savedquery/787787545662:92af174b7d1147e79412a90d59a31e7e
+
+```
+SELECT month, repo_name, num_events, num_actors,
+ ROUND(num_events/num_actors, 5) as events_per_actor,
+ ROUND((num_events/num_actors)/num_events, 1) as participation_rate
+FROM (
+  SELECT month, repo_name,
+   count(*) as num_events, 
+   EXACT_COUNT_DISTINCT(actor_login) as num_actors,
+  FROM [ci_plunder_events.githubarchive_2016_06]
+  GROUP BY month, repo_name
+)
+```
+
+```{r}
+
+participation_rate_per_month_sql <- 
+  'select * from [bonnyci-github-archive:ci_plunder_events.participation_rate_per_month_summary]'
+
+participation_rate_per_month_summary <- query_exec(participation_rate_per_month_sql, project = project)
+
+participation_rate_per_month_summary <-
+    mutate(participation_rate_per_month_summary,
+           participation_level = ifelse(participation_rate < 1 & participation_rate > 0, 'Medium', ''))
+
+participation_rate_per_month_summary <-
+  mutate(participation_rate_per_month_summary, participation_level = ifelse(participation_rate == 0, 'High', participation_level))
+
+participation_rate_per_month_summary <-
+  mutate(participation_rate_per_month_summary, participation_level = ifelse(participation_rate == 1, 'Low', participation_level))
+
+participation_rate_per_month_summary <- participation_rate_per_month_summary %>%
+  group_by(month, participation_level) %>%
+  summarise(num_actors=sum(num_actors),
+            num_events=sum(num_events),
+            num_repos=sum(num_repos))
+
+participation_rate_per_month_summary <- participation_rate_per_month_summary %>%
+  mutate(ave_events_per_actor = num_events/num_actors)
+
+saveRDS(participation_rate_per_month_summary, "participation_rate_per_month_summary.rds")
+
+```
+
+<h3>Events by type Per Participation Rate</h3>
+
+```{r}
+
+participation_rate_event_types_sql <-
+  'select * from [bonnyci-github-archive:ci_plunder_events.participation_rate_event_types_summary]'
+
+participation_rate_event_types <- query_exec(participation_rate_event_types_sql, project = project)
+
+participation_rate_event_types <-
+    mutate(participation_rate_event_types,
+           participation_level = ifelse(participation_rate < 1 & participation_rate > 0, 'Medium', ''))
+
+participation_rate_event_types <-
+  mutate(participation_rate_event_types, participation_level = ifelse(participation_rate == 0, 'High', participation_level))
+
+participation_rate_event_types <-
+  mutate(participation_rate_event_types, participation_level = ifelse(participation_rate == 1, 'Low', participation_level))
+
+# TODO: change original columns to "num_*" for consistency
+# TODO: add number of repos per type
+participation_rate_event_types <- participation_rate_event_types %>%
+  group_by(participation_level, type) %>%
+  summarise(num_actors=sum(total_actors_per_type),
+            num_events=sum(total_events_per_type))
+
+participation_rate_event_types <- participation_rate_event_types %>%
+  mutate(ave_events_per_actor = num_events/num_actors)
+
+saveRDS(participation_rate_event_types, "participation_rate_event_types.rds")
+
+```
+
