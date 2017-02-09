@@ -449,38 +449,38 @@ Each population was collected into a table in Google BigQuery and assigned a row
 
 <h3>Sampling Projects by Participation</h3>
 
-<h4>Experiment 2: 5 random samples for 100 low participation projects</h3>
+<h4>Experiment 2: 5 random samples for 100 high participation projects</h3>
 
 ```{r}
 
 # TODO abstract this into a function
 
-# Get the low end of the range
-low_count_sql <-
-  'select count(*) as count from [bonnyci-github-archive:ci_plunder_events.low_participation_repo_id]'
-low_count <- query_exec(low_count_sql, project = project)
+# Get the high end of the range
+high_count_sql <-
+  'select count(*) as count from [bonnyci-github-archive:ci_plunder_events.high_participation_repo_id]'
+high_count <- query_exec(high_count_sql, project = project)
 
 # Generate the random numbers and build the data sets
-low_sample_ids <- sort(sample(low_count$count, 100, replace=FALSE))
+high_sample_ids <- sort(sample(high_count$count, 100, replace=FALSE))
 
 # Get the list of project names so we can get the dataz
-low_sample_repos_sql <-
-  paste('SELECT repo_name FROM [bonnyci-github-archive:ci_plunder_events.low_participation_repo_id] WHERE repo_id IN(',
-      paste(as.character(low_sample_ids), collapse=", "),
+high_sample_repos_sql <-
+  paste('SELECT repo_name FROM [bonnyci-github-archive:ci_plunder_events.high_participation_repo_id] WHERE repo_id IN(',
+      paste(as.character(high_sample_ids), collapse=", "),
       ')',
       sep=" ")
-low_sample_repos <- query_exec(low_sample_repos_sql, project = project)
+high_sample_repos <- query_exec(high_sample_repos_sql, project = project)
 
 # Get the actual data for each repo
-low_sample_sql <-
+high_sample_sql <-
   paste("SELECT * FROM [bonnyci-github-archive:ci_plunder_events.repos_event_types_summary] WHERE repo_name IN('",
-      paste(as.character(low_sample_repos$repo_name), collapse="','"),
+      paste(as.character(high_sample_repos$repo_name), collapse="','"),
       "')", sep="")
-low_sample <- query_exec(low_sample_sql, project = project)
+high_sample <- query_exec(high_sample_sql, project = project)
 
 sample_number <- n # your sample number here
-low_sample_file <- paste("low_sample_", sample_number, ".rds", sep="")
-saveRDS(low_sample, low_sample_file)
+high_sample_file <- paste("high_sample_", sample_number, ".rds", sep="")
+saveRDS(high_sample, high_sample_file)
 
 ```
 
