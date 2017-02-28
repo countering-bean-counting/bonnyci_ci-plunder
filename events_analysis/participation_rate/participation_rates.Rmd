@@ -1,0 +1,1023 @@
+---
+title: "Participation Rates based on Github Repository Public Events"
+output: html_notebook
+---
+
+<h2>Overview</h2>
+
+The purpose of this study is to determine if we can predict the overall participation level for a repository based on public Github event activity. The ultimate goal is to develop a sampling methodology for Github repositories based on this event activity.
+
+This study is part of a larger research project to answer the following questions:
+ * What are the measurable impacts of Continuous Integration?
+ * What software projects would most likely benefit from Continuous Integration?
+
+<h2>Hypotheses</h2>
+
+A sample drawn from repositories with a similar events-to-actor proportion will be less variable than a sample drawn from the entire Github population.
+
+A sample drawn from an event type occurring most frequently for repositories in a given events-to-actor proportions will result in a larger proportion of repositories in the sample with that events-to-actor proportion. Therefore if one is interested in researching higher participation repositories active in the past month, one could take a random sample of events corresponding to the type occuring most frequently in high participation repositories.
+
+Samples based on event type will be more variable than samples based on events-to-actor proportion but still less variable than samples taken from the entire event population.
+
+<h2>Null Hypothesis</h2>
+
+Grouping repositories by participation does not significantly reduce variability.
+
+Event types and participation are unrelated such that samples drawn based on event type will show similar variability to samples drawn from the entire event population.
+
+<h2>Methodology</h2>
+
+This research analyzed 6 months of public GitHub activity published in the GitHub Archive, from June 2016 to December 2016. For data set creation, see the accompanying file, "events_analysis_data.Rmd".
+
+
+```{r}
+library(dplyr)
+library(ggplot2)
+library(reshape2)
+```
+
+<h2>Measuring Participation</h2>
+
+In the previous section, I identified types of events that occurred more frequently than others. However the total number of actors as well as the actors to project ratio suggest these events may be associated with projects that have a small number of contributors. In this section, I'll explore measuring project participation and grouping projects by this participation rating.
+
+The projects represented by the GitHub event data vary significantly. Some have only 1 or 2 contributors while others have several hundred. A normalized metric is required to effectively compare these repositories. The average percent of events per actor can provide a way to group projects by a comparable participation level.
+
+percent of events per actor = events per actor / total number of events
+where events per actor = total number of events/total number of unique actors
+
+For example, for a total of 100 events:
+1 unique actor = (100/1)/100 = 1 or 100% of events per actor
+2 unique actors = (100/2)/100 = .5 or 50% of events per actor
+5 unique actors = (100/5)/100 = .2 or 20% of events per actor
+100 unique actors = (100/100)/100 = .01 1% of events per actor
+Lower value = higher participation level
+
+I rounded to one decimal place to make the Participation Rate discrete rather than continous. Because of this rounding, repositories that fell into the rating of 0 and 1 had a significantly higher frequency than repositories that fell in to .1 through .5. To adjust for this, I defined 3 levels of Participation: High (0), Medium (.1-.5), and Low (1).
+
+Future iterations of this research may require me to divide the Medium partipation level even further if a lot of variation is observed further down the analysis pipeline. For the purposes of this research, however, a single Medium category should be sufficient.
+
+<h3>How do projects in each participation level compare to each other?</h3>
+
+The following charts look at the number of actors, events, events to actors ratio and the number of projects for each distribution level. These were grouped due to the large number of events with different values. Additionally the groupings make it easier to compare between participation levels. 
+
+The distributions are consistently right skewed. This suggests possible outlier activity, that the participation levels should be further subdivided, or that the groups are too aggressive to be useful.
+
+In some cases, grouping by frequency produced very few results and in other cases it produced a lot. Further analysis could look at these segements but given the scale of this initial exploration just the larger trend is sufficient.
+
+The distribution of actors and events across the three participation levels is consistent with the expectation of the participation level. As we look at each participation level, the bulk of the number of projects that have higher numbers of actors and numbers of events moves to the next tier to the right. Based on these visualizations, for the purposes of this research, the Low, Middle, and High participation levels do represent a consistent pattern across the event population.
+
+The bottom plot shows a comparison of events for each participation level. I thought that was interesting because the low participation projects with just one event per project really skew the overall event distribution. The previous sections that explored event type distribution indicated the most frequent events are Push and Create events, and when we look at the number of actors per number of projects generating these events, the ratio is pretty small. That suggests the high number of Push and Create events represent single actors working with a single project. I will do further analysis in the following sections to compare event types with the participation levels to prove this out.
+
+
+<h4>Low Participation</h4>
+
+All projects in this tier only had one actor, therefore the events-to-actor ratio is exactly the same as the events frequency.
+
+```{r}
+# TODO move this to the data notebook
+
+low_participation_num_actors_freq <- readRDS("low_participation_num_actors_freq.rds")
+low_participation_num_actors_freq <- low_participation_num_actors_freq %>%
+  mutate(group = actors_group, freq = actor_freq, dataset = "actors") %>%
+  select(group, freq, dataset)
+
+low_participation_num_events_freq <- readRDS("low_participation_num_events_freq.rds")
+low_participation_num_events_freq <- low_participation_num_events_freq %>%
+  mutate(group = events_group, freq = events_freq, dataset = "events") %>%
+  select(group, freq, dataset)
+
+low_participation_events_to_actor_freq <- readRDS("low_participation_events_to_actor_freq.rds")
+low_participation_events_to_actor_freq <- low_participation_events_to_actor_freq %>%
+  mutate(group = events_to_actor_group, freq = events_to_actor_freq, dataset = "events_to_actor") %>%
+  select(group, freq, dataset)
+
+low_participation_summary <- bind_rows(
+  low_participation_num_actors_freq, 
+  low_participation_num_events_freq, 
+  low_participation_events_to_actor_freq)
+
+low_participation_summary_long <- melt(low_participation_summary)
+
+ggplot(data = low_participation_summary_long, aes(x=group, y=value, fill=dataset))+
+  geom_bar(stat="identity", position="dodge") +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1)) + 
+  xlab("Events Per Actor") +
+  ylab("Number of Projects") +
+  scale_y_continuous(labels=function(n){format(n, scientific = FALSE)})
+
+```
+
+<h4>Medium Participation</h4>
+
+Medium Participation projects had around 2-28 actors.
+
+```{r}
+med_participation_num_actors_freq <- readRDS("med_participation_num_actors_freq.rds")
+med_participation_num_actors_freq <- med_participation_num_actors_freq %>%
+  mutate(group = actors_group, freq = actor_freq, dataset = "actors") %>%
+  select(group, freq, dataset)
+
+med_participation_num_events_freq <- readRDS("med_participation_num_events_freq.rds")
+med_participation_num_events_freq <- med_participation_num_events_freq %>%
+  mutate(group = events_group, freq = events_freq, dataset = "events") %>%
+  select(group, freq, dataset)
+
+med_participation_events_to_actor_freq <- readRDS("med_participation_events_to_actor_freq.rds")
+med_participation_events_to_actor_freq <- med_participation_events_to_actor_freq %>%
+  mutate(group = events_to_actor_group, freq = events_to_actor_freq, dataset = "events_to_actor") %>%
+  select(group, freq, dataset)
+
+med_participation_summary <- bind_rows(
+  med_participation_num_actors_freq, 
+  med_participation_num_events_freq, 
+  med_participation_events_to_actor_freq)
+
+med_participation_summary_long <- melt(med_participation_summary)
+
+ggplot(data = med_participation_summary_long, aes(x=group, y=value, fill=dataset))+
+  geom_bar(stat="identity", position="dodge") +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1)) + 
+  xlab("Events Per Actor") +
+  ylab("Number of Projects") +
+  scale_y_continuous(labels=function(n){format(n, scientific = FALSE)})
+
+```
+
+<h4>High Participation</h4>
+
+High Participation projects had over 30 actors.
+
+```{r}
+
+high_participation_num_actors_freq <- readRDS("high_participation_num_actors_freq.rds")
+high_participation_num_actors_freq <- high_participation_num_actors_freq %>%
+  mutate(group = actors_group, freq = actor_freq, dataset = "actors") %>%
+  select(group, freq, dataset)
+
+high_participation_num_events_freq <- readRDS("high_participation_num_events_freq.rds")
+high_participation_num_events_freq <- high_participation_num_events_freq %>%
+  mutate(group = events_group, freq = events_freq, dataset = "events") %>%
+  select(group, freq, dataset)
+
+high_participation_events_to_actor_freq <- readRDS("high_participation_events_to_actor_freq.rds")
+high_participation_events_to_actor_freq <- high_participation_events_to_actor_freq %>%
+  mutate(group = events_to_actor_group, freq = events_to_actor_freq, dataset = "events_to_actor") %>%
+  select(group, freq, dataset)
+
+high_participation_summary <- bind_rows(
+  high_participation_num_actors_freq, 
+  high_participation_num_events_freq, 
+  high_participation_events_to_actor_freq)
+
+high_participation_summary_long <- melt(high_participation_summary)
+
+ggplot(data = high_participation_summary_long, aes(x=group, y=value, fill=dataset))+
+  geom_bar(stat="identity", position="dodge") +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1)) + 
+  xlab("Events Per Actor") +
+  ylab("Number of Projects") +
+  scale_y_continuous(labels=function(n){format(n, scientific = FALSE)})
+
+```
+
+<h4>Event Distribution Comparison</h4>
+
+Looking at the raw data, just under 25% of GitHub events came from Low Participation (ie, 1 actor) projects that had only one event for the 6 month period studied. Medium Participation projects fall into the middle, suggesting further analysis that further divides the Medium level might be fruitful. We see the least variation in the number of events associated with High Participation projects.
+
+```{r}
+high_participation_num_events_freq <- high_participation_num_events_freq %>%
+  mutate(participation_level="1:High")
+med_participation_num_events_freq <- med_participation_num_events_freq %>%
+  mutate(participation_level="2:Medium")
+low_participation_num_events_freq <- low_participation_num_events_freq %>%
+  mutate(participation_level="3:Low")
+
+high_med_low_events_freq = bind_rows(high_participation_num_events_freq,
+                                     med_participation_num_events_freq,
+                                     low_participation_num_events_freq)
+
+high_med_low_events_freq_long <- melt(high_med_low_events_freq)
+
+ggplot(data = high_med_low_events_freq_long, aes(x=group, y=value, fill=participation_level))+
+  geom_bar(stat="identity", position="dodge") +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1)) + 
+  xlab("Events Per Actor") +
+  ylab("Number of Projects") +
+  scale_y_continuous(labels=function(n){format(n, scientific = FALSE)})
+ 
+```
+
+<h3>How do the number of actors, projects, and events compare in each participation level?</h3>
+
+We see a very skewed distribution with low participation projects making up the majority of the event activity and high participation projects making up the minority.
+
+<h4>Overall Events, Projects, and Actors</h4>
+
+```{r}
+
+participation_rate_summary <- readRDS("participation_rate_summary.rds")
+
+participation_rate_summary$participation_level <- factor(participation_rate_summary$participation_level, 
+  levels = unique(
+    participation_rate_summary$participation_level[order(participation_rate_summary$num_repos, decreasing=TRUE)]))
+
+participation_rate_summary_long <- melt(participation_rate_summary)
+
+ggplot(data = participation_rate_summary_long, aes(x=factor(participation_level), y=value, fill=variable)) +
+  geom_bar(stat="identity", position="dodge") +
+  xlab("Participation Rate") +
+  ylab("Frequency") +
+  scale_y_continuous(labels=function(n){format(n, scientific = FALSE)})
+
+```
+
+<h3>How much do the number of actors, projects, and events vary per over time in each participation grade?</h3>
+
+<h4>Repos per Month</h4>
+```{r}
+participation_rate_per_month_summary <- readRDS("participation_rate_per_month_summary.rds")
+
+participation_rate_per_month_summary$participation_level <- factor(participation_rate_per_month_summary$participation_level, 
+  levels = unique(participation_rate_per_month_summary$participation_level[
+    order(participation_rate_per_month_summary$num_repos, decreasing=TRUE)]))
+
+ggplot(data = participation_rate_per_month_summary, 
+       aes(x = factor(month, levels = month.abb), 
+           y = num_repos, 
+           fill=participation_level,
+           group=participation_level,
+           color=participation_level)) +
+  geom_line(stat="identity", position="identity") +
+  geom_point() +
+  ylab("Number of Repos") +
+  xlab("Month") +
+  scale_y_continuous(labels=function(n){format(n, scientific = FALSE)})
+```
+
+<h4>Actors per Month</h4>
+```{r}
+
+ggplot(data = participation_rate_per_month_summary, 
+       aes(x = factor(month, levels = month.abb), 
+           y = num_actors, 
+           fill=participation_level,
+           group=participation_level,
+           color=participation_level)) +
+  geom_line(stat="identity", position="identity") +
+  geom_point() +
+  ylab("Number of Actors") +
+  xlab("Month") +
+  scale_y_continuous(labels=function(n){format(n, scientific = FALSE)})
+```
+
+<h4>Events per Month</h4>
+```{r}
+
+ggplot(data = participation_rate_per_month_summary, 
+       aes(x = factor(month, levels = month.abb), 
+           y = num_events, 
+           fill=participation_level,
+           group=participation_level,
+           color=participation_level)) +
+  geom_line(stat="identity", position="identity") +
+  geom_point() +
+  ylab("Number of Events") +
+  xlab("Month") +
+  scale_y_continuous(labels=function(n){format(n, scientific = FALSE)})
+```
+
+<h4>Average Events per Actor per Month</h4>
+```{r}
+
+ggplot(data = participation_rate_per_month_summary, 
+       aes(x = factor(month, levels = month.abb), 
+           y = total_events_per_actor, 
+           fill=participation_level,
+           group=participation_level,
+           color=participation_level)) +
+  geom_line(stat="identity", position="identity") +
+  geom_point() +
+  ylab("Avg Events per Actor") +
+  xlab("Month") +
+  scale_y_continuous(labels=function(n){format(n, scientific = FALSE)})
+```
+
+<h3>How does the frequency of event types compare between participation rates?</h3>
+
+```{r}
+participation_rate_event_types <- readRDS("participation_rate_event_types.rds")
+
+participation_rate_event_types$type <- 
+  factor(participation_rate_event_types$type, 
+         levels = unique(participation_rate_event_types$type[
+           order(participation_rate_event_types$num_events, decreasing=TRUE)]))
+
+participation_rate_event_types$participation_level <- 
+  factor(participation_rate_event_types$participation_level, 
+  levels = unique(participation_rate_event_types$participation_level[
+    order(participation_rate_event_types$total_events_per_actor, decreasing=TRUE)]))
+
+ggplot(data = participation_rate_event_types, 
+       aes(x=type, 
+       y=num_events, 
+       fill=participation_level)) +
+  geom_bar(stat="identity", position="dodge") + 
+  ylab("Number of Events") +
+  xlab("Event Type") +
+  scale_y_continuous(labels=function(n){format(n, scientific = FALSE)}) +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1))
+
+```
+
+```{r}
+participation_rate_event_types_trimmed <- participation_rate_event_types %>% 
+  filter(type == "PushEvent" |
+           type == "CreateEvent" |
+           type == "IssueCommentEvent" |
+           type == "WatchEvent" |
+           type == "PullRequestEvent" |
+           type == "IssuesEvent" |
+           type == "ForkEvent")
+
+ggplot(data = participation_rate_event_types_trimmed, 
+       aes(x=type, 
+       y=num_events, 
+       fill=participation_level)) +
+  geom_bar(stat="identity", position="dodge") + 
+  ylab("Number of Events") +
+  xlab("Event Type") +
+  scale_y_continuous(labels=function(n){format(n, scientific = FALSE)}) +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1))
+
+```
+
+```{r}
+
+ggplot(data = participation_rate_event_types, 
+       aes(x=type, 
+       y=num_actors, 
+       fill=participation_level)) +
+  geom_bar(stat="identity", position="dodge") + 
+  ylab("Number of Actors") +
+  xlab("Event Type") +
+  scale_y_continuous(labels=function(n){format(n, scientific = FALSE)}) +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1))
+
+```
+
+```{r}
+
+ggplot(data = participation_rate_event_types_trimmed, 
+       aes(x=type, 
+       y=num_actors, 
+       fill=participation_level)) +
+  geom_bar(stat="identity", position="dodge") + 
+  ylab("Number of Actors") +
+  xlab("Event Type") +
+  scale_y_continuous(labels=function(n){format(n, scientific = FALSE)}) +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1))
+
+```
+
+TODO: This aggregation is weird and needs to be re-evaluated.
+
+```{r}
+
+ggplot(data = participation_rate_event_types, 
+       aes(x=type, 
+       y=total_events_per_actor, 
+       fill=participation_level)) +
+  geom_bar(stat="identity", position="dodge") + 
+  ylab("Events per Actor") +
+  xlab("Event Type") +
+  scale_y_continuous(labels=function(n){format(n, scientific = FALSE)}) +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1))
+
+```
+
+```{r}
+
+ggplot(data = participation_rate_event_types_trimmed, 
+       aes(x=type, 
+       y=total_events_per_actor, 
+       fill=participation_level)) +
+  geom_bar(stat="identity", position="dodge") + 
+  ylab("Events per Actor") +
+  xlab("Event Type") +
+  scale_y_continuous(labels=function(n){format(n, scientific = FALSE)}) +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1))
+
+```
+
+
+<h2>Sampling Experiments</h2>
+
+Given the above information, we should analyze the distributions of samples for the entire population and each strata. For sampling methodology, see the events_analysis_data.Rmd workbook in this repository.
+
+<h3>Participation Levels</h3>
+
+Compare these to the total population for the given participation level. Proportions instead of total counts of events and actors are used to compare the shape of the distribution in the population to the shape of the distribution in the sample. The x-axis indicates what percent is represented by each variable, with a maximum value of 1 (or 100%).
+
+<h4>Experiment 1: Distribution of 5 random samples for 100 high participation projects per above</h4>
+
+```{r}
+high_samples <- readRDS("high_samples.rds")
+
+# this should equal 500
+verify_high_sample <- high_samples %>%
+  group_by(dataset, repo_name) %>%
+  summarise(n())
+
+paste(nrow(verify_high_sample) == 500)
+```
+
+<h5>Event Type Frequency</h5>
+
+The distribution of events per event type per sample dataset.
+```{r}
+# TODO fix sorting
+
+high_sample_event_types <- high_samples %>%
+  group_by(dataset, type) %>%
+  summarise(
+    sum_events = sum(num_events),
+    events_prop = round(sum_events/min(total_events),2)) %>%
+  select(type, events_prop, dataset)
+
+high_samples$type <- factor(high_samples$type, 
+                           levels = unique(high_samples$type[order(high_samples$num_events, decreasing=TRUE)]))
+
+ggplot(data = high_samples, 
+       aes(x = dataset, 
+           y = num_events, 
+           fill=type)) +
+  geom_bar(stat="identity", position="stack") +
+  ylab("Number of Events") +
+  xlab("Dataset") +
+  scale_y_continuous(labels=function(n){format(n, scientific = FALSE)})
+
+```
+
+<h5>Event Type Actors Frequency</h5>
+The number of unique actors that generated events within each event type, per sample.
+```{r}
+high_samples_actors_by_type <- high_samples %>% group_by(dataset, type) %>% summarise(actors=sum(num_actors)) %>% arrange(dataset, -actors)
+
+high_samples_actors_by_type$type <- factor(high_samples_actors_by_type$type,
+                           levels = unique(high_samples_actors_by_type$type[
+                             order(high_samples_actors_by_type$actors, decreasing=TRUE)]))
+
+ggplot(data = high_samples_actors_by_type, 
+       aes(x = dataset, 
+           y = actors, 
+           fill=type)) +
+  geom_bar(stat="identity", position="stack") +
+  ylab("Number of Actors") +
+  xlab("Dataset") +
+  scale_y_continuous(labels=function(n){format(n, scientific = FALSE)})
+```
+
+<h5>Actors Per Repo</h5>
+The number of repos sharing the same number of unique actors. The entire bar represents the total number of repos in the sample. Due to the high variability of numbers of actors, I rounded these to the nearest 100. 0 represents repos with 21-50 unique actors.
+
+```{r}
+high_sample_by_repo <- high_samples %>% 
+  group_by(dataset, repo_name) %>%
+  summarise(num_repo_actors = max(num_repo_actors)) %>%
+  mutate(num_repo_actors_rnd = round(num_repo_actors, -2)) 
+  
+high_sample_actors <- high_sample_by_repo %>%
+  group_by(dataset, num_repo_actors_rnd) %>%
+  summarise(repo_count = n()) %>%
+  select(dataset, num_repo_actors_rnd, repo_count)
+
+high_sample_actors <- high_sample_actors[order(high_sample_actors$repo_count, decreasing=TRUE),]
+
+ggplot(data = high_sample_actors, 
+       aes(x = dataset, 
+           y = repo_count, 
+           fill=factor(num_repo_actors_rnd))) +
+  geom_bar(stat="identity", position="stack") +
+  ylab("Number of Repos with x Actors") +
+  xlab("Dataset") +
+  scale_y_continuous(labels=function(n){format(n, scientific = FALSE)})
+```
+
+
+```{r}
+
+ggplot(data = events_repo_samples, 
+       aes(y=repo_events_per_actor/num_repo_events, x=num_repo_actors, group=1)) +
+  geom_point(stat="identity") +
+  ylab("Events to Actor") +
+  xlab("Actors in Repo") +
+  scale_x_continuous(trans = "log", labels = NULL) +
+  scale_y_continuous(trans = "log", labels = NULL)
+
+```
+
+
+<h4>Experiment 3: Distribution of 5 random samples for 100 medium participation projects per above</h4>
+
+```{r}
+med_samples <- readRDS("med_samples.rds")
+
+# this should equal 500
+verify_med_sample <- med_samples %>%
+  group_by(dataset, repo_name) %>%
+  summarise(n())
+
+paste(nrow(verify_med_sample) == 500)
+```
+
+<h5>Event Type Frequency</h5>
+
+The distribution of events per event type per sample dataset.
+
+```{r}
+med_sample_event_types <- med_samples %>%
+  group_by(dataset, type) %>%
+  summarise(
+    sum_events = sum(num_events),
+    events_prop = round(sum_events/min(total_events),2)) %>%
+  select(type, events_prop, dataset)
+
+med_samples$type <- factor(med_samples$type, 
+                           levels = unique(med_samples$type[order(med_samples$num_events, decreasing=TRUE)]))
+
+ggplot(data = med_samples, 
+       aes(x = dataset, 
+           y = num_events, 
+           fill=type)) +
+  geom_bar(stat="identity", position="stack") +
+  ylab("Number of Events") +
+  xlab("Dataset") +
+  scale_y_continuous(labels=function(n){format(n, scientific = FALSE)})
+
+```
+
+<h5>Event Type Actors Frequency</h5>
+The number of unique actors that generated events within each event type, per sample.
+
+```{r}
+med_samples_actors_by_type <- med_samples %>% group_by(dataset, type) %>% summarise(actors=sum(num_actors)) %>% arrange(dataset, -actors)
+
+med_samples_actors_by_type$type <- factor(med_samples_actors_by_type$type,
+                           levels = unique(med_samples_actors_by_type$type[order(med_samples_actors_by_type$actors, decreasing=TRUE)]))
+
+ggplot(data = med_samples_actors_by_type, 
+       aes(x = dataset, 
+           y = actors, 
+           fill=type)) +
+  geom_bar(stat="identity", position="stack") +
+  ylab("Number of Actors") +
+  xlab("Dataset") +
+  scale_y_continuous(labels=function(n){format(n, scientific = FALSE)})
+```
+
+<h5>Actors Per Repo</h5>
+The total number of unique actors in each repos with the entire bar representing the total number of unique actors in the sample.
+
+```{r}
+med_sample_by_repo <- med_samples %>% 
+  group_by(dataset, repo_name) %>%
+  summarise(num_repo_actors = max(num_repo_actors))
+
+med_sample_actors <- med_sample_by_repo %>%
+  group_by(dataset, num_repo_actors) %>%
+  summarise(repo_count = n()) %>%
+  select(dataset, num_repo_actors, repo_count)
+
+med_sample_actors <- med_sample_actors[order(med_sample_actors$repo_count),]
+
+ggplot(data = med_sample_actors, 
+       aes(x = dataset, 
+           y = repo_count, 
+           fill=factor(num_repo_actors))) +
+  geom_bar(stat="sum", position="stack") +
+  ylab("Number of Repos with x Actors") +
+  xlab("Dataset") +
+  scale_y_continuous(labels=function(n){format(n, scientific = FALSE)})
+```
+
+<h4>Experiment 4: Distribution of 5 random samples for 100 low participation projects per above</h4>
+
+```{r}
+low_samples <- readRDS("low_samples.rds")
+
+# this should equal 500
+verify_low_sample <- low_samples %>%
+  group_by(dataset, repo_name) %>%
+  summarise(n())
+
+paste(nrow(verify_low_sample) == 500)
+```
+<h5>Event Type Frequency</h5>
+
+The distribution of events per event type per sample dataset.
+
+
+```{r}
+low_sample_event_types <- low_samples %>%
+  group_by(dataset, type) %>%
+  summarise(
+    sum_events = sum(num_events),
+    events_prop = round(sum_events/min(total_events),2)) %>%
+  select(type, events_prop, dataset)
+
+low_samples$type <- factor(low_samples$type, 
+                           levels = unique(low_samples$type[order(low_samples$num_events, decreasing=TRUE)]))
+
+ggplot(data = low_samples, 
+       aes(x = dataset, 
+           y = num_events, 
+           fill=type)) +
+  geom_bar(stat="identity", position="stack") +
+  ylab("Number of Events") +
+  xlab("Dataset") +
+  scale_y_continuous(labels=function(n){format(n, scientific = FALSE)})
+
+```
+
+<h5>Event Type Actors Frequency</h5>
+The number of unique actors that generated events within each event type, per sample.
+
+```{r}
+low_samples_actors_by_type <- low_samples %>% group_by(dataset, type) %>% summarise(actors=sum(num_actors)) %>% arrange(dataset, -actors)
+
+low_samples_actors_by_type$type <- factor(low_samples_actors_by_type$type, 
+                           levels = unique(low_samples_actors_by_type$type[order(low_samples_actors_by_type$actors, decreasing=TRUE)]))
+
+ggplot(data = low_samples_actors_by_type, 
+       aes(x = dataset, 
+           y = actors, 
+           fill=type)) +
+  geom_bar(stat="identity", position="stack") +
+  ylab("Number of Actors") +
+  xlab("Dataset") +
+  scale_y_continuous(labels=function(n){format(n, scientific = FALSE)})
+
+```
+
+
+Specific Event Types
+
+In this experiment, samples are pulled from 3 different event types that had the highest association with one participation level. The participation level distribution will be evaluated to see if by sampling events of a certain type we can guarantee a majority of repositories at the desired participation level. If this turns out to be the case, it means we do not have to calculate the participation levels of repositories and could potentially just pull samples directly from events in the archive.
+
+
+Experiment 5: Distribution of 10 random samples for 100 Watch Events (High Participation)
+
+```{r}
+watch_events_repo_samples <- readRDS("watch_events_repo_samples.rds")
+
+watch_events_repo_summary <- watch_events_repo_samples %>%
+  group_by(dataset, repo_name) %>%
+  summarise(participation_rate = max(participation_rate))
+
+watch_events_participation_freq <- watch_events_repo_summary %>%
+  group_by(dataset, participation_rate) %>%
+  summarise(repos=n())
+
+ggplot(data = watch_events_participation_freq, 
+       aes(x = dataset, 
+           y = repos, 
+           fill=factor(participation_rate))) +
+  geom_bar(stat="identity", position="stack") +
+  ylab("Number of Repos") +
+  xlab("Dataset") +
+  scale_y_continuous(labels=function(n){format(n, scientific = FALSE)})
+
+```
+
+Experiment 6: Distribution of 5 random samples for 100 Pull Request Events (Medium Participation)
+
+
+```{r}
+pr_events_repo_samples <- readRDS("pr_events_repo_samples.rds")
+
+pr_events_repo_summary <- pr_events_repo_samples %>%
+  group_by(dataset, repo_name) %>%
+  summarise(participation_rate = max(participation_rate))
+
+pr_events_participation_freq <- pr_events_repo_summary %>%
+  group_by(dataset, participation_rate) %>%
+  summarise(repos=n())
+
+ggplot(data = pr_events_participation_freq, 
+       aes(x = dataset, 
+           y = repos, 
+           fill=factor(participation_rate))) +
+  geom_bar(stat="identity", position="stack") +
+  ylab("Number of Repos") +
+  xlab("Dataset") +
+  scale_y_continuous(labels=function(n){format(n, scientific = FALSE)})
+
+```
+
+
+Experiment 7: Distribution of 5 random samples for 100 Create Events (Low Participation)
+
+```{r}
+create_events_repo_samples <- readRDS("create_events_repo_samples.rds")
+
+create_events_repo_summary <- create_events_repo_samples %>%
+  group_by(dataset, repo_name) %>%
+  summarise(participation_rate = max(participation_rate))
+
+create_events_participation_freq <- create_events_repo_summary %>%
+  group_by(dataset, participation_rate) %>%
+  summarise(repos=n())
+
+ggplot(data = create_events_participation_freq, 
+       aes(x = dataset, 
+           y = repos, 
+           fill=factor(participation_rate))) +
+  geom_bar(stat="identity", position="stack") +
+  ylab("Number of Repos") +
+  xlab("Dataset") +
+  scale_y_continuous(labels=function(n){format(n, scientific = FALSE)})
+
+```
+
+
+Experiment 8: Distribution of 5 random samples for 100 Push Events (Low Participation)
+
+```{r}
+prrevcomment_events_repo_samples <- readRDS("prrevcomment_events_repo_samples.rds")
+
+prrevcomment_events_repo_summary <- prrevcomment_events_repo_samples %>%
+  group_by(dataset, repo_name) %>%
+  summarise(participation_rate = max(participation_rate))
+
+prrevcomment_events_participation_freq <- prrevcomment_events_repo_summary %>%
+  group_by(dataset, participation_rate) %>%
+  summarise(repos=n())
+
+ggplot(data = prrevcomment_events_participation_freq, 
+       aes(x = dataset, 
+           y = repos, 
+           fill=factor(participation_rate))) +
+  geom_bar(stat="identity", position="stack") +
+  ylab("Number of Repos") +
+  xlab("Dataset") +
+  scale_y_continuous(labels=function(n){format(n, scientific = FALSE)})
+
+```
+
+Experiment 9: Distribution of 5 random samples for 100 Pull Request Review Comment Events (Medium Participation)
+
+```{r}
+prrevcomment_events_repo_samples <- readRDS("prrevcomment_events_repo_samples.rds")
+
+prrevcomment_events_repo_summary <- prrevcomment_events_repo_samples %>%
+  group_by(dataset, repo_name) %>%
+  summarise(participation_rate = max(participation_rate))
+
+prrevcomment_events_participation_freq <- prrevcomment_events_repo_summary %>%
+  group_by(dataset, participation_rate) %>%
+  summarise(repos=n())
+
+ggplot(data = prrevcomment_events_participation_freq, 
+       aes(x = dataset, 
+           y = repos, 
+           fill=factor(participation_rate))) +
+  geom_bar(stat="identity", position="stack") +
+  ylab("Number of Repos") +
+  xlab("Dataset") +
+  scale_y_continuous(labels=function(n){format(n, scientific = FALSE)})
+
+```
+
+Experiment 10: Distribution of 5 random samples for 100 Issue Comment Events (Medium Participation)
+#TODO
+
+
+<h3>Specific Event Types</h3>
+
+In this series of experiments, 10 random samples of 100 events filtered by type are taken from the GitHub archive data from June 2016 through December 2016. The goal is to determine if any particular event type shows less variation in the repository characteristics calculated based on event activity.
+
+<h4>Strongest Correlation to Actor Frequency</h4>
+
+The first set of event types examined are those that showed a strong correlation between event type frequency per repository and the number of actors per repository.
+
+<h3>Push Events</h3>
+
+```{r}
+push_event_samples <- readRDS("push_events_repo_samples.rds")
+```
+
+
+```{r}
+push_event_samples_summary <- push_event_samples %>%
+  group_by(dataset) %>%
+  summarize(total_events = sum(num_events))
+
+push_event_samples_type_summary <- push_event_samples %>%
+  group_by(dataset, type) %>%
+  summarize(num_events = sum(num_events))
+
+push_event_samples_type_summary$total_events <- 
+  push_event_samples_summary$total_events[match(push_event_samples_type_summary$dataset, push_event_samples_summary$dataset)]
+
+push_event_samples_type_summary$type <- factor(push_event_samples_type_summary$type, 
+   levels = unique(push_event_samples_type_summary$type[order(push_event_samples_type_summary$num_events, decreasing=TRUE)]))
+
+push_event_samples_type_summary$dataset <- factor(push_event_samples_type_summary$dataset, 
+   levels = unique(push_event_samples_type_summary$dataset[order(push_event_samples_type_summary$total_events)]))
+```
+
+```{r}
+ggplot(data = push_event_samples_type_summary, 
+       aes(x = dataset, 
+           y = num_events, 
+           fill=type)) +
+  geom_bar(stat="identity", position="stack") +
+  ylab("Number of Events") +
+  xlab("Dataset") +
+  scale_y_continuous(labels=function(n){format(n, scientific = FALSE)}) +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1))
+```
+
+```{r}
+push_event_samples_type_summary_lower <- push_event_samples_type_summary %>% filter(
+  type != "PushEvent" & 
+  type != "CreateEvent" & 
+  type != "DeleteEvent" & 
+  type != "PullRequestEvent"
+)
+
+ggplot(data = push_event_samples_type_summary_lower, 
+       aes(x = dataset, 
+           y = num_events, 
+           fill=type)) +
+  geom_bar(stat="identity", position="stack") +
+  ylab("Number of Events") +
+  xlab("Dataset") +
+  scale_y_continuous(labels=function(n){format(n, scientific = FALSE)}) +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1))
+```
+
+
+<h3>Specific Event Types</h3>
+
+In this series of experiments, 10 random samples of 100 events filtered by type are taken from the GitHub archive data from June 2016 through December 2016. The goal is to determine if any particular event type shows less variation in the repository characteristics calculated based on event activity.
+
+<h4>Strongest Correlation to Actor Frequency</h4>
+
+The first set of event types examined are those that showed a strong correlation between event type frequency per repository and the number of actors per repository.
+
+<h3>Push Events</h3>
+
+```{r}
+push_event_samples <- readRDS("push_events_repo_samples.rds")
+```
+
+
+```{r}
+push_event_samples_summary <- push_event_samples %>%
+  group_by(dataset) %>%
+  summarize(total_events = sum(num_events))
+
+push_event_samples_type_summary <- push_event_samples %>%
+  group_by(dataset, type) %>%
+  summarize(num_events = sum(num_events))
+
+push_event_samples_type_summary$total_events <- 
+  push_event_samples_summary$total_events[match(push_event_samples_type_summary$dataset, push_event_samples_summary$dataset)]
+
+push_event_samples_type_summary$type <- factor(push_event_samples_type_summary$type, 
+   levels = unique(push_event_samples_type_summary$type[order(push_event_samples_type_summary$num_events, decreasing=TRUE)]))
+
+push_event_samples_type_summary$dataset <- factor(push_event_samples_type_summary$dataset, 
+   levels = unique(push_event_samples_type_summary$dataset[order(push_event_samples_type_summary$total_events)]))
+```
+
+```{r}
+ggplot(data = push_event_samples_type_summary, 
+       aes(x = dataset, 
+           y = num_events, 
+           fill=type)) +
+  geom_bar(stat="identity", position="stack") +
+  ylab("Number of Events") +
+  xlab("Dataset") +
+  scale_y_continuous(labels=function(n){format(n, scientific = FALSE)}) +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1))
+```
+
+```{r}
+push_event_samples_type_summary_lower <- push_event_samples_type_summary %>% filter(
+  type != "PushEvent" & 
+  type != "CreateEvent" & 
+  type != "DeleteEvent" & 
+  type != "PullRequestEvent"
+)
+
+ggplot(data = push_event_samples_type_summary_lower, 
+       aes(x = dataset, 
+           y = num_events, 
+           fill=type)) +
+  geom_bar(stat="identity", position="stack") +
+  ylab("Number of Events") +
+  xlab("Dataset") +
+  scale_y_continuous(labels=function(n){format(n, scientific = FALSE)}) +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1))
+```
+
+```{r}
+push_event_samples_type_summary_lower2 <- push_event_samples_type_summary_lower %>% filter(
+  type != "IssueCommentEvent" & 
+  type != "PullRequestReviewCommentEvent" &
+  type != "WatchEvent" &
+  type != "IssuesEvent" &
+  type != "ForkEvent"
+)
+
+ggplot(data = push_event_samples_type_summary_lower2, 
+       aes(x = dataset, 
+           y = num_events, 
+           fill=type)) +
+  geom_bar(stat="identity", position="stack") +
+  ylab("Number of Events") +
+  xlab("Dataset") +
+  scale_y_continuous(labels=function(n){format(n, scientific = FALSE)}) +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1))
+```
+
+
+```{r}
+ggplot(data = push_event_samples, aes(x=dataset, y=num_repo_actors)) +
+  geom_point(stat="identity") +
+  ylab("Actors per Repo") +
+  xlab("Dataset") +
+  scale_y_continuous(labels=function(n){format(n, scientific = FALSE)}) +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1))
+```
+
+```{r}
+ggplot(data = push_event_samples, aes(x=dataset, y=num_repo_actors)) +
+  geom_point(stat="identity") +
+  ylab("Actors per Repo") +
+  xlab("Dataset") +
+  scale_y_continuous(labels=function(n){format(n, scientific = FALSE)}) +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
+  ylim(0, 50)
+```
+
+
+```{r}
+ggplot(data = push_event_samples, aes(x=dataset, y=repo_events_per_actor)) +
+  geom_point(stat="identity") +
+  theme(legend.position="none") +
+  ylab("Events per Actor") +
+  xlab("Dataset") +
+  scale_y_continuous(labels=function(n){format(n, scientific = FALSE)}) +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1))
+```
+
+
+```{r}
+ggplot(data = push_event_samples, aes(x=dataset, y=repo_events_per_actor)) +
+  geom_point(stat="identity") +
+  theme(legend.position="none") +
+  ylab("Events per Actor") +
+  xlab("Dataset") +
+  scale_y_continuous(labels=function(n){format(n, scientific = FALSE)}, limits = c(0,100000)) +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1))
+```
+
+```{r}
+push_event_samples <- push_event_samples %>%
+  mutate(events_to_actor_perc = repo_events_per_actor/total_events)
+
+push_event_samples_events_to_actor_summary <- push_event_samples %>%
+  group_by(dataset, events_to_actor_perc) %>%
+  summarise(num_repos = n())
+
+ggplot(data = push_event_samples_events_to_actor_summary, 
+       aes(x = dataset, 
+           y = num_repos,
+           fill = events_to_actor_perc)) +
+  geom_bar(stat = "identity", position="stack") +
+  ylab("Number of Repos") +
+  xlab("Dataset") +
+  scale_y_continuous(labels=function(n){format(n, scientific = FALSE)}) +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1))
+```
+
+
+<h2>Conclusions</h2>
+
+Given the incomplete state of the analysis, only preliminary conclusions can be made at this time.
+
+<ol>
+<li> At the macro scale, the proportions of different event types are consistent from month to month.</li>
+<li> Samples from High and Medium participation projects did not significantly deviate from the overall population.</li>
+<li> Based on the sample, the majority of Medium participation projects generated less than 20 events.</li>
+<li> Based on the sample, the majority of High participation projects generated between 30 and 60 events.</li>
+</ol>
+
+<h3>Participation Rate Calculation Shortcomings</h3>
+
+One possible issue worth considering is how the participation rate is calculated. Counting all events equally might misrepresent the participation rate, resulting in repos that are actually low participation ending up with a medium or participation rate.
+
+To determine how accurate the Participation Rate Calculation is for predicting the nature of a repository, further analysis is needed on the samples by getting additional GitHub data. This will be explored in the next report.
