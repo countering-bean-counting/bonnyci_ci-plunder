@@ -120,12 +120,12 @@ low_participation_num_actors_freq_sql <-
 
 low_participation_num_actors_freq <- query_exec(low_participation_num_actors_freq_sql, project = project)
 
-low_participation_num_actors_freq_grouped <- low_participation_num_actors_freq %>%
-mutate(actors_group = ifelse(num_actors <= 10, 'Tier 0: < 10', actors_group)) %>% 
-  group_by(actors_group) %>%
-  summarise(actor_freq = sum(actor_freq))
+# low_participation_num_actors_freq_grouped <- low_participation_num_actors_freq %>%
+# mutate(actors_group = ifelse(num_actors <= 10, 'Tier 0: < 10', actors_group)) %>% 
+#   group_by(actors_group) %>%
+#   summarise(actor_freq = sum(actor_freq))
 
-saveRDS(low_participation_num_actors_freq_grouped, "low_participation_num_actors_freq.rds")
+saveRDS(low_participation_num_actors_freq, "low_participation_num_actors_freq.rds")
 
 ```
 

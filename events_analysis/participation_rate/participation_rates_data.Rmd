@@ -1,0 +1,763 @@
+---
+title: "Data Supporting Participation Rates of GitHub Projects"
+output: html_notebook
+---
+
+# Initial Setup
+```{r}
+library(dplyr)
+library(bigrquery)
+
+project <- "bonnyci-github-archive"
+```
+
+# Measuring Participation
+
+The full participation rates broken down by repo are available in the same data under ci_plunder_events.participation_rate. The data set is huge, hence the summary.
+
+https://bigquery.cloud.google.com:443/savedquery/787787545662:6ad718ecc0a94650b605f2baa0ddd58d
+
+```
+SELECT repo_name, num_events, num_actors,
+ ROUND(num_events/num_actors, 5) as events_per_actor,
+ ROUND((num_events/num_actors)/num_events, 1) as participation_rate
+FROM (
+  SELECT repo_name,
+   count(*) as num_events, 
+   EXACT_COUNT_DISTINCT(actor_login) as num_actors,
+  FROM [ci_plunder_events.githubarchive_2016_06]
+  GROUP BY repo_name
+)
+```
+
+## What is the proportion of different participation levels in the repository population?
+
+This is a test to see how much variation exists in each category for the number of actors involved in each repository at each participation level.
+
+Summarized for this graph: https://bigquery.cloud.google.com:443/savedquery/787787545662:f1d9cbf5955240af8baf4dc206e508e6
+
+```
+SELECT participation_rate, COUNT(repo_name)
+FROM [bonnyci-github-archive:ci_plunder_events.total_participation_rate_per_repo]
+GROUP BY participation_rate
+```
+
+```{r}
+
+participation_rate_sql <- 'select * from [bonnyci-github-archive:ci_plunder_events.participation_rate_summary]'
+
+participation_rate_summary <- query_exec(participation_rate_sql, project = project)
+
+participation_rate_summary <-
+    mutate(participation_rate_summary, 
+           participation_level = ifelse(participation_rate < 1 & participation_rate > 0, 'Medium', ''))
+
+participation_rate_summary <- 
+  mutate(participation_rate_summary, participation_level = ifelse(participation_rate == 0, 'High', participation_level))
+
+participation_rate_summary <-  
+  mutate(participation_rate_summary, participation_level = ifelse(participation_rate == 1, 'Low', participation_level))
+
+participation_rate_summary <- participation_rate_summary %>%
+  group_by(participation_level) %>%
+  summarise(num_actors=sum(num_actors), num_events=sum(num_events), num_repos=sum(num_repos))
+
+saveRDS(participation_rate_summary, "participation_rate_summary.rds")
+
+```
+
+## What proportion of repositories contributed to event activity in each participation level?
+
+Check the distribution of the number of events per repo. Use the rounded result of a log function against number of events to create buckets.
+
+### Low Participation: Events Per Repo Frequency
+
+Calculated here:
+https://bigquery.cloud.google.com:443/savedquery/787787545662:8017f4ad2b77472ba85e258b806cea38
+
+```
+SELECT repo_name, num_events as event_freq,
+round(num_events/95136690, 9) as event_rel_freq
+FROM [bonnyci-github-archive:ci_plunder_events.participation_rate_per_repo]
+WHERE participation_rate == 1
+```
+
+Summarized here:
+https://bigquery.cloud.google.com:443/savedquery/787787545662:827535f1ace140e3a87d271da861e263
+
+```
+SELECT  event_rel_freq, event_freq, count(repo_name) as num_repos
+FROM [bonnyci-github-archive:ci_plunder_events.low_participation_event_freq_repo]
+GROUP BY event_rel_freq, event_freq
+```
+
+
+```{r}
+
+low_participation_num_events_freq_sql <-
+  'select * from [bonnyci-github-archive:ci_plunder_events.low_participation_events_freq]'
+
+low_participation_num_events_freq <- query_exec(low_participation_num_events_freq_sql, project = project)
+
+low_participation_num_events_freq <- low_participation_num_events_freq %>% 
+  mutate(event_freq_log = round(log(event_freq)))
+
+saveRDS(low_participation_num_events_freq, "low_participation_num_events_freq.rds")
+
+```
+
+### Medium Participation: Events Per Repo Frequency
+
+TODO: add links to sql queries
+
+```{r}
+
+med_participation_num_events_freq_sql <- 
+  'select * from [bonnyci-github-archive:ci_plunder_events.med_participation_events_freq]'
+
+med_participation_num_events_freq <- query_exec(med_participation_num_events_freq_sql, project = project)
+med_participation_num_events_freq <- med_participation_num_events_freq %>% 
+  mutate(event_freq_log = round(log(event_freq)))
+
+saveRDS(med_participation_num_events_freq, "med_participation_num_events_freq.rds")
+
+```
+
+### High Participation: Events Per Repo Frequency
+
+TODO: add links to sql queries
+
+```{r}
+
+high_participation_num_events_freq_sql <- 
+  'select * from [bonnyci-github-archive:ci_plunder_events.high_participation_events_freq]'
+
+high_participation_num_events_freq <- query_exec(high_participation_num_events_freq_sql, project = project)
+high_participation_num_events_freq <- high_participation_num_events_freq %>% 
+  mutate(event_freq_log = round(log(event_freq)))
+
+saveRDS(high_participation_num_events_freq, "high_participation_num_events_freq.rds")
+
+```
+
+### All Participation Levels: Events Per Repo Frequency
+
+```{r}
+high_participation_num_events_freq <- high_participation_num_events_freq %>% mutate(participation_level = "High")
+med_participation_num_events_freq <- med_participation_num_events_freq %>% mutate(participation_level = "Medium")
+low_participation_num_events_freq <- low_participation_num_events_freq %>% mutate(participation_level = "Low")
+
+participation_num_events_freq <- bind_rows(high_participation_num_events_freq, med_participation_num_events_freq, low_participation_num_events_freq)
+
+saveRDS(participation_num_events_freq, "participation_num_events_freq.rds")
+```
+
+
+## What was the distribution of actors in each participation level?
+
+### Medium Participation: Actors per Repo Frequency
+
+TODO: add sql
+
+```{r}
+med_participation_num_actors_freq_sql <-
+  'select * from [bonnyci-github-archive:ci_plunder_events.med_participation_actors_freq]'
+
+med_participation_num_actors_freq <- query_exec(med_participation_num_actors_freq_sql, project = project)
+med_participation_num_actors_freq <- med_participation_num_actors_freq %>%
+  mutate(actor_freq_log = round(log(actor_freq)))
+
+saveRDS(med_participation_num_actors_freq, "med_participation_num_actors_freq.rds")
+
+```
+
+### High Participation: Actors per Repo Frequency
+
+```{r}
+
+high_participation_num_actors_freq_sql <- 
+  'select * from [bonnyci-github-archive:ci_plunder_events.high_participation_actors_freq]'
+
+high_participation_num_actors_freq <- query_exec(high_participation_num_actors_freq_sql, project = project)
+high_participation_num_actors_freq <- high_participation_num_actors_freq %>% 
+  mutate(actor_freq_log = round(log(actor_freq)))
+
+saveRDS(high_participation_num_actors_freq, "high_participation_num_actors_freq.rds")
+
+```
+
+### All Participation Levels: Actors per Repo Frequency
+
+```{r}
+high_participation_num_actors_freq <- high_participation_num_actors_freq %>% mutate(participation_level = "High")
+med_participation_num_actors_freq <- med_participation_num_actors_freq %>% mutate(participation_level = "Medium")
+
+# all low participation repos had only 1 unique actor
+lp_summary <- participation_rate_summary %>% filter(participation_level == "Low")
+low_participation_num_actors_freq <- data.frame(participation_level = "Low", 
+                                                actor_rel_freq = 1,
+                                                actor_freq = 1,
+                                                num_repos = lp_summary$num_repos,
+                                                actor_freq_log = 0)
+
+participation_num_actors_freq <- bind_rows(high_participation_num_actors_freq, med_participation_num_actors_freq, low_participation_num_actors_freq)
+
+saveRDS(participation_num_actors_freq, "participation_num_actors_freq.rds")
+```
+
+## How does the frequency of event types compare between participation rates?
+
+TODO: add sql
+
+```{r}
+
+participation_rate_event_types_sql <-
+  'select * from [bonnyci-github-archive:ci_plunder_events.participation_rate_event_types_summary]'
+
+participation_rate_event_types <- query_exec(participation_rate_event_types_sql, project = project)
+
+participation_rate_event_types <-
+    mutate(participation_rate_event_types,
+           participation_level = ifelse(participation_rate < 1 & participation_rate > 0, 'Medium', ''))
+
+participation_rate_event_types <-
+  mutate(participation_rate_event_types, participation_level = ifelse(participation_rate == 0, 'High', participation_level))
+
+participation_rate_event_types <-
+  mutate(participation_rate_event_types, participation_level = ifelse(participation_rate == 1, 'Low', participation_level))
+
+# TODO: change original columns to "num_*" for consistency
+# TODO: add number of repos per type
+participation_rate_event_types <- participation_rate_event_types %>%
+  group_by(participation_level, type) %>%
+  summarise(num_actors=sum(total_actors_per_type),
+            num_events=sum(total_events_per_type))
+
+participation_rate_event_types <- participation_rate_event_types %>%
+  mutate(total_events_per_actor = num_events/num_actors)
+
+saveRDS(participation_rate_event_types, "participation_rate_event_types.rds")
+
+```
+
+# Sampling Experiments
+
+Each population was collected into a table in Google BigQuery and assigned a row number. Sets of random numbers were generated using R's random number function and those records were then downloaded via the Google BigQuery R api.
+
+```{r}
+
+# Better practice would be to have the saveRDS seperate from the functions, but this works for now
+
+get_events_sample <- function(event_type, event_type_abbr) {
+  for (i in 1:10){
+    events_sql <- paste(
+    'SELECT *, rand() as rand
+    FROM [bonnyci-github-archive:ci_plunder_events.githubarchive_2016_06]
+    WHERE type = "', event_type, '"
+    order by rand
+    limit 100', sep="")
+    events <- query_exec(events_sql, project = project)
+    saveRDS(events, paste(event_type_abbr, "_events_sample_", i, ".rds", sep=""))
+  }
+  return(TRUE)
+}
+
+get_events_repo_data <- function(event_type_abbr) {
+  events_samples <- data.frame()
+  events_repo_samples <- data.frame()
+
+  for (i in 1:10){
+    events_sample <- readRDS(paste(event_type_abbr, '_events_sample_', i, '.rds', sep=""))
+    events_sample <- events_sample %>%
+      mutate(dataset=paste("sample", i, sep=""))
+    events_samples <- bind_rows(events_sample, events_samples)
+  
+    # Get the actual data for each repo
+    sample_sql <-
+      paste("SELECT * FROM [bonnyci-github-archive:ci_plunder_events.repos_participation_rate_event_types_summary] WHERE repo_name IN('",
+            paste(as.character(events_sample$repo_name), collapse="','"),
+            "')", sep="")
+    sample <- query_exec(sample_sql, project = project)
+    sample <- sample %>%
+      mutate(dataset=paste("sample", i, sep=""))
+    events_repo_samples <- bind_rows(sample, events_repo_samples)
+  }
+  
+  saveRDS(events_samples, paste(event_type_abbr, "_events_samples.rds", sep=""))
+  saveRDS(events_repo_samples, paste(event_type_abbr, "_events_repo_samples.rds", sep=""))
+  return(events_repo_samples)
+}
+```
+
+
+## Push Events
+10 random samples of 100 Push events
+
+TODO: add SQL
+
+```{r}
+get_events_sample(event_type="PushEvent", event_type_abbr="push")
+push_events_repo_samples <- get_events_repo_data(event_type_abbr="push")
+```
+
+
+
+
+
+<h3>Sampling Specific Event Types</h3>
+<h4>Experiment 5: 10 random samples of 100 Watch Events</h3>
+```{r}
+for (i in 1:10){
+  watch_events_sql <-
+  'SELECT *, rand() as rand
+  FROM [bonnyci-github-archive:ci_plunder_events.githubarchive_2016_06]
+  WHERE type = "WatchEvent"
+  order by rand
+  limit 100'
+  watch_events <- query_exec(watch_events_sql, project = project)
+
+  saveRDS(watch_events, paste("watch_events_sample_", i, ".rds", sep=""))
+}
+
+```
+
+```{r}
+watch_events_samples <- data.frame()
+watch_events_repo_samples <- data.frame()
+
+for (i in 1:10){
+  watch_events_sample <- readRDS(paste('watch_events_sample_', i, '.rds', sep=""))
+  watch_events_sample <- watch_events_sample %>%
+    mutate(dataset=paste("sample", i, sep=""))
+  watch_events_samples <- bind_rows(watch_events_sample, watch_events_samples)
+
+  # Get the actual data for each repo
+  sample_sql <-
+    paste("SELECT * FROM [bonnyci-github-archive:ci_plunder_events.repos_participation_rate_event_types_summary] WHERE repo_name IN('",
+          paste(as.character(watch_events_sample$repo_name), collapse="','"),
+          "')", sep="")
+  sample <- query_exec(sample_sql, project = project)
+  sample <- sample %>%
+    mutate(dataset=paste("sample", i, sep=""))
+  watch_events_repo_samples <- bind_rows(sample, watch_events_repo_samples)
+}
+
+saveRDS(watch_events_samples, "watch_events_samples.rds")
+saveRDS(watch_events_repo_samples, "watch_events_repo_samples.rds")
+
+
+```
+
+
+
+<h4>Experiment 6: 5 random samples of 100 Pull Request Events</h3>
+```{r}
+event_type = "PullRequestEvent"
+event_type_abbr <- "pr"
+
+for (i in 1:10){
+  events_sql <- paste(
+  'SELECT *, rand() as rand
+  FROM [bonnyci-github-archive:ci_plunder_events.githubarchive_2016_06]
+  WHERE type = "', event_type, '"
+  order by rand
+  limit 100', sep="")
+  events <- query_exec(events_sql, project = project)
+
+  saveRDS(events, paste(event_type_abbr, "_events_sample_", i, ".rds", sep=""))
+}
+
+```
+
+```{r}
+events_samples <- data.frame()
+events_repo_samples <- data.frame()
+
+for (i in 1:10){
+  events_sample <- readRDS(paste(event_type_abbr, '_events_sample_', i, '.rds', sep=""))
+  events_sample <- events_sample %>%
+    mutate(dataset=paste("sample", i, sep=""))
+  events_samples <- bind_rows(events_sample, events_samples)
+
+  # Get the actual data for each repo
+  sample_sql <-
+    paste("SELECT * FROM [bonnyci-github-archive:ci_plunder_events.repos_participation_rate_event_types_summary] WHERE repo_name IN('",
+          paste(as.character(events_sample$repo_name), collapse="','"),
+          "')", sep="")
+  sample <- query_exec(sample_sql, project = project)
+  sample <- sample %>%
+    mutate(dataset=paste("sample", i, sep=""))
+  events_repo_samples <- bind_rows(sample, events_repo_samples)
+}
+
+saveRDS(events_samples, paste(event_type_abbr, "_events_samples.rds", sep=""))
+saveRDS(events_repo_samples, paste(event_type_abbr, "_events_repo_samples.rds", sep=""))
+
+```
+
+<h4>Experiment 7: 5 random samples of 100 Create Events</h3>
+```{r}
+event_type = "CreateEvent"
+event_type_abbr <- "create"
+
+for (i in 1:10){
+  events_sql <- paste(
+  'SELECT *, rand() as rand
+  FROM [bonnyci-github-archive:ci_plunder_events.githubarchive_2016_06]
+  WHERE type = "', event_type, '"
+  order by rand
+  limit 100', sep="")
+  events <- query_exec(events_sql, project = project)
+
+  saveRDS(events, paste(event_type_abbr, "_events_sample_", i, ".rds", sep=""))
+}
+
+```
+
+```{r}
+events_samples <- data.frame()
+events_repo_samples <- data.frame()
+
+for (i in 1:10){
+  events_sample <- readRDS(paste(event_type_abbr, '_events_sample_', i, '.rds', sep=""))
+  events_sample <- events_sample %>%
+    mutate(dataset=paste("sample", i, sep=""))
+  events_samples <- bind_rows(events_sample, events_samples)
+
+  # Get the actual data for each repo
+  sample_sql <-
+    paste("SELECT * FROM [bonnyci-github-archive:ci_plunder_events.repos_participation_rate_event_types_summary] WHERE repo_name IN('",
+          paste(as.character(events_sample$repo_name), collapse="','"),
+          "')", sep="")
+  sample <- query_exec(sample_sql, project = project)
+  sample <- sample %>%
+    mutate(dataset=paste("sample", i, sep=""))
+  events_repo_samples <- bind_rows(sample, events_repo_samples)
+}
+
+saveRDS(events_samples, paste(event_type_abbr, "_events_samples.rds", sep=""))
+saveRDS(events_repo_samples, paste(event_type_abbr, "_events_repo_samples.rds", sep=""))
+
+```
+
+
+<h4>Experiment 8: 10 random samples of 100 Member Events</h3>
+
+```{r}
+event_type = "MemberEvent"
+event_type_abbr <- "member"
+
+for (i in 1:10){
+  events_sql <- paste(
+  'SELECT *, rand() as rand
+  FROM [bonnyci-github-archive:ci_plunder_events.githubarchive_2016_06]
+  WHERE type = "', event_type, '"
+  order by rand
+  limit 100', sep="")
+  events <- query_exec(events_sql, project = project)
+
+  saveRDS(events, paste(event_type_abbr, "_events_sample_", i, ".rds", sep=""))
+}
+
+```
+
+```{r}
+events_samples <- data.frame()
+events_repo_samples <- data.frame()
+
+for (i in 1:10){
+  events_sample <- readRDS(paste(event_type_abbr, '_events_sample_', i, '.rds', sep=""))
+  events_sample <- events_sample %>%
+    mutate(dataset=paste("sample", i, sep=""))
+  events_samples <- bind_rows(events_sample, events_samples)
+
+  # Get the actual data for each repo
+  sample_sql <-
+    paste("SELECT * FROM [bonnyci-github-archive:ci_plunder_events.repos_participation_rate_event_types_summary] WHERE repo_name IN('",
+          paste(as.character(events_sample$repo_name), collapse="','"),
+          "')", sep="")
+  sample <- query_exec(sample_sql, project = project)
+  sample <- sample %>%
+    mutate(dataset=paste("sample", i, sep=""))
+  events_repo_samples <- bind_rows(sample, events_repo_samples)
+}
+
+saveRDS(events_samples, paste(event_type_abbr, "_events_samples.rds", sep=""))
+saveRDS(events_repo_samples, paste(event_type_abbr, "_events_repo_samples.rds", sep=""))
+
+```
+
+
+<h4>Experiment 8: 10 random samples of 100 Release Events</h3>
+
+```{r}
+event_type = "ReleaseEvent"
+event_type_abbr <- "release"
+
+for (i in 1:10){
+  events_sql <- paste(
+  'SELECT *, rand() as rand
+  FROM [bonnyci-github-archive:ci_plunder_events.githubarchive_2016_06]
+  WHERE type = "', event_type, '"
+  order by rand
+  limit 100', sep="")
+  events <- query_exec(events_sql, project = project)
+
+  saveRDS(events, paste(event_type_abbr, "_events_sample_", i, ".rds", sep=""))
+}
+
+```
+
+```{r}
+events_samples <- data.frame()
+events_repo_samples <- data.frame()
+
+for (i in 1:10){
+  events_sample <- readRDS(paste(event_type_abbr, '_events_sample_', i, '.rds', sep=""))
+  events_sample <- events_sample %>%
+    mutate(dataset=paste("sample", i, sep=""))
+  events_samples <- bind_rows(events_sample, events_samples)
+
+  # Get the actual data for each repo
+  sample_sql <-
+    paste("SELECT * FROM [bonnyci-github-archive:ci_plunder_events.repos_participation_rate_event_types_summary] WHERE repo_name IN('",
+          paste(as.character(events_sample$repo_name), collapse="','"),
+          "')", sep="")
+  sample <- query_exec(sample_sql, project = project)
+  sample <- sample %>%
+    mutate(dataset=paste("sample", i, sep=""))
+  events_repo_samples <- bind_rows(sample, events_repo_samples)
+}
+
+saveRDS(events_samples, paste(event_type_abbr, "_events_samples.rds", sep=""))
+saveRDS(events_repo_samples, paste(event_type_abbr, "_events_repo_samples.rds", sep=""))
+
+```
+h4>Experiment 8: 10 random samples of 100 Delete Events</h3>
+
+```{r}
+event_type = "DeleteEvent"
+event_type_abbr <- "delete"
+
+for (i in 1:10){
+  events_sql <- paste(
+  'SELECT *, rand() as rand
+  FROM [bonnyci-github-archive:ci_plunder_events.githubarchive_2016_06]
+  WHERE type = "', event_type, '"
+  order by rand
+  limit 100', sep="")
+  events <- query_exec(events_sql, project = project)
+
+  saveRDS(events, paste(event_type_abbr, "_events_sample_", i, ".rds", sep=""))
+}
+
+```
+
+```{r}
+events_samples <- data.frame()
+events_repo_samples <- data.frame()
+
+for (i in 1:10){
+  events_sample <- readRDS(paste(event_type_abbr, '_events_sample_', i, '.rds', sep=""))
+  events_sample <- events_sample %>%
+    mutate(dataset=paste("sample", i, sep=""))
+  events_samples <- bind_rows(events_sample, events_samples)
+
+  # Get the actual data for each repo
+  sample_sql <-
+    paste("SELECT * FROM [bonnyci-github-archive:ci_plunder_events.repos_participation_rate_event_types_summary] WHERE repo_name IN('",
+          paste(as.character(events_sample$repo_name), collapse="','"),
+          "')", sep="")
+  sample <- query_exec(sample_sql, project = project)
+  sample <- sample %>%
+    mutate(dataset=paste("sample", i, sep=""))
+  events_repo_samples <- bind_rows(sample, events_repo_samples)
+}
+
+saveRDS(events_samples, paste(event_type_abbr, "_events_samples.rds", sep=""))
+saveRDS(events_repo_samples, paste(event_type_abbr, "_events_repo_samples.rds", sep=""))
+
+```
+
+h4>Experiment 8: 10 random samples of 100 Public Events</h3>
+
+```{r}
+event_type = "PublicEvent"
+event_type_abbr <- "public"
+
+for (i in 1:10){
+  events_sql <- paste(
+  'SELECT *, rand() as rand
+  FROM [bonnyci-github-archive:ci_plunder_events.githubarchive_2016_06]
+  WHERE type = "', event_type, '"
+  order by rand
+  limit 100', sep="")
+  events <- query_exec(events_sql, project = project)
+
+  saveRDS(events, paste(event_type_abbr, "_events_sample_", i, ".rds", sep=""))
+}
+
+```
+
+```{r}
+events_samples <- data.frame()
+events_repo_samples <- data.frame()
+
+for (i in 1:10){
+  events_sample <- readRDS(paste(event_type_abbr, '_events_sample_', i, '.rds', sep=""))
+  events_sample <- events_sample %>%
+    mutate(dataset=paste("sample", i, sep=""))
+  events_samples <- bind_rows(events_sample, events_samples)
+
+  # Get the actual data for each repo
+  sample_sql <-
+    paste("SELECT * FROM [bonnyci-github-archive:ci_plunder_events.repos_participation_rate_event_types_summary] WHERE repo_name IN('",
+          paste(as.character(events_sample$repo_name), collapse="','"),
+          "')", sep="")
+  sample <- query_exec(sample_sql, project = project)
+  sample <- sample %>%
+    mutate(dataset=paste("sample", i, sep=""))
+  events_repo_samples <- bind_rows(sample, events_repo_samples)
+}
+
+saveRDS(events_samples, paste(event_type_abbr, "_events_samples.rds", sep=""))
+saveRDS(events_repo_samples, paste(event_type_abbr, "_events_repo_samples.rds", sep=""))
+
+```
+
+<h4>Experiment 8: 10 random samples of 100 Issue Comment Events</h3>
+
+```{r}
+event_type = "IssueCommentEvent"
+event_type_abbr <- "isscomment"
+
+for (i in 1:10){
+  events_sql <- paste(
+  'SELECT *, rand() as rand
+  FROM [bonnyci-github-archive:ci_plunder_events.githubarchive_2016_06]
+  WHERE type = "', event_type, '"
+  order by rand
+  limit 100', sep="")
+  events <- query_exec(events_sql, project = project)
+
+  saveRDS(events, paste(event_type_abbr, "_events_sample_", i, ".rds", sep=""))
+}
+
+```
+
+```{r}
+events_samples <- data.frame()
+events_repo_samples <- data.frame()
+
+for (i in 1:10){
+  events_sample <- readRDS(paste(event_type_abbr, '_events_sample_', i, '.rds', sep=""))
+  events_sample <- events_sample %>%
+    mutate(dataset=paste("sample", i, sep=""))
+  events_samples <- bind_rows(events_sample, events_samples)
+
+  # Get the actual data for each repo
+  sample_sql <-
+    paste("SELECT * FROM [bonnyci-github-archive:ci_plunder_events.repos_participation_rate_event_types_summary] WHERE repo_name IN('",
+          paste(as.character(events_sample$repo_name), collapse="','"),
+          "')", sep="")
+  sample <- query_exec(sample_sql, project = project)
+  sample <- sample %>%
+    mutate(dataset=paste("sample", i, sep=""))
+  events_repo_samples <- bind_rows(sample, events_repo_samples)
+}
+
+saveRDS(events_samples, paste(event_type_abbr, "_events_samples.rds", sep=""))
+saveRDS(events_repo_samples, paste(event_type_abbr, "_events_repo_samples.rds", sep=""))
+
+```
+
+<h4>Experiment 8: 10 random samples of 100 Fork Events</h3>
+
+```{r}
+event_type = "ForkEvent"
+event_type_abbr <- "fork"
+
+for (i in 1:10){
+  events_sql <- paste(
+  'SELECT *, rand() as rand
+  FROM [bonnyci-github-archive:ci_plunder_events.githubarchive_2016_06]
+  WHERE type = "', event_type, '"
+  order by rand
+  limit 100', sep="")
+  events <- query_exec(events_sql, project = project)
+
+  saveRDS(events, paste(event_type_abbr, "_events_sample_", i, ".rds", sep=""))
+}
+
+```
+
+```{r}
+events_samples <- data.frame()
+events_repo_samples <- data.frame()
+
+for (i in 1:10){
+  events_sample <- readRDS(paste(event_type_abbr, '_events_sample_', i, '.rds', sep=""))
+  events_sample <- events_sample %>%
+    mutate(dataset=paste("sample", i, sep=""))
+  events_samples <- bind_rows(events_sample, events_samples)
+
+  # Get the actual data for each repo
+  sample_sql <-
+    paste("SELECT * FROM [bonnyci-github-archive:ci_plunder_events.repos_participation_rate_event_types_summary] WHERE repo_name IN('",
+          paste(as.character(events_sample$repo_name), collapse="','"),
+          "')", sep="")
+  sample <- query_exec(sample_sql, project = project)
+  sample <- sample %>%
+    mutate(dataset=paste("sample", i, sep=""))
+  events_repo_samples <- bind_rows(sample, events_repo_samples)
+}
+
+saveRDS(events_samples, paste(event_type_abbr, "_events_samples.rds", sep=""))
+saveRDS(events_repo_samples, paste(event_type_abbr, "_events_repo_samples.rds", sep=""))
+
+```
+
+
+```{r}
+event_type = "IssuesEvent"
+event_type_abbr <- "issues"
+
+for (i in 1:10){
+  events_sql <- paste(
+  'SELECT *, rand() as rand
+  FROM [bonnyci-github-archive:ci_plunder_events.githubarchive_2016_06]
+  WHERE type = "', event_type, '"
+  order by rand
+  limit 100', sep="")
+  events <- query_exec(events_sql, project = project)
+
+  saveRDS(events, paste(event_type_abbr, "_events_sample_", i, ".rds", sep=""))
+}
+
+```
+
+```{r}
+events_samples <- data.frame()
+events_repo_samples <- data.frame()
+
+for (i in 1:10){
+  events_sample <- readRDS(paste(event_type_abbr, '_events_sample_', i, '.rds', sep=""))
+  events_sample <- events_sample %>%
+    mutate(dataset=paste("sample", i, sep=""))
+  events_samples <- bind_rows(events_sample, events_samples)
+
+  # Get the actual data for each repo
+  sample_sql <-
+    paste("SELECT * FROM [bonnyci-github-archive:ci_plunder_events.repos_participation_rate_event_types_summary] WHERE repo_name IN('",
+          paste(as.character(events_sample$repo_name), collapse="','"),
+          "')", sep="")
+  sample <- query_exec(sample_sql, project = project)
+  sample <- sample %>%
+    mutate(dataset=paste("sample", i, sep=""))
+  events_repo_samples <- bind_rows(sample, events_repo_samples)
+}
+
+saveRDS(events_samples, paste(event_type_abbr, "_events_samples.rds", sep=""))
+saveRDS(events_repo_samples, paste(event_type_abbr, "_events_repo_samples.rds", sep=""))
+
+```

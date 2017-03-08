@@ -1,0 +1,45 @@
+---
+title: "Participation Rate based on Github Repository Public Events"
+output: html_notebook
+---
+
+# Overview
+
+The purpose of this study is to determine if we can predict the overall participation level for a repository based on public Github event activity. The ultimate goal is to develop a sampling methodology for Github repositories based on this event activity.
+
+This study is part of a larger research project to answer the following questions:
+
+* What are the measurable impacts of Continuous Integration?
+* What software projects would most likely benefit from Continuous Integration?
+
+# Hypotheses
+
+A sample drawn from repositories with a similar events-to-actor proportion will be less variable than a sample drawn from the entire Github population.
+
+A sample drawn from an event type occurring most frequently for repositories in a given events-to-actor proportions will result in a larger proportion of repositories in the sample with that events-to-actor proportion. Therefore if one is interested in researching higher participation repositories active in the past month, one could take a random sample of events corresponding to the type occuring most frequently in high participation repositories.
+
+Samples based on event type will be more variable than samples based on events-to-actor proportion but still less variable than samples taken from the entire event population.
+
+Drawing repository samples from event types correlated with certain events-to-actor proportion results in a larger proportion of repositories matching the events-to-actor proportion.
+
+# Null Hypothesis
+
+Event types show no relationship to events-to-actor proportion such that samples drawn based on event type will show similar variability to samples drawn from the entire event population.
+
+# Methodology
+
+Because this research relied on additional GitHub repository data, samples were drawn from events occurring 60 days from when the research was initiated. Additional data was fetched via the Github API. The Github API uses rate limiting so sample sizes were limited to 100 events each.
+
+# Experiments
+
+## All Events
+
+## Push Events
+
+## Watch Events
+
+## Fork Events
+
+## Create Events
+
+## Release Events
