@@ -1,3 +1,4 @@
 *.Rmd linguist-language=R
-reports/* linguist-vendored
-events_analysis/*.nb.html linguist-vendored=True
+reports/* linguist-documentation
+*.html linguist-documentation=True
+*.pdf linguist-documentation=True
