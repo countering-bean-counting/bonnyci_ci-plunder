@@ -32,7 +32,7 @@ For current work in progress, see our GitHub project board:
  * https://github.com/orgs/BonnyCI/projects/4
 
 Want to get involved? See our contributing guidelines:
- * https://raw.githubusercontent.com/BonnyCI/ci-plunder/master/CONTRIBUTING.md
+ *  https://github.com/BonnyCI/ci-plunder/blob/master/CONTRIBUTING.rst
 
 Additional project information and resources are available on the wiki:
  * https://github.com/BonnyCI/ci-plunder/wiki
