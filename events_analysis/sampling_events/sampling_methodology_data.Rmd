@@ -28,26 +28,102 @@ SELECT *, rand() as rand
   order by rand
   limit 100
 ```
+
 ```{r}
-all_events_sample_sql <-
-  'select * from [bonnyci-github-archive:ci_plunder_repo_samples.all_events_sample]'
+all_repo_data_sql <-
+  'select * from [bonnyci-github-archive:ci_plunder_repo_samples_all.repo_data_trimmed]'
 
-all_events_sample <- query_exec(all_events_sample_sql, project = project)
+all_repo_data <- query_exec(all_repo_data_sql, project = project)
 
-saveRDS(all_events_sample, "all_events_sample.rds")
+saveRDS(all_repo_data, "all_repo_data.rds")
 
 ```
 
-### Event Type Frequency
+### Repo Owner Frequency
+How many repos came from the same owner?
 
 ```{r}
-all_events_sample_event_types_cnt_sql <-
-  'select * from [bonnyci-github-archive:ci_plunder_repo_samples.all_events_sample_event_types_cnt]'
+all_repo_data_owners_sql <-
+  'select * from [bonnyci-github-archive:ci_plunder_repo_samples_all.repo_data_owners]'
 
-all_events_sample_event_types_cnt <- query_exec(all_events_sample_event_types_cnt_sql, project = project)
+all_repo_data_owners <- query_exec(all_repo_data_owners_sql, project = project)
 
-saveRDS(all_events_sample_event_types_cnt, "all_events_sample_event_types_cnt.rds")
+all_repo_data <- merge(all_repo_data_owners, all_repo_data, by="repo_owner")
 
+saveRDS(all_repo_data, "all_repo_data.rds")
+```
+
+### Repo Age
+How old are the repos in the sample? How recently were they last updated?
+
+```{r}
+all_repo_data_age_sql <-
+  'select * from [bonnyci-github-archive:ci_plunder_repo_samples_all.repo_data]'
+
+all_repo_data_age <- query_exec(all_repo_data_age_sql, project = project)
+
+all_repo_data <- merge(x=all_repo_data_age, y=all_repo_data, by.x="repo_name", by.y="repo_slug")
+
+saveRDS(all_repo_data, "all_repo_data.rds")
+```
+
+### Actors per Repo
+How many unique actors did each repo have?
+
+### Actors per Event Type per Repo
+How many unique actors did each event type in each repo have?
+
+### Events per Actor Percent Frequency
+How are events distributed among actors in the repository?
+
+### Repos per Actor in Sample
+How many separate repos did actors in the sample contribute to? Did any actors contribute across samples?
+
+### Repo Language Frequency
+What languages were represented in the repositories? What proportion of the repository's code was in that language?
+
+### Build Status in Readme
+What proportion of repos had a README detected by Github? Of those, how many had a Build status tag (indicates possible CI)?
+
+## Create Events
+
+### Random Sample of Events
+
+```
+SELECT *, rand() as rand
+  FROM [bonnyci-github-archive:ci_plunder_repo_samples.2017_02_03_21]
+  where type == "CreateEvent"
+  order by rand
+  limit 100
+```
+
+```{r}
+create_repo_data_sql <-
+  'select * from [bonnyci-github-archive:ci_plunder_repo_samples_create.repo_data]'
+
+create_repo_data <- query_exec(create_repo_data_sql, project = project)
+
+saveRDS(create_repo_data, "create_repo_data.rds")
+```
+
+## Fork Events
+
+### Random Sample of Events
+```
+SELECT *, rand() as rand
+  FROM [bonnyci-github-archive:ci_plunder_repo_samples.2017_02_03_21]
+  where type == "ForkEvent"
+  order by rand
+  limit 100
+```
+
+```{r}
+fork_repo_data_sql <-
+  'select * from [bonnyci-github-archive:ci_plunder_repo_samples_fork.repo_data]'
+
+fork_repo_data <- query_exec(fork_repo_data_sql, project = project)
+
+saveRDS(fork_repo_data, "fork_repo_data.rds")
 ```
 
 ## Push Events
@@ -63,25 +139,33 @@ SELECT *, rand() as rand
 ```
 
 ```{r}
-push_events_sample_sql <-
-  'select * from [bonnyci-github-archive:ci_plunder_repo_samples.push_events_sample]'
+push_repo_data_sql <-
+  'select * from [bonnyci-github-archive:ci_plunder_repo_samples_push.repo_data]'
 
-push_events_sample <- query_exec(push_events_sample_sql, project = project)
+push_repo_data <- query_exec(push_repo_data_sql, project = project)
 
-saveRDS(push_events_sample, "push_events_sample.rds")
-
+saveRDS(push_repo_data, "push_repo_data.rds")
 ```
 
-### Event Type Frequency
+## Release Events
+
+### Random Sample of Events
+
+```
+SELECT *, rand() as rand
+  FROM [bonnyci-github-archive:ci_plunder_repo_samples.2017_02_03_21]
+  where type == "ReleaseEvent"
+  order by rand
+  limit 100
+```
 
 ```{r}
-all_events_sample_event_types_cnt_sql <-
-  'select * from [bonnyci-github-archive:ci_plunder_repo_samples.all_events_sample_event_types_cnt]'
+release_repo_data_sql <-
+  'select * from [bonnyci-github-archive:ci_plunder_repo_samples_release.repo_data]'
 
-all_events_sample_event_types_cnt <- query_exec(all_events_sample_event_types_cnt_sql, project = project)
+release_repo_data <- query_exec(release_repo_data_sql, project = project)
 
-saveRDS(all_events_sample_event_types_cnt, "all_events_sample_event_types_cnt.rds")
-
+saveRDS(release_repo_data, "release_repo_data.rds")
 ```
 
 ## Watch Events
@@ -96,122 +180,10 @@ SELECT *, rand() as rand
   limit 100
 ```
 ```{r}
-watch_events_sample_sql <-
-  'select * from [bonnyci-github-archive:ci_plunder_repo_samples.watch_events_sample]'
+watch_repo_data_sql <-
+  'select * from [bonnyci-github-archive:ci_plunder_repo_samples_watch.repo_data]'
 
-watch_events_sample <- query_exec(watch_events_sample_sql, project = project)
+watch_repo_data <- query_exec(watch_repo_data_sql, project = project)
 
-saveRDS(watch_events_sample, "watch_events_sample.rds")
-
-```
-
-### Event Type Frequency
-
-```{r}
-all_events_sample_event_types_cnt_sql <-
-  'select * from [bonnyci-github-archive:ci_plunder_repo_samples.all_events_sample_event_types_cnt]'
-
-all_events_sample_event_types_cnt <- query_exec(all_events_sample_event_types_cnt_sql, project = project)
-
-saveRDS(all_events_sample_event_types_cnt, "all_events_sample_event_types_cnt.rds")
-
-```
-
-## Fork Events
-
-### Random Sample of Events
-```
-SELECT *, rand() as rand
-  FROM [bonnyci-github-archive:ci_plunder_repo_samples.2017_02_03_21]
-  where type == "ForkEvent"
-  order by rand
-  limit 100
-```
-```{r}
-fork_events_sample_sql <-
-  'select * from [bonnyci-github-archive:ci_plunder_repo_samples.fork_events_sample]'
-
-fork_events_sample <- query_exec(fork_events_sample_sql, project = project)
-
-saveRDS(fork_events_sample, "fork_events_sample.rds")
-
-```
-
-### Event Type Frequency
-
-```{r}
-all_events_sample_event_types_cnt_sql <-
-  'select * from [bonnyci-github-archive:ci_plunder_repo_samples.all_events_sample_event_types_cnt]'
-
-all_events_sample_event_types_cnt <- query_exec(all_events_sample_event_types_cnt_sql, project = project)
-
-saveRDS(all_events_sample_event_types_cnt, "all_events_sample_event_types_cnt.rds")
-
-```
-
-## Create Events
-
-### Random Sample of Events
-
-```
-SELECT *, rand() as rand
-  FROM [bonnyci-github-archive:ci_plunder_repo_samples.2017_02_03_21]
-  where type == "CreateEvent"
-  order by rand
-  limit 100
-```
-
-```{r}
-create_events_sample_sql <-
-  'select * from [bonnyci-github-archive:ci_plunder_repo_samples.create_events_sample]'
-
-create_events_sample <- query_exec(create_events_sample_sql, project = project)
-
-saveRDS(create_events_sample, "create_events_sample.rds")
-
-```
-
-### Event Type Frequency
-
-```{r}
-all_events_sample_event_types_cnt_sql <-
-  'select * from [bonnyci-github-archive:ci_plunder_repo_samples.all_events_sample_event_types_cnt]'
-
-all_events_sample_event_types_cnt <- query_exec(all_events_sample_event_types_cnt_sql, project = project)
-
-saveRDS(all_events_sample_event_types_cnt, "all_events_sample_event_types_cnt.rds")
-
-```
-
-## Release Events
-
-### Random Sample of Events
-
-```
-SELECT *, rand() as rand
-  FROM [bonnyci-github-archive:ci_plunder_repo_samples.2017_02_03_21]
-  where type == "ReleaseEvent"
-  order by rand
-  limit 100
-```
-```{r}
-release_events_sample_sql <-
-  'select * from [bonnyci-github-archive:ci_plunder_repo_samples.release_events_sample]'
-
-release_events_sample <- query_exec(release_events_sample_sql, project = project)
-
-saveRDS(release_events_sample, "release_events_sample.rds")
-
-```
-
-### Event Type Frequency
-
-```{r}
-all_events_sample_event_types_cnt_sql <-
-  'select * from [bonnyci-github-archive:ci_plunder_repo_samples.all_events_sample_event_types_cnt]'
-
-all_events_sample_event_types_cnt <- query_exec(all_events_sample_event_types_cnt_sql, project = project)
-
-saveRDS(all_events_sample_event_types_cnt, "all_events_sample_event_types_cnt.rds")
-
+saveRDS(watch_repo_data, "watch_repo_data.rds")
 ```
