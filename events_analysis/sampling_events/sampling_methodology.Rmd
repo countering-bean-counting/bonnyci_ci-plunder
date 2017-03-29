@@ -3,6 +3,12 @@ title: "Participation Rate based on Github Repository Public Events"
 output: html_notebook
 ---
 
+```{r}
+library(dplyr)
+library(ggplot2)
+library(reshape2)
+```
+
 # Overview
 
 The purpose of this study is to determine if we can predict the overall participation level for a repository based on public Github event activity. The ultimate goal is to develop a sampling methodology for Github repositories based on this event activity.
@@ -32,14 +38,268 @@ Because this research relied on additional GitHub repository data, samples were 
 
 # Experiments
 
+Because this study would require pulling repository data from the GitHub API, more recent events in a smaller time frame were used as the population to sample from. Events were selected from the Github Archive Events occuring from February 1, 2017 through March 21, 2017. The samples were randomly selected using Google BigQuery's "rand()" function and filtered by type where appropriate. Previous studies in this series used a mix of the rand() function and another method that used R's "sample()" function. This provided better randomness but required more overhead to generate row numbers in Google BigQuery as this is limited in big data sets. The Google BigQuery random() function was deemed sufficient given the overhead trade-offs of using a better random generator.
+
+For repositories in the each sample, additional event data were pulled from the GitHub Archive going back to 1/1/2016.
+
+Each sample group explores the following parameters based on the events data:
+
+* Event Types in Sample
+* Event Type Frequency per Repository
+* Repo Owner Frequency
+* Actors per Repository
+* Actors per Event Type per Repo
+* Events per Actor Percent Frequency
+* Repos per Owner in Sample
+
+Each sample group explores the following parameters based on GitHub API data:
+
+* Age and Last Update
+* Language
+* "Build Status" in README
+
+## Population
+
+This section provides high level demographics of the population the samples were drawn from. Previous studies in this series have already confirmed that there is limited variability in event activity from month to month so we will not repeat that here.
+
+### Event Type Distribution
+
+
 ## All Events
+
+Our control sample is a sample of all events regardless of event type. We expect to see a lot of variation between the repositories.
+
+### Event Types in Sample
+
+The random sample of 100 events contained the following distribution of event types.
+
+```{r}
+all_sample_event_type_freq <- readRDS("all_sample_event_type_freq.rds")
+
+all_sample_event_type_freq$type <- factor(all_sample_event_type_freq$type,
+                                          levels=all_sample_event_type_freq$type[
+                                            order(all_sample_event_type_freq$num_events, 
+                                                  decreasing=TRUE)])
+
+ggplot(data = all_sample_event_type_freq, 
+       aes(x=type, 
+       y=num_events)) +
+  geom_bar(stat="identity") + 
+  theme(legend.position="none") +
+  ylab("Events") +
+  xlab("Event Type") +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1)) + 
+  ggtitle("Event Types in Sample")
+
+ggsave("all_sample_event_types.png")
+```
+
+
+### Event Type Frequency per Repository
+
+How were event types distributed amongst repositories? The charts below count the number of repositories per event type frequency. Create and Push events were the best represented in this group. This is consistent with previous work that showed these as being the most frequent events overall.
+
+```{r}
+all_repo_event_type_freq <- readRDS("all_repo_event_type_freq.rds")
+
+ggplot(data = all_repo_event_type_freq, 
+       aes(x=type, 
+       y=num_repos,
+       fill=factor(num_events_log))) +
+  geom_bar(stat="identity", position="dodge") + 
+  theme(legend.position="none") +
+  ylab("Repos") +
+  xlab("Event Type") +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1)) + 
+  ggtitle("Event Type Frequencies p/ Repo")
+
+ggsave("all_repo_event_type_freq.png")
+
+all_repo_max_events <- all_repo_event_type_freq %>%
+  filter(num_repos >= 10)
+
+ggplot(data = all_repo_max_events, 
+       aes(x=type, 
+       y=num_repos, 
+       fill=factor(num_events_max))) +
+  geom_bar(stat="identity", position="dodge") + 
+  ylab("Repos") +
+  xlab("Event Type") +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1)) + 
+  ggtitle("Top Event Type Frequencies p/ Repo")
+
+ggsave("all_repo_max_events.png")
+```
+
+
+### Repo Owner Frequency
+
+The majority of owners had only 1 repository in the sample. One owner had 2 repositories and 2 owners had 3 repositories in the sample.
+
+```{r}
+all_repo_data_owner <- readRDS("all_repo_data_owner.rds")
+
+all_repo_data_owner_freq <- all_repo_data_owner %>%
+  group_by(num_repos) %>%
+  summarise(num_owners = n())
+
+ggplot(data = all_repo_data_owner_freq, 
+       aes(x=num_repos, y=factor(num_owners))) +
+  geom_bar(stat="identity") +
+  xlab("Repos Owned in Sample") +
+  ylab("Owners with x Repos")  +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1))
+
+ggsave("all_repo_data_owner_freq.png")
+```
+
+
+### Actors per Repository
+
+In the sample, 3/4 of the repositories had 1-12 unique actors in 15 months.
+
+```{r}
+all_repo_actors_freq <- readRDS("all_repo_actors_freq.rds")
+
+ggplot(data = all_repo_actors_freq, 
+       aes(x = factor(total_actors_max), 
+           y = num_repos)) +
+  geom_bar(stat="identity", position="stack") +
+  ylab("Repos with x Actors") +
+  xlab("Max Actors") +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1))
+
+ggsave("all_repo_actors_freq.png")
+```
+
+### Actors per Event Type per Repo
+
+The majority of repositories in the sample had 1-4 unique actors per event type.
+
+```{r}
+all_repo_event_type_actors_freq <- readRDS("all_repo_event_type_actors_freq.rds")
+
+ggplot(data = all_repo_event_type_actors_freq, 
+       aes(x = type, 
+           y = num_repos,
+           fill=factor(num_actors_log))) +
+  geom_bar(stat="identity", position="dodge") +
+  theme(legend.position="none") +
+  ylab("Repos with x Actors per Event Type") +
+  xlab("Event Type") +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1))
+
+ggsave("all_repo_event_type_actors_freq.png")
+
+all_repo_max_actors <- all_repo_event_type_actors_freq %>%
+  filter(num_repos >= 10)
+
+ggplot(data = all_repo_max_actors, 
+       aes(x=type, 
+       y=num_repos, 
+       fill=factor(num_actors_max))) +
+  geom_bar(stat="identity", position="dodge") + 
+  ylab("Repos") +
+  xlab("Event Type") +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1)) + 
+  ggtitle("Top Event Type Actors p/ Repo")
+
+ggsave("all_repo_max_actors.png")
+
+```
+
+### Events per Actor Percent Frequency
+
+```{r}
+all_repo_e2a_pct_freq <- readRDS("all_repo_e2a_pct_freq.rds")
+
+all_repo_e2a_pct_freq_summary <- all_repo_e2a_pct_freq %>%
+  mutate(e2a_max_rnd = round(events_per_actor_pct_max, 3)) %>%
+  group_by(e2a_max_rnd) %>%
+  summarise(
+    e2a_log = min(events_per_actor_pct_log),
+    num_repos = sum(num_repos),
+    total_actors_max = max(total_actors_max),
+    total_actors_min = min(total_actors_min)
+  )
+
+ggplot(data = all_repo_e2a_pct_freq_summary, 
+       aes(x = factor(total_actors_max), 
+           y = num_repos,
+           fill=factor(e2a_max_rnd))) +
+  geom_bar(stat="identity", position="dodge") +
+  ylab("Repos") +
+  xlab("Max Actors p/ Repo") +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1))
+
+ggsave("all_repo_e2a_pct_freq.png")
+
+# all_repo_max_actors <- all_repo_event_type_actors_freq %>%
+#   filter(num_repos >= 10)
+# 
+# ggplot(data = all_repo_max_actors, 
+#        aes(x=type, 
+#        y=num_repos, 
+#        fill=factor(num_actors_max))) +
+#   geom_bar(stat="identity", position="dodge") + 
+#   ylab("Repos") +
+#   xlab("Event Type") +
+#   theme(axis.text.x = element_text(angle = 90, hjust = 1)) + 
+#   ggtitle("Top Event Type Actors p/ Repo")
+# 
+# ggsave("all_repo_max_actors.png")
+
+```
+
+### Repos per Owner in Sample
+
+```{r}
+all_actor_repo_freq <- readRDS("all_actor_repo_freq.rds")
+all_total_actors <- sum(all_actor_repo_freq$num_actors)
+
+ggplot(data = all_actor_repo_freq, 
+       aes(x = factor(max_total_repos), 
+           y = num_actors/all_total_actors,
+           fill=factor(total_repos_log))) +
+  geom_bar(stat="identity", position="stack") +
+  theme(legend.position="none") +
+  ylab("Actors with x Repos (%)") +
+  xlab("Max Repos") +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1))
+
+ggsave("all_actor_repo_freq.png")
+```
+
+### Age and Last Update
+
+```{r}
+
+# age of repos
+
+# updated since repos
+
+```
+
+
+### Language
+### "Build Status" in README
 
 ## Push Events
 
+Previous studies in this series have established that Push events are well represented across all levels of participation. We would expect the sample taken from Push Events to resemble the control sample in the previous section. 
+
 ## Watch Events
+
+Previous studies in this series have established that Watch events are well represented across higher levels of participation. We would expect the sample taken from Watch Events to be larger projects with more contributors and end users.
 
 ## Fork Events
 
+Previous studies in this series have established that Fork events are well represented across higher levels of participation, but show a weaker correlation to the participation metrics used previously. Here, we explore how similar our results are to the repositories sampled through Watch Events.
+
 ## Create Events
 
+Previous studies in this series have established that Create events are well represented across lower levels of participation. We would expect the sample taken from Create Events to be smaller projects with more contributors and end users. Create events not only include repositories but branches and tags. Possible paths for further exploration could include looking at these different Create Event subtypes to see how they are correlated within the sample, and determining if there are any predictive conditions for a newly created repository to become a higher participation repository.
+
 ## Release Events
+
+Previous studies in this series have established that Fork events are well represented across Medium levels of participation, but show a weaker correlation to the participation metrics used previously. Previous studies also questioned whether the metrics used were sufficient to establish a "Medium" participation level at all. We don't expect to see a lot from these events, but it does provide some initial discovery for what kinds of project do releases and how they are doing them in GitHub.

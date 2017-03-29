@@ -12,7 +12,13 @@ project <- "bonnyci-github-archive"
 
 # Experiments
 
-## Overview
+## Population
+
+```
+SELECT (*) FROM githubarchive:month.201703, githubarchive:month.201702
+```
+
+https://bigquery.cloud.google.com:443/savedquery/787787545662:1844b6d0dc164b0ea2103ca2653f5790
 
 ```{r}
 # TODO time period summary by event type - number of events, number of repos, number of actors, number of independent repos (not part of same user/org)
@@ -22,12 +28,122 @@ project <- "bonnyci-github-archive"
 ## All Events
 
 ### Random Sample of Events
+
 ```
 SELECT *, rand() as rand
   FROM [bonnyci-github-archive:ci_plunder_repo_samples.2017_02_03_21]
   order by rand
   limit 100
 ```
+
+https://bigquery.cloud.google.com:443/savedquery/787787545662:743dd041fa9c478ba66dbb336e587cbe
+
+```{r}
+all_events_sample_sql <-
+  'select * from [bonnyci-github-archive:ci_plunder_repo_samples.all_events_sample]'
+
+all_events_sample <- query_exec(all_events_sample_sql, project = project)
+
+saveRDS(all_events_sample, "all_events_sample.rds")
+
+```
+
+### Events Data
+
+#### Event Types in Sample
+
+```{r}
+all_sample_event_type_freq <- all_events_sample %>%
+  group_by(type) %>%
+  summarise(num_events = n())
+
+saveRDS(all_sample_event_type_freq, "all_sample_event_type_freq.rds")
+```
+
+
+#### Event Type Frequency per Repository
+
+```{r}
+all_repo_event_type_freq_sql <-
+  'select * from [bonnyci-github-archive:ci_plunder_repo_samples_all.ghevents_repo_event_types_frequency]'
+
+all_repo_event_type_freq <- query_exec(all_repo_event_type_freq_sql, project = project)
+
+saveRDS(all_repo_event_type_freq, "all_repo_event_type_freq.rds")
+```
+
+#### Repo Owner Frequency
+How many repos came from the same owner?
+
+```{r}
+# TODO fix bl905060/gitskills Description (copy-pasta got into it)
+all_repo_data_owner_sql <-
+  'select * from [bonnyci-github-archive:ci_plunder_repo_samples_all.repo_data_owner]'
+
+all_repo_data_owner <- query_exec(all_repo_data_owner_sql, project = project)
+
+saveRDS(all_repo_data_owner, "all_repo_data_owner.rds")
+```
+
+#### Actors per Repo
+How many unique actors did each repo have?
+
+```{r}
+all_repo_actors_freq_sql <-
+  'select * from [bonnyci-github-archive:ci_plunder_repo_samples_all.ghevents_repo_actors_freq]'
+
+all_repo_actors_freq <- query_exec(all_repo_actors_freq_sql, project = project)
+
+saveRDS(all_repo_actors_freq, "all_repo_actors_freq.rds")
+```
+
+
+#### Actors per Event Type per Repo
+How many unique actors did each event type in each repo have?
+
+```{r}
+all_repo_event_type_actors_freq_sql <-
+  'select * from [bonnyci-github-archive:ci_plunder_repo_samples_all.ghevents_repo_event_type_actors_freq]'
+
+all_repo_event_type_actors_freq <- query_exec(all_repo_event_type_actors_freq_sql, project = project)
+
+saveRDS(all_repo_event_type_actors_freq, "all_repo_event_type_actors_freq.rds")
+```
+
+#### Events per Actor Percent Frequency
+How are events distributed among actors in the repository?
+
+```{r}
+all_repo_e2a_pct_freq_sql <-
+  'select * from [bonnyci-github-archive:ci_plunder_repo_samples_all.ghevents_repo_events_per_actor_pct_freq]'
+
+all_repo_e2a_pct_freq <- query_exec(all_repo_e2a_pct_freq_sql, project = project)
+
+saveRDS(all_repo_e2a_pct_freq, "all_repo_e2a_pct_freq.rds")
+```
+
+#### Repos per Owner in Sample
+How many separate repos did repo owners in the sample contribute to? Did any actors contribute across samples?
+
+```{r}
+all_actor_repo_freq_sql <-
+  'select * from [bonnyci-github-archive:ci_plunder_repo_samples_all.ghevents_actor_repo_freq]'
+
+all_actor_repo_freq <- query_exec(all_actor_repo_freq_sql, project = project)
+
+saveRDS(all_actor_repo_freq, "all_actor_repo_freq.rds")
+```
+
+### GitHube API Data
+
+```
+SELECT *, rand() as rand
+  FROM [bonnyci-github-archive:ci_plunder_repo_samples.2017_02_03_21]
+  order by rand
+  limit 100
+```
+
+https://bigquery.cloud.google.com:443/savedquery/787787545662:743dd041fa9c478ba66dbb336e587cbe
 
 ```{r}
 all_repo_data_sql <-
@@ -39,51 +155,27 @@ saveRDS(all_repo_data, "all_repo_data.rds")
 
 ```
 
-### Repo Owner Frequency
-How many repos came from the same owner?
-
-```{r}
-all_repo_data_owners_sql <-
-  'select * from [bonnyci-github-archive:ci_plunder_repo_samples_all.repo_data_owners]'
-
-all_repo_data_owners <- query_exec(all_repo_data_owners_sql, project = project)
-
-all_repo_data <- merge(all_repo_data_owners, all_repo_data, by="repo_owner")
-
-saveRDS(all_repo_data, "all_repo_data.rds")
-```
-
-### Repo Age
+#### Repo Age
 How old are the repos in the sample? How recently were they last updated?
 
+I did some exploratory analysis with ratios to see if I could find any interesting patterns but nothing really stuck. One thing I did find is a ratio of age to updated_since that is <1 suggests repos were only acted upon when they were created. There may be further analysis that could be interesting here but I'm not sure that it's telling us anything we can't learn elsewhere.
+
 ```{r}
-all_repo_data_age_sql <-
-  'select * from [bonnyci-github-archive:ci_plunder_repo_samples_all.repo_data]'
+all_repo_age_sql <-
+  'select * from [bonnyci-github-archive:ci_plunder_repo_samples_all.repo_data_age]'
 
-all_repo_data_age <- query_exec(all_repo_data_age_sql, project = project)
+all_repo_age <- query_exec(all_repo_age_sql, project = project)
 
-all_repo_data <- merge(x=all_repo_data_age, y=all_repo_data, by.x="repo_name", by.y="repo_slug")
+saveRDS(all_repo_age, "all_repo_age.rds")
 
-saveRDS(all_repo_data, "all_repo_data.rds")
 ```
 
-### Actors per Repo
-How many unique actors did each repo have?
-
-### Actors per Event Type per Repo
-How many unique actors did each event type in each repo have?
-
-### Events per Actor Percent Frequency
-How are events distributed among actors in the repository?
-
-### Repos per Actor in Sample
-How many separate repos did actors in the sample contribute to? Did any actors contribute across samples?
-
-### Repo Language Frequency
+#### Repo Language Frequency
 What languages were represented in the repositories? What proportion of the repository's code was in that language?
 
-### Build Status in Readme
+#### Build Status in Readme
 What proportion of repos had a README detected by Github? Of those, how many had a Build status tag (indicates possible CI)?
+
 
 ## Create Events
 
