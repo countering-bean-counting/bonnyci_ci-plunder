@@ -173,8 +173,23 @@ saveRDS(all_repo_age, "all_repo_age.rds")
 #### Repo Language Frequency
 What languages were represented in the repositories? What proportion of the repository's code was in that language?
 
-#### Build Status in Readme
-What proportion of repos had a README detected by Github? Of those, how many had a Build status tag (indicates possible CI)?
+```{r}
+all_repo_languages_freq_sql <-
+  'select * from [bonnyci-github-archive:ci_plunder_repo_samples_all.repo_languages_freq]'
+
+all_repo_languages_freq <- query_exec(all_repo_languages_freq_sql, project = project)
+
+saveRDS(all_repo_languages_freq, "all_repo_languages_freq.rds")
+
+```
+
+#### Releases
+What proportion of repos had Releases? How many releases did each repo have? What were the characteristics of repositories that had releases and the ones that didn't?
+
+#### Readme
+What proportion of repos had a README detected by Github? What were the characteristics of repositories that had a README and the ones that didn't?
+
+Of those, how many had a Build status tag (indicates possible CI)? What are the characterstics of repositories that had a Build status tag vs those that didn't?
 
 
 ## Create Events
