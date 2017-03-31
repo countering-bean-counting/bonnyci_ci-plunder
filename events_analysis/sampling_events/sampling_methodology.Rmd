@@ -131,29 +131,6 @@ ggplot(data = all_repo_max_events,
 ggsave("all_repo_max_events.png")
 ```
 
-
-### Repo Owner Frequency
-
-The majority of owners had only 1 repository in the sample. One owner had 2 repositories and 2 owners had 3 repositories in the sample.
-
-```{r}
-all_repo_data_owner <- readRDS("all_repo_data_owner.rds")
-
-all_repo_data_owner_freq <- all_repo_data_owner %>%
-  group_by(num_repos) %>%
-  summarise(num_owners = n())
-
-ggplot(data = all_repo_data_owner_freq, 
-       aes(x=num_repos, y=factor(num_owners))) +
-  geom_bar(stat="identity") +
-  xlab("Repos Owned in Sample") +
-  ylab("Owners with x Repos")  +
-  theme(axis.text.x = element_text(angle = 90, hjust = 1))
-
-ggsave("all_repo_data_owner_freq.png")
-```
-
-
 ### Actors per Repository
 
 In the sample, 3/4 of the repositories had 1-12 unique actors in 15 months.
@@ -270,6 +247,27 @@ ggplot(data = all_actor_repo_freq,
 ggsave("all_actor_repo_freq.png")
 ```
 
+### Repo Owner Frequency
+
+The majority of owners had only 1 repository in the sample. One owner had 2 repositories and 2 owners had 3 repositories in the sample.
+
+```{r}
+all_repo_data_owner <- readRDS("all_repo_data_owner.rds")
+
+all_repo_data_owner_freq <- all_repo_data_owner %>%
+  group_by(num_repos) %>%
+  summarise(num_owners = n())
+
+ggplot(data = all_repo_data_owner_freq, 
+       aes(x=num_repos, y=factor(num_owners))) +
+  geom_bar(stat="identity") +
+  xlab("Repos Owned in Sample") +
+  ylab("Owners with x Repos")  +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1))
+
+ggsave("all_repo_data_owner_freq.png")
+```
+
 ### Age and Last Update
 
 ```{r}
@@ -362,30 +360,78 @@ ggsave("all_repo_age_vs_updated_freq.png")
 ### Language
 
 ```{r}
-all_repo_languages_freq <- readRDS("all_repo_languages_freq.rds")
+all_repo_languages <- readRDS("all_repo_languages.rds")
 
-all_repo_languages_freq$language <- factor(all_repo_languages_freq$language, levels = 
-                                             all_repo_languages_freq$language[
-                                               order(all_repo_languages_freq$num_repos, decreasing=TRUE)])
+all_repo_languages_top <- all_repo_languages %>%
+  group_by(language) %>%
+  summarise(
+    total_repos = n()
+  ) %>%
+  filter(total_repos > 1)
 
-ggplot(data = all_repo_languages_freq, 
+all_repo_languages_pct_freq <- all_repo_languages %>%
+  group_by(language, loc_log) %>%
+  summarise(
+    loc_pct_min = min(loc_pct),
+    loc_pct_max = round(max(loc_pct), 1),
+    num_repos = n()
+  )
+
+all_repo_languages_pct_freq_top <- all_repo_languages_pct_freq %>%
+  filter(language %in% all_repo_languages_top$language)
+
+all_repo_languages_pct_freq_top <- merge(all_repo_languages_pct_freq_top, all_repo_languages_top, by="language")
+
+all_repo_languages_pct_freq_top$language <- 
+  factor(all_repo_languages_pct_freq_top$language, 
+         levels = unique(all_repo_languages_pct_freq_top$language[
+           order(all_repo_languages_pct_freq_top$total_repos, decreasing=TRUE)]))
+
+ggplot(data = all_repo_languages_pct_freq_top, 
        aes(x = language, 
            y = num_repos,
-           fill = language)) +
-  geom_bar(stat="identity") +
-  theme(legend.position="none") +
+           fill=factor(loc_pct_max))) +
+  geom_bar(stat="identity", position="stack") +
+  #theme(legend.position="none") +
   ylab("Repos") +
   xlab("Language") +
-  theme(axis.text.x = element_text(angle = 90, hjust = 1)) 
+  theme(axis.text.x = element_text(angle = 90, hjust = 1))
 
-ggsave("all_repo_languages_freq.png")
+ggsave("all_repo_languages_pct_freq_top.png")
+  
+  
 ```
+
 
 ### Releases
 
 ```{r}
+
+all_repo_releases <- readRDS("all_repo_releases.rds")
+
+all_repo_releases_change <- all_repo_releases %>%
+  group_by(repo_slug) %>%
+  arrange(repo_slug, published_at) %>%
+  mutate(
+    prev_published_at = lag(published_at),
+    published_at_interval = ceiling(difftime(published_at, prev_published_at, units="days")),
+    is_release = ifelse(is.na(id), 0, 1)
+  )
+
 # TODO
 # repos with releases
+all_repo_releases_freq <- all_repo_releases_change %>%
+  group_by(repo_slug) %>%
+  summarise(
+    release_count = sum(is_release),
+    published_at_min = min(published_at),
+    published_at_max = max(published_at),
+    published_at_interval_max = ifelse(release_count == 1, 0, max(published_at_interval, na.rm=TRUE)),
+    published_at_interval_min = ifelse(release_count == 1, 0, min(published_at_interval, na.rm=TRUE)),
+    published_at_interval_mean = ifelse(release_count == 1, 0, round(mean(published_at_interval, na.rm=TRUE))),
+    published_at_interval_mean = ifelse(release_count == 0, mean(published_at_interval), published_at_interval_mean),
+    published_at_interval_med = ifelse(release_count == 1, 0, round(median(published_at_interval, na.rm=TRUE)))
+  )
 
 # number of releases
 
