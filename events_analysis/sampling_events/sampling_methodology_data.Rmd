@@ -205,6 +205,12 @@ all_repo_releases <- query_exec(all_repo_releases_sql, project = project)
 
 saveRDS(all_repo_releases, "all_repo_releases.rds")
 
+# characteristics of repos with vs without
+# age
+# number of actors
+# events to actor percent
+# languages?
+
 ```
 
 #### Readme
@@ -214,7 +220,7 @@ Of those, how many had a Build status tag (indicates possible CI)? What are the 
 
 ```{r}
 all_repo_readme_sql <-
-  'select * from [bonnyci-github-archive:ci_plunder_repo_samples_all.repo_releases]'
+  'select * from [bonnyci-github-archive:ci_plunder_repo_samples_all.repo_readme_buildstatus]'
 
 all_repo_readme <- query_exec(all_repo_readme_sql, project = project)
 
