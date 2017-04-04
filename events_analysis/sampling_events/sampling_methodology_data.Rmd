@@ -70,7 +70,7 @@ all_repo_event_type_freq_sql <-
 all_repo_event_type_freq <- query_exec(all_repo_event_type_freq_sql, project = project)
 
 saveRDS(all_repo_event_type_freq, "all_repo_event_type_freq.rds")
-````
+```
 
 
 #### Actors per Repo
@@ -122,7 +122,7 @@ all_actor_repo_freq <- query_exec(all_actor_repo_freq_sql, project = project)
 saveRDS(all_actor_repo_freq, "all_actor_repo_freq.rds")
 ```
 
-### GitHube API Data
+### GitHub API Data
 
 ```
 SELECT *, rand() as rand
@@ -229,47 +229,6 @@ saveRDS(all_repo_readme, "all_repo_readme.rds")
 ```
 
 
-## Create Events
-
-### Random Sample of Events
-
-```
-SELECT *, rand() as rand
-  FROM [bonnyci-github-archive:ci_plunder_repo_samples.2017_02_03_21]
-  where type == "CreateEvent"
-  order by rand
-  limit 100
-```
-
-```{r}
-create_repo_data_sql <-
-  'select * from [bonnyci-github-archive:ci_plunder_repo_samples_create.repo_data]'
-
-create_repo_data <- query_exec(create_repo_data_sql, project = project)
-
-saveRDS(create_repo_data, "create_repo_data.rds")
-```
-
-## Fork Events
-
-### Random Sample of Events
-```
-SELECT *, rand() as rand
-  FROM [bonnyci-github-archive:ci_plunder_repo_samples.2017_02_03_21]
-  where type == "ForkEvent"
-  order by rand
-  limit 100
-```
-
-```{r}
-fork_repo_data_sql <-
-  'select * from [bonnyci-github-archive:ci_plunder_repo_samples_fork.repo_data]'
-
-fork_repo_data <- query_exec(fork_repo_data_sql, project = project)
-
-saveRDS(fork_repo_data, "fork_repo_data.rds")
-```
-
 ## Push Events
 
 ### Random Sample of Events
@@ -283,33 +242,70 @@ SELECT *, rand() as rand
 ```
 
 ```{r}
-push_repo_data_sql <-
-  'select * from [bonnyci-github-archive:ci_plunder_repo_samples_push.repo_data]'
+push_events_sample_sql <-
+  'select * from [bonnyci-github-archive:ci_plunder_repo_samples.push_events_sample]'
 
-push_repo_data <- query_exec(push_repo_data_sql, project = project)
+push_events_sample <- query_exec(push_events_sample_sql, project = project)
 
-saveRDS(push_repo_data, "push_repo_data.rds")
+saveRDS(push_events_sample, "push_events_sample.rds")
+
 ```
 
-## Release Events
+
+### Events Data
+
+```{r}
+push_events_repo_summary_sql <-
+  'select * from [bonnyci-github-archive:ci_plunder_repo_samples_push.ghevents_repo_summary]'
+
+push_events_repo_summary <- query_exec(push_events_repo_summary_sql, project = project)
+
+saveRDS(push_events_repo_summary, "push_events_repo_summary.rds")
+
+```
+
+```{r}
+push_events_repo_type_summary_sql <-
+  'select * from [bonnyci-github-archive:ci_plunder_repo_samples_push.ghevents_repo_type_summary]'
+
+push_events_repo_type_summary <- query_exec(push_events_repo_type_summary_sql, project = project)
+
+saveRDS(push_events_repo_type_summary, "push_events_repo_type_summary.rds")
+
+```
+
+## Create Events
 
 ### Random Sample of Events
 
 ```
 SELECT *, rand() as rand
   FROM [bonnyci-github-archive:ci_plunder_repo_samples.2017_02_03_21]
-  where type == "ReleaseEvent"
+  where type == "CreateEvent"
   order by rand
   limit 100
 ```
 
+### Events Data
+
 ```{r}
-release_repo_data_sql <-
-  'select * from [bonnyci-github-archive:ci_plunder_repo_samples_release.repo_data]'
+create_events_repo_summary_sql <-
+  'select * from [bonnyci-github-archive:ci_plunder_repo_samples_create.ghevents_repo_summary]'
 
-release_repo_data <- query_exec(release_repo_data_sql, project = project)
+create_events_repo_summary <- query_exec(create_events_repo_summary_sql, project = project)
 
-saveRDS(release_repo_data, "release_repo_data.rds")
+saveRDS(create_events_repo_summary, "create_events_repo_summary.rds")
+
+```
+
+```{r}
+create_events_repo_type_summary_sql <-
+  'select * from [bonnyci-github-archive:ci_plunder_repo_samples_create.ghevents_repo_type_summary]'
+
+create_events_repo_type_summary <- query_exec(create_events_repo_type_summary_sql, project = project)
+
+saveRDS(create_events_repo_type_summary, "create_events_repo_type_summary.rds")
+
 ```
 
 ## Watch Events
@@ -323,11 +319,94 @@ SELECT *, rand() as rand
   order by rand
   limit 100
 ```
+### Events Data
+
 ```{r}
-watch_repo_data_sql <-
-  'select * from [bonnyci-github-archive:ci_plunder_repo_samples_watch.repo_data]'
+watch_events_repo_summary_sql <-
+  'select * from [bonnyci-github-archive:ci_plunder_repo_samples_watch.ghevents_repo_summary]'
 
-watch_repo_data <- query_exec(watch_repo_data_sql, project = project)
+watch_events_repo_summary <- query_exec(watch_events_repo_summary_sql, project = project)
 
-saveRDS(watch_repo_data, "watch_repo_data.rds")
+saveRDS(watch_events_repo_summary, "watch_events_repo_summary.rds")
+
 ```
+
+```{r}
+watch_events_repo_type_summary_sql <-
+  'select * from [bonnyci-github-archive:ci_plunder_repo_samples_watch.ghevents_repo_type_summary]'
+
+watch_events_repo_type_summary <- query_exec(watch_events_repo_type_summary_sql, project = project)
+
+saveRDS(watch_events_repo_type_summary, "watch_events_repo_type_summary.rds")
+
+```
+
+## Fork Events
+
+### Random Sample of Events
+```
+SELECT *, rand() as rand
+  FROM [bonnyci-github-archive:ci_plunder_repo_samples.2017_02_03_21]
+  where type == "ForkEvent"
+  order by rand
+  limit 100
+```
+
+### Events Data
+
+```{r}
+fork_events_repo_summary_sql <-
+  'select * from [bonnyci-github-archive:ci_plunder_repo_samples_fork.ghevents_repo_summary]'
+
+fork_events_repo_summary <- query_exec(fork_events_repo_summary_sql, project = project)
+
+saveRDS(fork_events_repo_summary, "fork_events_repo_summary.rds")
+
+```
+
+```{r}
+fork_events_repo_type_summary_sql <-
+  'select * from [bonnyci-github-archive:ci_plunder_repo_samples_fork.ghevents_repo_type_summary]'
+
+fork_events_repo_type_summary <- query_exec(fork_events_repo_type_summary_sql, project = project)
+
+saveRDS(fork_events_repo_type_summary, "fork_events_repo_type_summary.rds")
+
+```
+
+
+
+## Release Events
+
+### Random Sample of Events
+
+```
+SELECT *, rand() as rand
+  FROM [bonnyci-github-archive:ci_plunder_repo_samples.2017_02_03_21]
+  where type == "ReleaseEvent"
+  order by rand
+  limit 100
+```
+
+### Events Data
+
+```{r}
+release_events_repo_summary_sql <-
+  'select * from [bonnyci-github-archive:ci_plunder_repo_samples_release.ghevents_repo_summary]'
+
+release_events_repo_summary <- query_exec(release_events_repo_summary_sql, project = project)
+
+saveRDS(release_events_repo_summary, "release_events_repo_summary.rds")
+
+```
+
+```{r}
+release_events_repo_type_summary_sql <-
+  'select * from [bonnyci-github-archive:ci_plunder_repo_samples_release.ghevents_repo_type_summary]'
+
+release_events_repo_type_summary <- query_exec(release_events_repo_type_summary_sql, project = project)
+
+saveRDS(release_events_repo_type_summary, "release_events_repo_type_summary.rds")
+
+```
+
