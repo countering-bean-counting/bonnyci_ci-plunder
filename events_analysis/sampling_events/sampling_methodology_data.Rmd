@@ -124,15 +124,6 @@ saveRDS(all_actor_repo_freq, "all_actor_repo_freq.rds")
 
 ### GitHub API Data
 
-```
-SELECT *, rand() as rand
-  FROM [bonnyci-github-archive:ci_plunder_repo_samples.2017_02_03_21]
-  order by rand
-  limit 100
-```
-
-https://bigquery.cloud.google.com:443/savedquery/787787545662:743dd041fa9c478ba66dbb336e587cbe
-
 ```{r}
 all_repo_data_sql <-
   'select * from [bonnyci-github-archive:ci_plunder_repo_samples_all.repo_data_trimmed]'
@@ -274,6 +265,48 @@ saveRDS(push_events_repo_type_summary, "push_events_repo_type_summary.rds")
 
 ```
 
+### Github API
+
+```{r}
+push_repo_data_sql <-
+  'select * from [bonnyci-github-archive:ci_plunder_repo_samples_push.repo_data_trimmed]'
+
+push_repo_data <- query_exec(push_repo_data_sql, project = project)
+
+saveRDS(push_repo_data, "push_repo_data.rds")
+
+```
+```{r}
+push_repo_owner_sql <-
+  'select * from [bonnyci-github-archive:ci_plunder_repo_samples_push.repo_owner]'
+
+push_repo_owner <- query_exec(push_repo_owner_sql, project = project)
+
+saveRDS(push_repo_owner, "push_repo_owner.rds")
+
+```
+
+
+```{r}
+push_repo_languages_sql <-
+  'select * from [bonnyci-github-archive:ci_plunder_repo_samples_push.repo_languages]'
+
+push_repo_languages <- query_exec(push_repo_languages_sql, project = project)
+
+saveRDS(push_repo_languages, "push_repo_languages.rds")
+
+```
+
+
+```{r}
+push_repo_age_sql <-
+  'select * from [bonnyci-github-archive:ci_plunder_repo_samples_push.repo_data_age]'
+
+push_repo_age <- query_exec(push_repo_age_sql, project = project)
+
+saveRDS(push_repo_age, "push_repo_age.rds")
+
+```
 ## Create Events
 
 ### Random Sample of Events

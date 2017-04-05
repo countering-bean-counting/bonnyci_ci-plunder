@@ -210,44 +210,29 @@ ggsave("all_repo_e2a_pct_freq.png")
 
 ```
 
-### Repos per Owner in Sample
+### Repos per Owner
 
 ```{r}
-all_actor_repo_freq <- readRDS("all_actor_repo_freq.rds")
-all_total_actors <- sum(all_actor_repo_freq$num_actors)
+all_repo_owner <- readRDS("all_repo_owner.rds")
 
-ggplot(data = all_actor_repo_freq, 
-       aes(x = factor(max_total_repos), 
-           y = num_actors/all_total_actors,
-           fill=factor(total_repos_log))) +
+all_repo_owner_freq <- all_repo_owner %>%
+  mutate(public_repos_log = round(log(public_repos))) %>%
+  group_by(public_repos_log) %>%
+  summarise(num_actors = n(),
+            public_repos_max = max(public_repos),
+            public_repos_min = min(public_repos))
+
+ggplot(data = all_repo_owner_freq,
+       aes(x = factor(public_repos_max),
+           y = num_actors,
+           fill=factor(public_repos_log))) +
   geom_bar(stat="identity", position="stack") +
   theme(legend.position="none") +
-  ylab("Actors with x Repos (%)") +
+  ylab("Actors with x Repos") +
   xlab("Max Repos") +
   theme(axis.text.x = element_text(angle = 90, hjust = 1))
 
-ggsave("all_actor_repo_freq.png")
-```
-
-### Repo Owner Frequency
-
-The majority of owners had only 1 repository in the sample. One owner had 2 repositories and 2 owners had 3 repositories in the sample.
-
-```{r}
-all_repo_data_owner <- readRDS("all_repo_data_owner.rds")
-
-all_repo_data_owner_freq <- all_repo_data_owner %>%
-  group_by(num_repos) %>%
-  summarise(num_owners = n())
-
-ggplot(data = all_repo_data_owner_freq, 
-       aes(x=num_repos, y=factor(num_owners), fill=factor(num_repos))) +
-  geom_bar(stat="identity") +
-  theme(legend.position="none") +
-  xlab("Repos Owned in Sample") +
-  ylab("Owners with x Repos")
-
-ggsave("all_repo_data_owner_freq.png")
+ggsave("all_repo_owner_freq.png")
 ```
 
 ### Age and Last Update
@@ -696,6 +681,171 @@ ggsave("push_repo_e2a_pct_freq.png")
 
 ```
 
+```{r}
+push_repo_owner <- readRDS("push_repo_owner.rds")
+
+push_repo_owner_freq <- push_repo_owner %>%
+  mutate(public_repos_log = round(log(public_repos))) %>%
+  group_by(public_repos_log) %>%
+  summarise(num_actors = n(),
+            public_repos_max = max(public_repos),
+            public_repos_min = min(public_repos))
+
+ggplot(data = push_repo_owner_freq,
+       aes(x = factor(public_repos_max),
+           y = num_actors,
+           fill=factor(public_repos_log))) +
+  geom_bar(stat="identity", position="stack") +
+  theme(legend.position="none") +
+  ylab("Actors with x Repos") +
+  xlab("Max Repos") +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1))
+
+ggsave("push_repo_owner_freq.png")
+```
+
+### Age and Last Update
+
+```{r}
+push_repo_age <- readRDS("push_repo_age.rds")
+
+# age of repos
+push_repo_age_freq <- push_repo_age %>%
+  group_by(age_days_log) %>%
+  summarise(
+    num_repos = n(),
+    age_days_min = min(age_days),
+    age_days_max = max(age_days),
+    age_days_min_max = paste(age_days_min, "-", age_days_max)
+  )
+
+ggplot(data = push_repo_age_freq, 
+       aes(x = reorder(age_days_min_max, age_days_log), 
+           y = num_repos,
+           fill=factor(age_days_log))) +
+  geom_bar(stat="identity", position="dodge") +
+  theme(legend.position="none") +
+  ylab("Repos") +
+  xlab("Age (days)") +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1))
+
+ggsave("push_repo_age_freq.png")
+```
+
+
+```{r}
+push_repo_age <- readRDS("push_repo_age.rds")
+
+# updated since repos
+push_repo_updated_freq <- push_repo_age %>%
+  group_by(updated_since_days_log) %>%
+  summarise(
+    num_repos = n(),
+    updated_since_days_max = max(updated_since_days),
+    updated_since_days_min = min(updated_since_days),
+    updated_since_days_min_max = paste(updated_since_days_min, "-", updated_since_days_max)
+  )
+
+ggplot(data = push_repo_updated_freq, 
+       aes(x = reorder(updated_since_days_min_max, updated_since_days_log), 
+           y = num_repos,
+           fill=updated_since_days_min_max)) +
+  geom_bar(stat="identity", position="dodge") +
+  theme(legend.position="none") +
+  ylab("Repos") +
+  xlab("Max Updated Since (days)") +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1))
+
+ggsave("push_repo_updated_freq.png")
+
+```
+
+```{r}
+push_repo_age <- readRDS("push_repo_age.rds")
+
+push_repo_updated_vs_age <- push_repo_age %>% 
+  mutate(
+    updated_score = ifelse(updated_since_days_log >= 4, "Stale", "Fresh"),
+    age_score = ifelse(age_days_log >= 6, "Mature", "Young"),
+    updated_age_score = ifelse(
+      updated_since_days_log == age_days_log & updated_since_days_log > 2,
+      "Short-Lived",
+      paste(updated_score, "/", age_score)
+      )) %>%
+  group_by(updated_age_score) %>%
+  summarise(num_repos = n(),
+            updated_since_days_log = max(updated_since_days_log),
+            age_days_log = max(age_days_log),
+            updated_since_days_min = min(updated_since_days),
+            updated_since_days_max = max(updated_since_days),
+            age_days_min = min(age_days),
+            age_days_max = max(age_days),
+            updated_age_days = paste(updated_since_days_min, "-", updated_since_days_max, 
+                                         "/", age_days_min, "-", age_days_max)
+  )
+
+ggplot(data = push_repo_updated_vs_age,
+       aes(x = updated_age_score,
+           y = num_repos,
+           fill = updated_age_days)) +
+  geom_bar(position="dodge", stat="identity") +
+  ylab("Repos") +
+  xlab("Updated Age Score")
+
+ggsave("push_repo_age_vs_updated_freq.png")
+
+```
+
+### Language
+
+```{r}
+push_repo_languages <- readRDS("push_repo_languages.rds")
+
+push_repo_languages <- push_repo_languages %>%
+  group_by(repo_slug) %>%
+  mutate(loc_sum = sum(loc))
+
+push_repo_languages <- push_repo_languages %>%
+  mutate(
+    loc_log = round(log(loc)),
+    loc_pct = loc/loc_sum
+  )
+
+push_repo_languages_top <- push_repo_languages %>%
+  group_by(language) %>%
+  summarise(
+    total_repos = n()
+  ) %>%
+  filter(total_repos > 1)
+
+push_repo_languages_pct_freq <- push_repo_languages %>%
+  group_by(language, loc_log) %>%
+  summarise(
+    loc_pct_min = min(loc_pct),
+    loc_pct_max = round(max(loc_pct), 1),
+    num_repos = n()
+  )
+
+push_repo_languages_pct_freq_top <- push_repo_languages_pct_freq %>%
+  filter(language %in% push_repo_languages_top$language)
+
+push_repo_languages_pct_freq_top <- merge(push_repo_languages_pct_freq_top, push_repo_languages_top, by="language")
+
+# TODO flip coord?
+
+ggplot(data = push_repo_languages_pct_freq_top, 
+       aes(x = reorder(language, -total_repos), 
+           y = num_repos,
+           fill=factor(loc_pct_max))) +
+  geom_bar(stat="identity", position="stack") +
+  ylab("Repos") +
+  xlab("Language") +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1))
+
+ggsave("push_repo_languages_pct_freq_top.png")
+  
+  
+```
 
 ## Create Events
 
