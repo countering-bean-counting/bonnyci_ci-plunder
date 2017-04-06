@@ -316,14 +316,11 @@ all_actor_repo_freq &lt;- query_exec(all_actor_repo_freq_sql, project = project)
 <h3>GitHub API Data</h3>
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuYWxsX3JlcG9fZGF0YV9zcWwgPC1cbiAgJ3NlbGVjdCAqIGZyb20gW2Jvbm55Y2ktZ2l0aHViLWFyY2hpdmU6Y2lfcGx1bmRlcl9yZXBvX3NhbXBsZXNfYWxsLnJlcG9fZGF0YV90cmltbWVkXSdcblxuYWxsX3JlcG9fZGF0YSA8LSBxdWVyeV9leGVjKGFsbF9yZXBvX2RhdGFfc3FsLCBwcm9qZWN0ID0gcHJvamVjdClcblxuc2F2ZVJEUyhhbGxfcmVwb19kYXRhLCBcImFsbF9yZXBvX2RhdGEucmRzXCIpXG5cbmBgYCJ9 -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuYWxsX3JlcG9fZGF0YV9zcWwgPC1cbiAgJ3NlbGVjdCAqIGZyb20gW2Jvbm55Y2ktZ2l0aHViLWFyY2hpdmU6Y2lfcGx1bmRlcl9yZXBvX3NhbXBsZXNfYWxsLnJlcG9fZGF0YV90cmltbWVkXSdcbmFsbF9yZXBvX2RhdGEgPC0gcXVlcnlfZXhlYyhhbGxfcmVwb19kYXRhX3NxbCwgcHJvamVjdCA9IHByb2plY3QpXG5zYXZlUkRTKGFsbF9yZXBvX2RhdGEsIFwiYWxsX3JlcG9fZGF0YS5yZHNcIilcbmBgYCJ9 -->
 <pre class="r"><code>all_repo_data_sql &lt;-
   'select * from [bonnyci-github-archive:ci_plunder_repo_samples_all.repo_data_trimmed]'
-
 all_repo_data &lt;- query_exec(all_repo_data_sql, project = project)
-
-saveRDS(all_repo_data, &quot;all_repo_data.rds&quot;)
-</code></pre>
+saveRDS(all_repo_data, &quot;all_repo_data.rds&quot;)</code></pre>
 <!-- rnb-source-end -->
 <!-- rnb-chunk-end -->
 <!-- rnb-text-begin -->
@@ -350,16 +347,11 @@ saveRDS(all_repo_data_owner, &quot;all_repo_data_owner.rds&quot;)</code></pre>
 <p>I did some exploratory analysis with ratios to see if I could find any interesting patterns but nothing really stuck. One thing I did find is a ratio of age to updated_since that is &lt;1 suggests repos were only acted upon when they were created. There may be further analysis that could be interesting here but I’m not sure that it’s telling us anything we can’t learn elsewhere.</p>
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuYWxsX3JlcG9fYWdlX3NxbCA8LVxuICAnc2VsZWN0ICogZnJvbSBbYm9ubnljaS1naXRodWItYXJjaGl2ZTpjaV9wbHVuZGVyX3JlcG9fc2FtcGxlc19hbGwucmVwb19kYXRhX2FnZV0nXG5hbGxfcmVwb19hZ2UgPC0gcXVlcnlfZXhlYyhhbGxfcmVwb19hZ2Vfc3FsLCBwcm9qZWN0ID0gcHJvamVjdClcbmBgYCJ9 -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuYWxsX3JlcG9fYWdlX3NxbCA8LVxuICAnc2VsZWN0ICogZnJvbSBbYm9ubnljaS1naXRodWItYXJjaGl2ZTpjaV9wbHVuZGVyX3JlcG9fc2FtcGxlc19hbGwucmVwb19kYXRhX2FnZV0nXG5hbGxfcmVwb19hZ2UgPC0gcXVlcnlfZXhlYyhhbGxfcmVwb19hZ2Vfc3FsLCBwcm9qZWN0ID0gcHJvamVjdClcbnNhdmVSRFMoYWxsX3JlcG9fYWdlLCBcImFsbF9yZXBvX2FnZS5yZHNcIilcbmBgYCJ9 -->
 <pre class="r"><code>all_repo_age_sql &lt;-
   'select * from [bonnyci-github-archive:ci_plunder_repo_samples_all.repo_data_age]'
-all_repo_age &lt;- query_exec(all_repo_age_sql, project = project)</code></pre>
-<!-- rnb-source-end -->
-<!-- rnb-output-begin eyJkYXRhIjoiQXV0by1yZWZyZXNoaW5nIHN0YWxlIE9BdXRoIHRva2VuLlxuIn0= -->
-<pre><code>Auto-refreshing stale OAuth token.</code></pre>
-<!-- rnb-output-end -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuc2F2ZVJEUyhhbGxfcmVwb19hZ2UsIFwiYWxsX3JlcG9fYWdlLnJkc1wiKVxuYGBgIn0= -->
-<pre class="r"><code>saveRDS(all_repo_age, &quot;all_repo_age.rds&quot;)</code></pre>
+all_repo_age &lt;- query_exec(all_repo_age_sql, project = project)
+saveRDS(all_repo_age, &quot;all_repo_age.rds&quot;)</code></pre>
 <!-- rnb-source-end -->
 <!-- rnb-chunk-end -->
 <!-- rnb-text-begin -->
@@ -369,11 +361,10 @@ all_repo_age &lt;- query_exec(all_repo_age_sql, project = project)</code></pre>
 <p>What languages were represented in the repositories? What proportion of the repository’s code was in that language?</p>
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuIyBhbGxfcmVwb19sYW5ndWFnZXNfc3FsIDwtXG4jICAgJ3NlbGVjdCAqIGZyb20gW2Jvbm55Y2ktZ2l0aHViLWFyY2hpdmU6Y2lfcGx1bmRlcl9yZXBvX3NhbXBsZXNfYWxsLnJlcG9fbGFuZ3VhZ2VzXSdcbiMgXG4jIGFsbF9yZXBvX2xhbmd1YWdlcyA8LSBxdWVyeV9leGVjKGFsbF9yZXBvX2xhbmd1YWdlc19zcWwsIHByb2plY3QgPSBwcm9qZWN0KVxuYWxsX3JlcG9fbGFuZ3VhZ2VzIDwtIGFsbF9yZXBvX2xhbmd1YWdlcyAlPiVcbiAgZ3JvdXBfYnkocmVwb19zbHVnKSAlPiVcbiAgbXV0YXRlKFxuICAgIGxvY19zdW0gPSBzdW0obG9jKSxcbiAgICBsb2NfcGN0ID0gbG9jL2xvY19zdW0sXG4gICAgbG9jX2xvZyA9IHJvdW5kKGxvZyhsb2NfcGN0KSlcbiAgKVxuc2F2ZVJEUyhhbGxfcmVwb19sYW5ndWFnZXMsIFwiYWxsX3JlcG9fbGFuZ3VhZ2VzLnJkc1wiKVxuYGBgIn0= -->
-<pre class="r"><code># all_repo_languages_sql &lt;-
-#   'select * from [bonnyci-github-archive:ci_plunder_repo_samples_all.repo_languages]'
-# 
-# all_repo_languages &lt;- query_exec(all_repo_languages_sql, project = project)
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuYWxsX3JlcG9fbGFuZ3VhZ2VzX3NxbCA8LVxuICAnc2VsZWN0ICogZnJvbSBbYm9ubnljaS1naXRodWItYXJjaGl2ZTpjaV9wbHVuZGVyX3JlcG9fc2FtcGxlc19hbGwucmVwb19sYW5ndWFnZXNdJ1xuYWxsX3JlcG9fbGFuZ3VhZ2VzIDwtIHF1ZXJ5X2V4ZWMoYWxsX3JlcG9fbGFuZ3VhZ2VzX3NxbCwgcHJvamVjdCA9IHByb2plY3QpXG5hbGxfcmVwb19sYW5ndWFnZXMgPC0gYWxsX3JlcG9fbGFuZ3VhZ2VzICU+JVxuICBncm91cF9ieShyZXBvX3NsdWcpICU+JVxuICBtdXRhdGUoXG4gICAgbG9jX3N1bSA9IHN1bShsb2MpLFxuICAgIGxvY19wY3QgPSBsb2MvbG9jX3N1bSxcbiAgICBsb2NfbG9nID0gcm91bmQobG9nKGxvY19wY3QpKVxuICApXG5zYXZlUkRTKGFsbF9yZXBvX2xhbmd1YWdlcywgXCJhbGxfcmVwb19sYW5ndWFnZXMucmRzXCIpXG5gYGAifQ== -->
+<pre class="r"><code>all_repo_languages_sql &lt;-
+  'select * from [bonnyci-github-archive:ci_plunder_repo_samples_all.repo_languages]'
+all_repo_languages &lt;- query_exec(all_repo_languages_sql, project = project)
 all_repo_languages &lt;- all_repo_languages %&gt;%
   group_by(repo_slug) %&gt;%
   mutate(
@@ -391,16 +382,16 @@ saveRDS(all_repo_languages, &quot;all_repo_languages.rds&quot;)</code></pre>
 <p>What proportion of repos had Releases? How many releases did each repo have? What were the characteristics of repositories that had releases and the ones that didn’t?</p>
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuYWxsX3JlcG9fcmVsZWFzZXNfc3FsIDwtXG4gICdzZWxlY3QgKiBmcm9tIFtib25ueWNpLWdpdGh1Yi1hcmNoaXZlOmNpX3BsdW5kZXJfcmVwb19zYW1wbGVzX2FsbC5yZXBvX3JlbGVhc2VzXSdcbmFsbF9yZXBvX3JlbGVhc2VzIDwtIHF1ZXJ5X2V4ZWMoYWxsX3JlcG9fcmVsZWFzZXNfc3FsLCBwcm9qZWN0ID0gcHJvamVjdClcbmBgYCJ9 -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuYWxsX3JlcG9fcmVsZWFzZXNfc3FsIDwtXG4gICdzZWxlY3QgKiBmcm9tIFtib25ueWNpLWdpdGh1Yi1hcmNoaXZlOmNpX3BsdW5kZXJfcmVwb19zYW1wbGVzX2FsbC5yZXBvX3JlbGVhc2VzXSdcbmFsbF9yZXBvX3JlbGVhc2VzIDwtIHF1ZXJ5X2V4ZWMoYWxsX3JlcG9fcmVsZWFzZXNfc3FsLCBwcm9qZWN0ID0gcHJvamVjdClcbnNhdmVSRFMoYWxsX3JlcG9fcmVsZWFzZXMsIFwiYWxsX3JlcG9fcmVsZWFzZXMucmRzXCIpXG4jIGNoYXJhY3RlcmlzdGljcyBvZiByZXBvcyB3aXRoIHZzIHdpdGhvdXRcbiMgYWdlXG4jIG51bWJlciBvZiBhY3RvcnNcbiMgZXZlbnRzIHRvIGFjdG9yIHBlcmNlbnRcbiMgbGFuZ3VhZ2VzP1xuYGBgIn0= -->
 <pre class="r"><code>all_repo_releases_sql &lt;-
   'select * from [bonnyci-github-archive:ci_plunder_repo_samples_all.repo_releases]'
-all_repo_releases &lt;- query_exec(all_repo_releases_sql, project = project)</code></pre>
-<!-- rnb-source-end -->
-<!-- rnb-output-begin eyJkYXRhIjoiQXV0by1yZWZyZXNoaW5nIHN0YWxlIE9BdXRoIHRva2VuLlxuIn0= -->
-<pre><code>Auto-refreshing stale OAuth token.</code></pre>
-<!-- rnb-output-end -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuc2F2ZVJEUyhhbGxfcmVwb19yZWxlYXNlcywgXCJhbGxfcmVwb19yZWxlYXNlcy5yZHNcIilcbmBgYCJ9 -->
-<pre class="r"><code>saveRDS(all_repo_releases, &quot;all_repo_releases.rds&quot;)</code></pre>
+all_repo_releases &lt;- query_exec(all_repo_releases_sql, project = project)
+saveRDS(all_repo_releases, &quot;all_repo_releases.rds&quot;)
+# characteristics of repos with vs without
+# age
+# number of actors
+# events to actor percent
+# languages?</code></pre>
 <!-- rnb-source-end -->
 <!-- rnb-chunk-end -->
 <!-- rnb-text-begin -->

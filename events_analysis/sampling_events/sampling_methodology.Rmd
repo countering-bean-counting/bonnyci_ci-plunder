@@ -280,7 +280,7 @@ all_repo_updated_freq <- all_repo_age %>%
 ggplot(data = all_repo_updated_freq, 
        aes(x = reorder(updated_since_days_min_max, updated_since_days_log), 
            y = num_repos,
-           fill=updated_since_days_min_max)) +
+           fill=factor(updated_since_days_log))) +
   geom_bar(stat="identity", position="dodge") +
   theme(legend.position="none") +
   ylab("Repos") +
