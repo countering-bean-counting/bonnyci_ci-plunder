@@ -335,40 +335,6 @@ saveRDS(push_repo_readme, "push_repo_readme.rds")
 
 ```
 
-## Create Events
-
-### Random Sample of Events
-
-```
-SELECT *, rand() as rand
-  FROM [bonnyci-github-archive:ci_plunder_repo_samples.2017_02_03_21]
-  where type == "CreateEvent"
-  order by rand
-  limit 100
-```
-
-### Events Data
-
-```{r}
-create_events_repo_summary_sql <-
-  'select * from [bonnyci-github-archive:ci_plunder_repo_samples_create.ghevents_repo_summary]'
-
-create_events_repo_summary <- query_exec(create_events_repo_summary_sql, project = project)
-
-saveRDS(create_events_repo_summary, "create_events_repo_summary.rds")
-
-```
-
-```{r}
-create_events_repo_type_summary_sql <-
-  'select * from [bonnyci-github-archive:ci_plunder_repo_samples_create.ghevents_repo_type_summary]'
-
-create_events_repo_type_summary <- query_exec(create_events_repo_type_summary_sql, project = project)
-
-saveRDS(create_events_repo_type_summary, "create_events_repo_type_summary.rds")
-
-```
-
 ## Watch Events
 
 ### Random Sample of Events
