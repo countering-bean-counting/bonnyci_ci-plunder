@@ -862,6 +862,8 @@ ggsave("release_repo_e2a_pct_freq.png")
 
 ## Repos per Owner
 
+### All Events
+
 ```{r}
 all_repo_owner <- readRDS("all_repo_owner.rds")
 
@@ -884,8 +886,6 @@ ggplot(data = all_repo_owner_freq,
 
 ggsave("all_repo_owner_freq.png")
 ```
-
-### All Events
 
 ### Push Events
 
@@ -1732,7 +1732,6 @@ ggsave("push_repo_readme_buildstatus_host.png")
 
 ### Watch Events
 
-
 ```{r}
 
 watch_repo_readme <- readRDS("watch_repo_readme.rds")
@@ -1809,7 +1808,6 @@ ggplot(data = watch_repo_readme_releases_true,
 
 ggsave("watch_repo_readme_buildstatus_host.png")
 ```
-
 
 ### Fork Events
 

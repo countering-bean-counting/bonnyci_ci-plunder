@@ -139,12 +139,12 @@ How many repos came from the same owner?
 
 ```{r}
 # TODO summary should come from R not GBQ
-all_repo_data_owner_sql <-
-  'select * from [bonnyci-github-archive:ci_plunder_repo_samples_all.repo_data_owner]'
+all_repo_owner_sql <-
+  'select * from [bonnyci-github-archive:ci_plunder_repo_samples_all.repo_owner]'
 
-all_repo_data_owner <- query_exec(all_repo_data_owner_sql, project = project)
+all_repo_owner <- query_exec(all_repo_owner_sql, project = project)
 
-saveRDS(all_repo_data_owner, "all_repo_data_owner.rds")
+saveRDS(all_repo_owner, "all_repo_owner.rds")
 ```
 
 
