@@ -58,18 +58,53 @@ Each sample group explores the following parameters based on GitHub API data:
 * Language
 * "Build Status" in README
 
-## Population
+## Event Samples Overview
 
-This section provides high level demographics of the population the samples were drawn from. Previous studies in this series have already confirmed that there is limited variability in event activity from month to month so we will not repeat that here.
+### All Events
+
+### Push Events
+
+Previous studies in this series have established that Push events are well represented across all levels of participation. We would expect the sample taken from Push Events to resemble the control sample in the previous section. 
+
+```{r}
+push_events_repo_summary <- readRDS("push_events_repo_summary.rds")
+push_events_repo_type_summary <- readRDS("push_events_repo_type_summary.rds")
+```
+
+### Watch Events
+
+Previous studies in this series have established that Watch events are well represented across higher levels of participation. We would expect the sample taken from Watch Events to be larger projects with more contributors and end users.
+
+```{r}
+watch_events_repo_summary <- readRDS("watch_events_repo_summary.rds")
+watch_events_repo_type_summary <- readRDS("watch_events_repo_type_summary.rds")
+```
+
+### Fork Events
+
+Previous studies in this series have established that Fork events are well represented across higher levels of participation, but show a weaker correlation to the participation metrics used previously. Here, we explore how similar our results are to the repositories sampled through Watch Events.
+
+```{r}
+fork_events_repo_summary <- readRDS("fork_events_repo_summary.rds")
+fork_events_repo_type_summary <- readRDS("fork_events_repo_type_summary.rds")
+```
+
+### Release Events
+
+Previous studies in this series have established that Fork events are well represented across Medium levels of participation, but show a weaker correlation to the participation metrics used previously. Previous studies also questioned whether the metrics used were sufficient to establish a "Medium" participation level at all. We don't expect to see a lot from these events, but it does provide some initial discovery for what kinds of project do releases and how they are doing them in GitHub.
+
+```{r}
+release_events_repo_summary <- readRDS("release_events_repo_summary.rds")
+release_events_repo_type_summary <- readRDS("release_events_repo_type_summary.rds")
+```
 
 ### Event Type Distribution
 
+## Event Types in Samples
 
-## All Events
+### All Events
 
 Our control sample is a sample of all events regardless of event type. We expect to see a lot of variation between the repositories.
-
-### Event Types in Sample
 
 The random sample of 100 events contained the following distribution of event types.
 
@@ -91,9 +126,13 @@ ggsave("all_sample_event_types.png")
 ```
 
 
-### Event Type Frequency per Repository
+## Event Type Frequency per Repository
 
-How were event types distributed amongst repositories? The charts below count the number of repositories per event type frequency. Create and Push events were the best represented in this group. This is consistent with previous work that showed these as being the most frequent events overall.
+How were event types distributed amongst repositories? The charts below count the number of repositories per event type frequency.
+
+### All Events
+
+Create and Push events were the best represented in this group. This is consistent with previous work that showed these as being the most frequent events overall.
 
 ```{r}
 all_repo_event_type_freq <- readRDS("all_repo_event_type_freq.rds")
@@ -127,7 +166,188 @@ ggplot(data = all_repo_max_events,
 ggsave("all_repo_max_events.png")
 ```
 
-### Actors per Repository
+### Push Events
+
+```{r}
+push_repo_event_type_freq <- push_events_repo_type_summary %>%
+  group_by(type, num_events_log) %>%
+  summarise(
+    num_events_max = max(num_events),
+    num_events_min = min(num_events),
+    num_repos = n()
+  )
+```
+
+
+```{r}
+ggplot(data = push_repo_event_type_freq, 
+       aes(x=reorder(type, -num_repos), 
+       y=num_repos,
+       fill=factor(num_events_log))) +
+  geom_bar(stat="identity", position="dodge") + 
+  theme(legend.position="none") +
+  ylab("Repos") +
+  xlab("Event Type") +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1)) + 
+  ggtitle("Event Type Frequencies p/ Repo")
+
+ggsave("push_repo_event_type_freq.png")
+
+push_repo_max_events <- push_repo_event_type_freq %>%
+  filter(num_repos >= 10)
+
+ggplot(data = push_repo_max_events, 
+       aes(x=reorder(type, -num_repos), 
+       y=num_repos, 
+       fill=factor(num_events_max))) +
+  geom_bar(stat="identity", position="dodge") + 
+  ylab("Repos") +
+  xlab("Event Type") +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1)) + 
+  ggtitle("Top Event Type Frequencies p/ Repo")
+
+ggsave("push_repo_max_events.png")
+```
+
+### Watch Events
+
+
+How were event types distributed amongst repositories? The charts below count the number of repositories per event type frequency.
+
+```{r}
+watch_repo_event_type_freq <- watch_events_repo_type_summary %>%
+  group_by(type, num_events_log) %>%
+  summarise(
+    num_events_max = max(num_events),
+    num_events_min = min(num_events),
+    num_repos = n()
+  )
+```
+
+
+```{r}
+ggplot(data = watch_repo_event_type_freq, 
+       aes(x=reorder(type, -num_repos), 
+       y=num_repos,
+       fill=factor(num_events_log))) +
+  geom_bar(stat="identity", position="dodge") + 
+  theme(legend.position="none") +
+  ylab("Repos") +
+  xlab("Event Type") +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1)) + 
+  ggtitle("Event Type Frequencies p/ Repo")
+
+ggsave("watch_repo_event_type_freq.png")
+
+watch_repo_max_events <- watch_repo_event_type_freq %>%
+  filter(num_repos >= 10)
+
+ggplot(data = watch_repo_max_events, 
+       aes(x=reorder(type, -num_repos), 
+       y=num_repos, 
+       fill=factor(num_events_max))) +
+  geom_bar(stat="identity", position="dodge") + 
+  ylab("Repos") +
+  xlab("Event Type") +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1)) + 
+  ggtitle("Top Event Type Frequencies p/ Repo")
+
+ggsave("watch_repo_max_events.png")
+```
+
+### Fork Events
+
+```{r}
+fork_repo_event_type_freq <- fork_events_repo_type_summary %>%
+  group_by(type, num_events_log) %>%
+  summarise(
+    num_events_max = max(num_events),
+    num_events_min = min(num_events),
+    num_repos = n()
+  )
+```
+
+
+```{r}
+ggplot(data = fork_repo_event_type_freq, 
+       aes(x=reorder(type, -num_repos), 
+       y=num_repos,
+       fill=factor(num_events_log))) +
+  geom_bar(stat="identity", position="dodge") + 
+  theme(legend.position="none") +
+  ylab("Repos") +
+  xlab("Event Type") +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1)) + 
+  ggtitle("Event Type Frequencies p/ Repo")
+
+ggsave("fork_repo_event_type_freq.png")
+
+fork_repo_max_events <- fork_repo_event_type_freq %>%
+  filter(num_repos >= 10)
+
+ggplot(data = fork_repo_max_events, 
+       aes(x=reorder(type, -num_repos), 
+       y=num_repos, 
+       fill=factor(num_events_max))) +
+  geom_bar(stat="identity", position="dodge") + 
+  ylab("Repos") +
+  xlab("Event Type") +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1)) + 
+  ggtitle("Top Event Type Frequencies p/ Repo")
+
+ggsave("fork_repo_max_events.png")
+```
+
+
+### Release Events
+
+```{r}
+release_repo_event_type_freq <- release_events_repo_type_summary %>%
+  group_by(type, num_events_log) %>%
+  summarise(
+    num_events_max = max(num_events),
+    num_events_min = min(num_events),
+    num_repos = n()
+  )
+```
+
+
+```{r}
+ggplot(data = release_repo_event_type_freq, 
+       aes(x=reorder(type, -num_repos), 
+       y=num_repos,
+       fill=factor(num_events_log))) +
+  geom_bar(stat="identity", position="dodge") + 
+  theme(legend.position="none") +
+  ylab("Repos") +
+  xlab("Event Type") +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1)) + 
+  ggtitle("Event Type Frequencies p/ Repo")
+
+ggsave("release_repo_event_type_freq.png")
+
+release_repo_max_events <- release_repo_event_type_freq %>%
+  filter(num_repos >= 10)
+
+ggplot(data = release_repo_max_events, 
+       aes(x=reorder(type, -num_repos), 
+       y=num_repos, 
+       fill=factor(num_events_max))) +
+  geom_bar(stat="identity", position="dodge") + 
+  ylab("Repos") +
+  xlab("Event Type") +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1)) + 
+  ggtitle("Top Event Type Frequencies p/ Repo")
+
+ggsave("release_repo_max_events.png")
+```
+
+
+
+
+## Actors per Repository
+
+### All Events
 
 In the sample, 3/4 of the repositories had 1-12 unique actors in 15 months.
 
@@ -146,7 +366,121 @@ ggplot(data = all_repo_actors_freq,
 ggsave("all_repo_actors_freq.png")
 ```
 
-### Actors per Event Type per Repo
+### Push Events
+
+In the sample, 3/4 of the repositories had 1-12 unique actors in 15 months.
+
+```{r}
+push_repo_actors_freq <- push_events_repo_summary %>%
+  group_by(total_actors_log) %>%
+  summarise(
+    total_actors_max = max(total_actors),
+    total_actors_min = min(total_actors),
+    num_repos = n()
+  )
+```
+
+
+```{r}
+ggplot(data = push_repo_actors_freq, 
+       aes(x = factor(total_actors_max), 
+           y = num_repos,
+           fill=factor(total_actors_log))) +
+  geom_bar(stat="identity", position="stack") +
+  theme(legend.position="none") +
+  ylab("Repos with x Actors") +
+  xlab("Max Actors")
+
+ggsave("push_repo_actors_freq.png")
+```
+
+### Watch Events
+
+In the sample, 3/4 of the repositories had 1-12 unique actors in 15 months.
+
+```{r}
+watch_repo_actors_freq <- watch_events_repo_summary %>%
+  group_by(total_actors_log) %>%
+  summarise(
+    total_actors_max = max(total_actors),
+    total_actors_min = min(total_actors),
+    num_repos = n()
+  )
+```
+
+
+```{r}
+ggplot(data = watch_repo_actors_freq, 
+       aes(x = factor(total_actors_max), 
+           y = num_repos,
+           fill=factor(total_actors_log))) +
+  geom_bar(stat="identity", position="stack") +
+  theme(legend.position="none") +
+  ylab("Repos with x Actors") +
+  xlab("Max Actors")
+
+ggsave("watch_repo_actors_freq.png")
+```
+
+### Fork Events
+
+In the sample, 3/4 of the repositories had 1-12 unique actors in 15 months.
+
+```{r}
+fork_repo_actors_freq <- fork_events_repo_summary %>%
+  group_by(total_actors_log) %>%
+  summarise(
+    total_actors_max = max(total_actors),
+    total_actors_min = min(total_actors),
+    num_repos = n()
+  )
+```
+
+
+```{r}
+ggplot(data = fork_repo_actors_freq, 
+       aes(x = factor(total_actors_max), 
+           y = num_repos,
+           fill=factor(total_actors_log))) +
+  geom_bar(stat="identity", position="stack") +
+  theme(legend.position="none") +
+  ylab("Repos with x Actors") +
+  xlab("Max Actors")
+
+ggsave("fork_repo_actors_freq.png")
+```
+
+### Release Events
+
+In the sample, 3/4 of the repositories had 1-12 unique actors in 15 months.
+
+```{r}
+release_repo_actors_freq <- release_events_repo_summary %>%
+  group_by(total_actors_log) %>%
+  summarise(
+    total_actors_max = max(total_actors),
+    total_actors_min = min(total_actors),
+    num_repos = n()
+  )
+```
+
+
+```{r}
+ggplot(data = release_repo_actors_freq, 
+       aes(x = factor(total_actors_max), 
+           y = num_repos,
+           fill=factor(total_actors_log))) +
+  geom_bar(stat="identity", position="stack") +
+  theme(legend.position="none") +
+  ylab("Repos with x Actors") +
+  xlab("Max Actors")
+
+ggsave("release_repo_actors_freq.png")
+```
+
+## Actors per Event Type per Repo
+
+### All Events
 
 The majority of repositories in the sample had 1-4 unique actors per event type.
 
@@ -182,7 +516,179 @@ ggsave("all_repo_max_actors.png")
 
 ```
 
-### Events per Actor Percent Frequency
+### Push Events
+
+```{r}
+push_repo_type_actors_freq <- push_events_repo_type_summary %>%
+  group_by(type, num_actors_log) %>%
+  summarise(
+    num_actors_max = max(num_actors),
+    num_actors_min = min(num_actors),
+    num_repos = n()
+  )
+```
+
+```{r}
+ggplot(data = push_repo_type_actors_freq, 
+       aes(x = type, 
+           y = num_repos,
+           fill=factor(num_actors_log))) +
+  geom_bar(stat="identity", position="dodge") +
+  theme(legend.position="none") +
+  ylab("Repos with x Actors per Event Type") +
+  xlab("Event Type") +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1))
+
+ggsave("push_repo_event_type_actors_freq.png")
+
+push_repo_max_actors <- push_repo_type_actors_freq %>%
+  filter(num_repos >= 10)
+
+ggplot(data = push_repo_max_actors, 
+       aes(x=reorder(type, -num_repos), 
+       y=num_repos, 
+       fill=factor(num_actors_max))) +
+  geom_bar(stat="identity", position="dodge") + 
+  ylab("Repos") +
+  xlab("Event Type") +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1)) + 
+  ggtitle("Top Event Type Actors p/ Repo")
+
+ggsave("push_repo_max_actors.png")
+
+```
+
+### Watch Events
+
+
+```{r}
+watch_repo_type_actors_freq <- watch_events_repo_type_summary %>%
+  group_by(type, num_actors_log) %>%
+  summarise(
+    num_actors_max = max(num_actors),
+    num_actors_min = min(num_actors),
+    num_repos = n()
+  )
+```
+
+```{r}
+ggplot(data = watch_repo_type_actors_freq, 
+       aes(x = type, 
+           y = num_repos,
+           fill=factor(num_actors_log))) +
+  geom_bar(stat="identity", position="dodge") +
+  theme(legend.position="none") +
+  ylab("Repos with x Actors per Event Type") +
+  xlab("Event Type") +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1))
+
+ggsave("watch_repo_event_type_actors_freq.png")
+
+watch_repo_max_actors <- watch_repo_type_actors_freq %>%
+  filter(num_repos >= 10)
+
+ggplot(data = watch_repo_max_actors, 
+       aes(x=reorder(type, -num_repos), 
+       y=num_repos, 
+       fill=factor(num_actors_max))) +
+  geom_bar(stat="identity", position="dodge") + 
+  ylab("Repos") +
+  xlab("Event Type") +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1)) + 
+  ggtitle("Top Event Type Actors p/ Repo")
+
+ggsave("watch_repo_max_actors.png")
+
+```
+
+### Fork Events
+
+```{r}
+fork_repo_type_actors_freq <- fork_events_repo_type_summary %>%
+  group_by(type, num_actors_log) %>%
+  summarise(
+    num_actors_max = max(num_actors),
+    num_actors_min = min(num_actors),
+    num_repos = n()
+  )
+```
+
+```{r}
+ggplot(data = fork_repo_type_actors_freq, 
+       aes(x = type, 
+           y = num_repos,
+           fill=factor(num_actors_log))) +
+  geom_bar(stat="identity", position="dodge") +
+  theme(legend.position="none") +
+  ylab("Repos with x Actors per Event Type") +
+  xlab("Event Type") +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1))
+
+ggsave("fork_repo_event_type_actors_freq.png")
+
+fork_repo_max_actors <- fork_repo_type_actors_freq %>%
+  filter(num_repos >= 10)
+
+ggplot(data = fork_repo_max_actors, 
+       aes(x=reorder(type, -num_repos), 
+       y=num_repos, 
+       fill=factor(num_actors_max))) +
+  geom_bar(stat="identity", position="dodge") + 
+  ylab("Repos") +
+  xlab("Event Type") +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1)) + 
+  ggtitle("Top Event Type Actors p/ Repo")
+
+ggsave("fork_repo_max_actors.png")
+
+```
+
+### Release Events
+
+```{r}
+release_repo_type_actors_freq <- release_events_repo_type_summary %>%
+  group_by(type, num_actors_log) %>%
+  summarise(
+    num_actors_max = max(num_actors),
+    num_actors_min = min(num_actors),
+    num_repos = n()
+  )
+```
+
+```{r}
+ggplot(data = release_repo_type_actors_freq, 
+       aes(x = type, 
+           y = num_repos,
+           fill=factor(num_actors_log))) +
+  geom_bar(stat="identity", position="dodge") +
+  theme(legend.position="none") +
+  ylab("Repos with x Actors per Event Type") +
+  xlab("Event Type") +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1))
+
+ggsave("release_repo_event_type_actors_freq.png")
+
+release_repo_max_actors <- release_repo_type_actors_freq %>%
+  filter(num_repos >= 10)
+
+ggplot(data = release_repo_max_actors, 
+       aes(x=reorder(type, -num_repos), 
+       y=num_repos, 
+       fill=factor(num_actors_max))) +
+  geom_bar(stat="identity", position="dodge") + 
+  ylab("Repos") +
+  xlab("Event Type") +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1)) + 
+  ggtitle("Top Event Type Actors p/ Repo")
+
+ggsave("release_repo_max_actors.png")
+
+```
+
+
+## Events per Actor Percent Frequency
+
+### All Events
 
 ```{r}
 all_repo_e2a_pct_freq <- readRDS("all_repo_e2a_pct_freq.rds")
@@ -210,7 +716,151 @@ ggsave("all_repo_e2a_pct_freq.png")
 
 ```
 
-### Repos per Owner
+### Push Events
+
+```{r}
+push_repo_e2a_pct_freq <- push_events_repo_summary %>%
+  group_by(events_per_actor_pct_log) %>%
+  summarise(
+    events_per_actor_pct_max = max(events_per_actor_pct),
+    events_per_actor_pct_min = min(events_per_actor_pct),
+    events_per_actor_pct_max_rnd = round(events_per_actor_pct_max,3),
+    total_actors_max = max(total_actors),
+    total_actors_min = min(total_actors),
+    num_repos = n()
+  )
+```
+
+```{r}
+
+ggplot(data = push_repo_e2a_pct_freq, 
+       aes(x = factor(total_actors_max), 
+           y = num_repos,
+           fill=factor(events_per_actor_pct_max_rnd))) +
+  geom_bar(stat="identity", position="dodge") +
+  ylab("Repos") +
+  xlab("Max Actors p/ Repo") +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1))
+
+ggsave("push_repo_e2a_pct_freq.png")
+
+```
+
+```{r}
+push_repo_owner <- readRDS("push_repo_owner.rds")
+
+push_repo_owner_freq <- push_repo_owner %>%
+  mutate(public_repos_log = round(log(public_repos))) %>%
+  group_by(public_repos_log) %>%
+  summarise(num_actors = n(),
+            public_repos_max = max(public_repos),
+            public_repos_min = min(public_repos))
+
+ggplot(data = push_repo_owner_freq,
+       aes(x = factor(public_repos_max),
+           y = num_actors,
+           fill=factor(public_repos_log))) +
+  geom_bar(stat="identity", position="stack") +
+  theme(legend.position="none") +
+  ylab("Actors with x Repos") +
+  xlab("Max Repos") +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1))
+
+ggsave("push_repo_owner_freq.png")
+```
+
+
+### Watch Events
+
+```{r}
+watch_repo_e2a_pct_freq <- watch_events_repo_summary %>%
+  group_by(events_per_actor_pct_log) %>%
+  summarise(
+    events_per_actor_pct_max = max(events_per_actor_pct),
+    events_per_actor_pct_min = min(events_per_actor_pct),
+    events_per_actor_pct_max_rnd = round(events_per_actor_pct_max,3),
+    total_actors_max = max(total_actors),
+    total_actors_min = min(total_actors),
+    num_repos = n()
+  )
+```
+
+```{r}
+
+ggplot(data = watch_repo_e2a_pct_freq, 
+       aes(x = factor(total_actors_max), 
+           y = num_repos,
+           fill=factor(events_per_actor_pct_max_rnd))) +
+  geom_bar(stat="identity", position="dodge") +
+  ylab("Repos") +
+  xlab("Max Actors p/ Repo") +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1))
+
+ggsave("watch_repo_e2a_pct_freq.png")
+
+```
+
+### Fork Events
+
+```{r}
+fork_repo_e2a_pct_freq <- fork_events_repo_summary %>%
+  group_by(events_per_actor_pct_log) %>%
+  summarise(
+    events_per_actor_pct_max = max(events_per_actor_pct),
+    events_per_actor_pct_min = min(events_per_actor_pct),
+    events_per_actor_pct_max_rnd = round(events_per_actor_pct_max,3),
+    total_actors_max = max(total_actors),
+    total_actors_min = min(total_actors),
+    num_repos = n()
+  )
+```
+
+```{r}
+
+ggplot(data = fork_repo_e2a_pct_freq, 
+       aes(x = factor(total_actors_max), 
+           y = num_repos,
+           fill=factor(events_per_actor_pct_max_rnd))) +
+  geom_bar(stat="identity", position="dodge") +
+  ylab("Repos") +
+  xlab("Max Actors p/ Repo") +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1))
+
+ggsave("fork_repo_e2a_pct_freq.png")
+
+```
+
+### Release Events
+
+```{r}
+release_repo_e2a_pct_freq <- release_events_repo_summary %>%
+  group_by(events_per_actor_pct_log) %>%
+  summarise(
+    events_per_actor_pct_max = max(events_per_actor_pct),
+    events_per_actor_pct_min = min(events_per_actor_pct),
+    events_per_actor_pct_max_rnd = round(events_per_actor_pct_max,3),
+    total_actors_max = max(total_actors),
+    total_actors_min = min(total_actors),
+    num_repos = n()
+  )
+```
+
+```{r}
+
+ggplot(data = release_repo_e2a_pct_freq, 
+       aes(x = factor(total_actors_max), 
+           y = num_repos,
+           fill=factor(events_per_actor_pct_max_rnd))) +
+  geom_bar(stat="identity", position="dodge") +
+  ylab("Repos") +
+  xlab("Max Actors p/ Repo") +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1))
+
+ggsave("release_repo_e2a_pct_freq.png")
+
+```
+
+## Repos per Owner
 
 ```{r}
 all_repo_owner <- readRDS("all_repo_owner.rds")
@@ -235,7 +885,19 @@ ggplot(data = all_repo_owner_freq,
 ggsave("all_repo_owner_freq.png")
 ```
 
-### Age and Last Update
+### All Events
+
+### Push Events
+
+### Watch Events
+
+### Fork Events
+
+### Release Events
+
+## Age and Last Update
+
+### All Events
 
 ```{r}
 all_repo_age <- readRDS("all_repo_age.rds")
@@ -327,382 +989,7 @@ ggsave("all_repo_age_vs_updated_freq.png")
 
 ```
 
-### Language
-
-```{r}
-all_repo_languages <- readRDS("all_repo_languages.rds")
-
-all_repo_languages_top <- all_repo_languages %>%
-  group_by(language) %>%
-  summarise(
-    total_repos = n()
-  ) %>%
-  filter(total_repos > 1)
-
-all_repo_languages_pct_freq <- all_repo_languages %>%
-  group_by(language, loc_log) %>%
-  summarise(
-    loc_pct_min = min(loc_pct),
-    loc_pct_max = round(max(loc_pct), 1),
-    num_repos = n()
-  )
-
-all_repo_languages_pct_freq_top <- all_repo_languages_pct_freq %>%
-  filter(language %in% all_repo_languages_top$language)
-
-all_repo_languages_pct_freq_top <- merge(all_repo_languages_pct_freq_top, all_repo_languages_top, by="language")
-
-# TODO flip coord?
-
-ggplot(data = all_repo_languages_pct_freq_top, 
-       aes(x = reorder(language, -total_repos), 
-           y = num_repos,
-           fill=factor(loc_pct_max))) +
-  geom_bar(stat="identity", position="stack") +
-  ylab("Repos") +
-  xlab("Language") +
-  theme(axis.text.x = element_text(angle = 90, hjust = 1))
-
-ggsave("all_repo_languages_pct_freq_top.png")
-  
-  
-```
-
-### Releases
-
-```{r}
-
-all_repo_releases <- readRDS("all_repo_releases.rds")
-
-all_repo_releases_change <- all_repo_releases %>%
-  group_by(repo_slug) %>%
-  arrange(repo_slug, published_at) %>%
-  mutate(
-    prev_published_at = lag(published_at),
-    published_at_interval = ceiling(difftime(published_at, prev_published_at, units="days")),
-    is_release = ifelse(is.na(id), 0, 1),
-    release_sum = sum(is_release)
-  )
-
-# repos with releases
-all_repo_releases_freq <- all_repo_releases_change %>%
-  group_by(repo_slug) %>%
-  summarise(
-    release_count = sum(is_release),
-    published_at_min = min(published_at),
-    published_at_max = max(published_at),
-    published_at_interval_max = ifelse(release_count == 1, 0, max(published_at_interval, na.rm=TRUE)),
-    published_at_interval_min = ifelse(release_count == 1, 0, min(published_at_interval, na.rm=TRUE)),
-    published_at_interval_mean = ifelse(release_count == 1, 0, round(mean(published_at_interval, na.rm=TRUE))),
-    published_at_interval_mean = ifelse(release_count == 0, mean(published_at_interval), published_at_interval_mean),
-    published_at_interval_med = ifelse(release_count == 1, 0, round(median(published_at_interval, na.rm=TRUE)))
-  )  %>%
-  mutate(
-    release_count_log = round(log(release_count))
-  )
-
-# number of releases
-
-all_repo_releases_freq_summary <- all_repo_releases_freq %>%
-  group_by(release_count_log) %>%
-  summarise(
-    num_repos = n(),
-    release_count_min = min(release_count),
-    release_count_max = max(release_count),
-    time_between_min = min(published_at_interval_min),
-    time_between_max = max(published_at_interval_max),
-    time_between_mean = mean(published_at_interval_mean),
-    time_between_med = median(published_at_interval_med),
-    release_count_min_max = ifelse(release_count_min == release_count_max,
-                                   paste(release_count_min),
-                                   paste(release_count_min, "-", release_count_max)),
-    time_between_min_max = ifelse(time_between_min == time_between_max, 
-                                  paste(time_between_min), 
-                                  paste(time_between_min, "-", time_between_max))
-  )
-
-ggplot(data = all_repo_releases_freq_summary, 
-       aes(x = release_count_min_max, 
-           y = num_repos,
-           fill=factor(release_count_log))) +
-  geom_bar(stat="identity") +
-  theme(legend.position="none") +
-  ylab("Repos") +
-  xlab("Releases")
-
-ggsave("all_repo_releases_freq_summary_cnt.png")
-
-# frequency of releases
-ggplot(data = all_repo_releases_change %>% filter(is_release==1 & published_at_interval > 0), 
-       aes(x = reorder(repo_slug, -release_sum), 
-           y = published_at_interval, fill=factor(published_at_interval))) +
-  geom_bar(stat="identity", position = "dodge") +
-  theme(legend.position="none") +
-  ylab("Time Between Releases (Days)") +
-  xlab("Repos") +
-  theme(axis.text.x = element_blank())
-
-ggsave("all_repo_releases_freq_summary_bt.png")
-```
-
-### README
-
-```{r}
-
-all_repo_readme <- readRDS("all_repo_readme.rds")
-
-all_repo_readme <- all_repo_readme %>%
-  mutate(
-    has_readme = ifelse(is.na(size), FALSE, TRUE),
-    size_log = round(log(size))
-  )
-
-# repos with a readme vs repos with no readme
-ggplot(data = all_repo_readme, 
-       aes(x = has_readme,
-           fill = factor(has_readme))) +
-  geom_bar() +
-  theme(legend.position="none") +
-  xlab("Readme?")
-
-all_repo_readme_size_freq <- all_repo_readme %>%
-  group_by(size_log) %>%
-  summarise(
-    num_repos = n(),
-    size_min = min(size),
-    size_max = max(size),
-    size_min_max = ifelse(is.na(size_min), paste(NA), paste(size_min, "-", size_max))
-  )
-
-ggplot(data = all_repo_readme_size_freq, 
-       aes(x = reorder(size_min_max, size_log),
-           y = num_repos,
-           fill = factor(size_log))) +
-  geom_bar(stat="identity") +
-  theme(legend.position="none") +
-  xlab("Readme Size") +
-  ylab("Repos") +
-  theme(axis.text.x = element_text(angle = 90, hjust = 1))
-
-ggsave("all_repo_readme_size_freq.png")
-
-```
-```{r}
-
-# repos with a build status in the readme
-ggplot(data = all_repo_readme, 
-       aes(x = build_status_host, fill=build_status_host)) +
-  geom_bar() +
-  theme(legend.position="none") +
-  xlab("Build Status Host") +
-  theme(axis.text.x = element_text(angle = 90, hjust = 1))
-  
-```
-```{r}
-# did any of the repos with build status do releases?
-all_repo_has_releases <- all_repo_releases_freq %>%
-  select(repo_slug, release_count)
-
-all_repo_readme_sub <- all_repo_readme %>%
-  select(repo_slug, has_readme, build_status_host, size, size_log)
-
-all_repo_readme_releases <- merge(all_repo_has_releases, all_repo_readme_sub)
-
-all_repo_readme_releases_true <- all_repo_readme_releases %>%
-  mutate(has_build_status=ifelse(is.na(build_status_host), FALSE, TRUE)) %>%
-  filter(has_build_status == TRUE)
-
-ggplot(data = all_repo_readme_releases_true, 
-       aes(x = reorder(repo_slug, -release_count), y = release_count, fill=build_status_host)) +
-  geom_bar(stat="identity") +
-  xlab("Repos with Build Status") +
-  ylab("Releases") +
-  theme(axis.text.x = element_blank())
-
-ggsave("all_repo_readme_buildstatus_host.png")
-```
-
-
-## Push Events
-
-Previous studies in this series have established that Push events are well represented across all levels of participation. We would expect the sample taken from Push Events to resemble the control sample in the previous section. 
-
-```{r}
-push_events_repo_summary <- readRDS("push_events_repo_summary.rds")
-push_events_repo_type_summary <- readRDS("push_events_repo_type_summary.rds")
-```
-
-
-### Event Type Frequency per Repository
-
-How were event types distributed amongst repositories? The charts below count the number of repositories per event type frequency.
-
-```{r}
-push_repo_event_type_freq <- push_events_repo_type_summary %>%
-  group_by(type, num_events_log) %>%
-  summarise(
-    num_events_max = max(num_events),
-    num_events_min = min(num_events),
-    num_repos = n()
-  )
-```
-
-
-```{r}
-ggplot(data = push_repo_event_type_freq, 
-       aes(x=reorder(type, -num_repos), 
-       y=num_repos,
-       fill=factor(num_events_log))) +
-  geom_bar(stat="identity", position="dodge") + 
-  theme(legend.position="none") +
-  ylab("Repos") +
-  xlab("Event Type") +
-  theme(axis.text.x = element_text(angle = 90, hjust = 1)) + 
-  ggtitle("Event Type Frequencies p/ Repo")
-
-ggsave("push_repo_event_type_freq.png")
-
-push_repo_max_events <- push_repo_event_type_freq %>%
-  filter(num_repos >= 10)
-
-ggplot(data = push_repo_max_events, 
-       aes(x=reorder(type, -num_repos), 
-       y=num_repos, 
-       fill=factor(num_events_max))) +
-  geom_bar(stat="identity", position="dodge") + 
-  ylab("Repos") +
-  xlab("Event Type") +
-  theme(axis.text.x = element_text(angle = 90, hjust = 1)) + 
-  ggtitle("Top Event Type Frequencies p/ Repo")
-
-ggsave("push_repo_max_events.png")
-```
-
-
-### Actors per Repository
-
-In the sample, 3/4 of the repositories had 1-12 unique actors in 15 months.
-
-```{r}
-push_repo_actors_freq <- push_events_repo_summary %>%
-  group_by(total_actors_log) %>%
-  summarise(
-    total_actors_max = max(total_actors),
-    total_actors_min = min(total_actors),
-    num_repos = n()
-  )
-```
-
-
-```{r}
-ggplot(data = push_repo_actors_freq, 
-       aes(x = factor(total_actors_max), 
-           y = num_repos,
-           fill=factor(total_actors_log))) +
-  geom_bar(stat="identity", position="stack") +
-  theme(legend.position="none") +
-  ylab("Repos with x Actors") +
-  xlab("Max Actors")
-
-ggsave("push_repo_actors_freq.png")
-```
-
-### Actors per Event Type per Repo
-
-```{r}
-push_repo_type_actors_freq <- push_events_repo_type_summary %>%
-  group_by(type, num_actors_log) %>%
-  summarise(
-    num_actors_max = max(num_actors),
-    num_actors_min = min(num_actors),
-    num_repos = n()
-  )
-```
-
-```{r}
-ggplot(data = push_repo_type_actors_freq, 
-       aes(x = type, 
-           y = num_repos,
-           fill=factor(num_actors_log))) +
-  geom_bar(stat="identity", position="dodge") +
-  theme(legend.position="none") +
-  ylab("Repos with x Actors per Event Type") +
-  xlab("Event Type") +
-  theme(axis.text.x = element_text(angle = 90, hjust = 1))
-
-ggsave("push_repo_event_type_actors_freq.png")
-
-push_repo_max_actors <- push_repo_type_actors_freq %>%
-  filter(num_repos >= 10)
-
-ggplot(data = push_repo_max_actors, 
-       aes(x=reorder(type, -num_repos), 
-       y=num_repos, 
-       fill=factor(num_actors_max))) +
-  geom_bar(stat="identity", position="dodge") + 
-  ylab("Repos") +
-  xlab("Event Type") +
-  theme(axis.text.x = element_text(angle = 90, hjust = 1)) + 
-  ggtitle("Top Event Type Actors p/ Repo")
-
-ggsave("push_repo_max_actors.png")
-
-```
-
-### Events per Actor Percent Frequency
-
-```{r}
-push_repo_e2a_pct_freq <- push_events_repo_summary %>%
-  group_by(events_per_actor_pct_log) %>%
-  summarise(
-    events_per_actor_pct_max = max(events_per_actor_pct),
-    events_per_actor_pct_min = min(events_per_actor_pct),
-    events_per_actor_pct_max_rnd = round(events_per_actor_pct_max,3),
-    total_actors_max = max(total_actors),
-    total_actors_min = min(total_actors),
-    num_repos = n()
-  )
-```
-
-```{r}
-
-ggplot(data = push_repo_e2a_pct_freq, 
-       aes(x = factor(total_actors_max), 
-           y = num_repos,
-           fill=factor(events_per_actor_pct_max_rnd))) +
-  geom_bar(stat="identity", position="dodge") +
-  ylab("Repos") +
-  xlab("Max Actors p/ Repo") +
-  theme(axis.text.x = element_text(angle = 90, hjust = 1))
-
-ggsave("push_repo_e2a_pct_freq.png")
-
-```
-
-```{r}
-push_repo_owner <- readRDS("push_repo_owner.rds")
-
-push_repo_owner_freq <- push_repo_owner %>%
-  mutate(public_repos_log = round(log(public_repos))) %>%
-  group_by(public_repos_log) %>%
-  summarise(num_actors = n(),
-            public_repos_max = max(public_repos),
-            public_repos_min = min(public_repos))
-
-ggplot(data = push_repo_owner_freq,
-       aes(x = factor(public_repos_max),
-           y = num_actors,
-           fill=factor(public_repos_log))) +
-  geom_bar(stat="identity", position="stack") +
-  theme(legend.position="none") +
-  ylab("Actors with x Repos") +
-  xlab("Max Repos") +
-  theme(axis.text.x = element_text(angle = 90, hjust = 1))
-
-ggsave("push_repo_owner_freq.png")
-```
-
-### Age and Last Update
+### Push Events
 
 ```{r}
 push_repo_age <- readRDS("push_repo_age.rds")
@@ -794,372 +1081,8 @@ ggsave("push_repo_age_vs_updated_freq.png")
 
 ```
 
-### Language
+### Watch Events
 
-```{r}
-push_repo_languages <- readRDS("push_repo_languages.rds")
-
-push_repo_languages <- push_repo_languages %>%
-  group_by(repo_slug) %>%
-  mutate(loc_sum = sum(loc))
-
-push_repo_languages <- push_repo_languages %>%
-  mutate(
-    loc_log = round(log(loc)),
-    loc_pct = loc/loc_sum
-  )
-
-push_repo_languages_top <- push_repo_languages %>%
-  group_by(language) %>%
-  summarise(
-    total_repos = n()
-  ) %>%
-  filter(total_repos > 1)
-
-push_repo_languages_pct_freq <- push_repo_languages %>%
-  group_by(language, loc_log) %>%
-  summarise(
-    loc_pct_min = min(loc_pct),
-    loc_pct_max = round(max(loc_pct), 1),
-    num_repos = n()
-  )
-
-push_repo_languages_pct_freq_top <- push_repo_languages_pct_freq %>%
-  filter(language %in% push_repo_languages_top$language)
-
-push_repo_languages_pct_freq_top <- merge(push_repo_languages_pct_freq_top, push_repo_languages_top, by="language")
-
-# TODO flip coord?
-
-ggplot(data = push_repo_languages_pct_freq_top, 
-       aes(x = reorder(language, -total_repos), 
-           y = num_repos,
-           fill=factor(loc_pct_max))) +
-  geom_bar(stat="identity", position="stack") +
-  ylab("Repos") +
-  xlab("Language") +
-  theme(axis.text.x = element_text(angle = 90, hjust = 1))
-
-ggsave("push_repo_languages_pct_freq_top.png")
-  
-  
-```
-
-### Releases
-
-```{r}
-
-push_repo_releases <- readRDS("push_repo_releases.rds")
-
-push_repo_releases_change <- push_repo_releases %>%
-  group_by(repo_slug) %>%
-  arrange(repo_slug, published_at) %>%
-  mutate(
-    prev_published_at = lag(published_at),
-    published_at_interval = ceiling(difftime(published_at, prev_published_at, units="days")),
-    is_release = ifelse(is.na(id), 0, 1),
-    release_sum = sum(is_release)
-  )
-
-# repos with releases
-push_repo_releases_freq <- push_repo_releases_change %>%
-  group_by(repo_slug) %>%
-  summarise(
-    release_count = sum(is_release),
-    published_at_min = min(published_at),
-    published_at_max = max(published_at),
-    published_at_interval_max = ifelse(release_count == 1, 0, max(published_at_interval, na.rm=TRUE)),
-    published_at_interval_min = ifelse(release_count == 1, 0, min(published_at_interval, na.rm=TRUE)),
-    published_at_interval_mean = ifelse(release_count == 1, 0, round(mean(published_at_interval, na.rm=TRUE))),
-    published_at_interval_mean = ifelse(release_count == 0, mean(published_at_interval), published_at_interval_mean),
-    published_at_interval_med = ifelse(release_count == 1, 0, round(median(published_at_interval, na.rm=TRUE)))
-  )  %>%
-  mutate(
-    release_count_log = round(log(release_count))
-  )
-
-# number of releases
-
-push_repo_releases_freq_summary <- push_repo_releases_freq %>%
-  group_by(release_count_log) %>%
-  summarise(
-    num_repos = n(),
-    release_count_min = min(release_count),
-    release_count_max = max(release_count),
-    time_between_min = min(published_at_interval_min),
-    time_between_max = max(published_at_interval_max),
-    time_between_mean = mean(published_at_interval_mean),
-    time_between_med = median(published_at_interval_med),
-    release_count_min_max = ifelse(release_count_min == release_count_max,
-                                   paste(release_count_min),
-                                   paste(release_count_min, "-", release_count_max)),
-    time_between_min_max = ifelse(time_between_min == time_between_max, 
-                                  paste(time_between_min), 
-                                  paste(time_between_min, "-", time_between_max))
-  )
-
-ggplot(data = push_repo_releases_freq_summary, 
-       aes(x = release_count_min_max, 
-           y = num_repos,
-           fill=factor(release_count_log))) +
-  geom_bar(stat="identity") +
-  theme(legend.position="none") +
-  ylab("Repos") +
-  xlab("Releases")
-
-ggsave("push_repo_releases_freq_summary_cnt.png")
-
-# frequency of releases
-ggplot(data = push_repo_releases_change %>% filter(is_release==1 & published_at_interval > 0), 
-       aes(x = reorder(repo_slug, -release_sum), 
-           y = published_at_interval, fill=factor(published_at_interval))) +
-  geom_bar(stat="identity", position = "dodge") +
-  theme(legend.position="none") +
-  ylab("Time Between Releases (Days)") +
-  xlab("Repos") +
-  theme(axis.text.x = element_blank())
-
-ggsave("push_repo_releases_freq_summary_bt.png")
-```
-
-### README
-
-```{r}
-
-push_repo_readme <- readRDS("push_repo_readme.rds")
-
-push_repo_readme <- push_repo_readme %>%
-  mutate(
-    has_readme = ifelse(is.na(size), FALSE, TRUE),
-    size_log = round(log(size))
-  )
-
-# repos with a readme vs repos with no readme
-ggplot(data = push_repo_readme, 
-       aes(x = has_readme,
-           fill = factor(has_readme))) +
-  geom_bar() +
-  theme(legend.position="none") +
-  xlab("Readme?")
-
-push_repo_readme_size_freq <- push_repo_readme %>%
-  group_by(size_log) %>%
-  summarise(
-    num_repos = n(),
-    size_min = min(size),
-    size_max = max(size),
-    size_min_max = ifelse(is.na(size_min), paste(NA), paste(size_min, "-", size_max))
-  )
-
-ggplot(data = push_repo_readme_size_freq, 
-       aes(x = reorder(size_min_max, size_log),
-           y = num_repos,
-           fill = factor(size_log))) +
-  geom_bar(stat="identity") +
-  theme(legend.position="none") +
-  xlab("Readme Size") +
-  ylab("Repos") +
-  theme(axis.text.x = element_text(angle = 90, hjust = 1))
-
-ggsave("push_repo_readme_size_freq.png")
-
-```
-
-```{r}
-
-# repos with a build status in the readme
-ggplot(data = push_repo_readme, 
-       aes(x = build_status_host, fill=build_status_host)) +
-  geom_bar() +
-  theme(legend.position="none") +
-  xlab("Build Status Host") +
-  theme(axis.text.x = element_text(angle = 90, hjust = 1))
-  
-```
-
-```{r}
-# did any of the repos with build status do releases?
-push_repo_has_releases <- push_repo_releases_freq %>%
-  select(repo_slug, release_count)
-
-push_repo_readme_sub <- push_repo_readme %>%
-  select(repo_slug, has_readme, build_status_host, size, size_log)
-
-push_repo_readme_releases <- merge(push_repo_has_releases, push_repo_readme_sub)
-
-push_repo_readme_releases_true <- push_repo_readme_releases %>%
-  mutate(has_build_status=ifelse(is.na(build_status_host), FALSE, TRUE)) %>%
-  filter(has_build_status == TRUE)
-
-ggplot(data = push_repo_readme_releases_true, 
-       aes(x = reorder(repo_slug, -release_count), y = release_count, fill=build_status_host)) +
-  geom_bar(stat="identity") +
-  xlab("Repos with Build Status") +
-  ylab("Releases") +
-  theme(axis.text.x = element_blank())
-
-ggsave("push_repo_readme_buildstatus_host.png")
-```
-
-
-
-## Watch Events
-
-Previous studies in this series have established that Watch events are well represented across higher levels of participation. We would expect the sample taken from Watch Events to be larger projects with more contributors and end users.
-
-```{r}
-watch_events_repo_summary <- readRDS("watch_events_repo_summary.rds")
-watch_events_repo_type_summary <- readRDS("watch_events_repo_type_summary.rds")
-```
-
-
-### Event Type Frequency per Repository
-
-How were event types distributed amongst repositories? The charts below count the number of repositories per event type frequency.
-
-```{r}
-watch_repo_event_type_freq <- watch_events_repo_type_summary %>%
-  group_by(type, num_events_log) %>%
-  summarise(
-    num_events_max = max(num_events),
-    num_events_min = min(num_events),
-    num_repos = n()
-  )
-```
-
-
-```{r}
-ggplot(data = watch_repo_event_type_freq, 
-       aes(x=reorder(type, -num_repos), 
-       y=num_repos,
-       fill=factor(num_events_log))) +
-  geom_bar(stat="identity", position="dodge") + 
-  theme(legend.position="none") +
-  ylab("Repos") +
-  xlab("Event Type") +
-  theme(axis.text.x = element_text(angle = 90, hjust = 1)) + 
-  ggtitle("Event Type Frequencies p/ Repo")
-
-ggsave("watch_repo_event_type_freq.png")
-
-watch_repo_max_events <- watch_repo_event_type_freq %>%
-  filter(num_repos >= 10)
-
-ggplot(data = watch_repo_max_events, 
-       aes(x=reorder(type, -num_repos), 
-       y=num_repos, 
-       fill=factor(num_events_max))) +
-  geom_bar(stat="identity", position="dodge") + 
-  ylab("Repos") +
-  xlab("Event Type") +
-  theme(axis.text.x = element_text(angle = 90, hjust = 1)) + 
-  ggtitle("Top Event Type Frequencies p/ Repo")
-
-ggsave("watch_repo_max_events.png")
-```
-
-
-### Actors per Repository
-
-In the sample, 3/4 of the repositories had 1-12 unique actors in 15 months.
-
-```{r}
-watch_repo_actors_freq <- watch_events_repo_summary %>%
-  group_by(total_actors_log) %>%
-  summarise(
-    total_actors_max = max(total_actors),
-    total_actors_min = min(total_actors),
-    num_repos = n()
-  )
-```
-
-
-```{r}
-ggplot(data = watch_repo_actors_freq, 
-       aes(x = factor(total_actors_max), 
-           y = num_repos,
-           fill=factor(total_actors_log))) +
-  geom_bar(stat="identity", position="stack") +
-  theme(legend.position="none") +
-  ylab("Repos with x Actors") +
-  xlab("Max Actors")
-
-ggsave("watch_repo_actors_freq.png")
-```
-
-### Actors per Event Type per Repo
-
-```{r}
-watch_repo_type_actors_freq <- watch_events_repo_type_summary %>%
-  group_by(type, num_actors_log) %>%
-  summarise(
-    num_actors_max = max(num_actors),
-    num_actors_min = min(num_actors),
-    num_repos = n()
-  )
-```
-
-```{r}
-ggplot(data = watch_repo_type_actors_freq, 
-       aes(x = type, 
-           y = num_repos,
-           fill=factor(num_actors_log))) +
-  geom_bar(stat="identity", position="dodge") +
-  theme(legend.position="none") +
-  ylab("Repos with x Actors per Event Type") +
-  xlab("Event Type") +
-  theme(axis.text.x = element_text(angle = 90, hjust = 1))
-
-ggsave("watch_repo_event_type_actors_freq.png")
-
-watch_repo_max_actors <- watch_repo_type_actors_freq %>%
-  filter(num_repos >= 10)
-
-ggplot(data = watch_repo_max_actors, 
-       aes(x=reorder(type, -num_repos), 
-       y=num_repos, 
-       fill=factor(num_actors_max))) +
-  geom_bar(stat="identity", position="dodge") + 
-  ylab("Repos") +
-  xlab("Event Type") +
-  theme(axis.text.x = element_text(angle = 90, hjust = 1)) + 
-  ggtitle("Top Event Type Actors p/ Repo")
-
-ggsave("watch_repo_max_actors.png")
-
-```
-
-### Events per Actor Percent Frequency
-
-```{r}
-watch_repo_e2a_pct_freq <- watch_events_repo_summary %>%
-  group_by(events_per_actor_pct_log) %>%
-  summarise(
-    events_per_actor_pct_max = max(events_per_actor_pct),
-    events_per_actor_pct_min = min(events_per_actor_pct),
-    events_per_actor_pct_max_rnd = round(events_per_actor_pct_max,3),
-    total_actors_max = max(total_actors),
-    total_actors_min = min(total_actors),
-    num_repos = n()
-  )
-```
-
-```{r}
-
-ggplot(data = watch_repo_e2a_pct_freq, 
-       aes(x = factor(total_actors_max), 
-           y = num_repos,
-           fill=factor(events_per_actor_pct_max_rnd))) +
-  geom_bar(stat="identity", position="dodge") +
-  ylab("Repos") +
-  xlab("Max Actors p/ Repo") +
-  theme(axis.text.x = element_text(angle = 90, hjust = 1))
-
-ggsave("watch_repo_e2a_pct_freq.png")
-
-```
-
-### Age and Last Update
 
 ```{r}
 watch_repo_age <- readRDS("watch_repo_age.rds")
@@ -1253,7 +1176,106 @@ ggsave("watch_repo_age_vs_updated_freq.png")
 
 ```
 
-### Language
+### Fork Events
+
+### Release Events
+
+## Language
+
+### All Events
+
+```{r}
+all_repo_languages <- readRDS("all_repo_languages.rds")
+
+all_repo_languages_top <- all_repo_languages %>%
+  group_by(language) %>%
+  summarise(
+    total_repos = n()
+  ) %>%
+  filter(total_repos > 1)
+
+all_repo_languages_pct_freq <- all_repo_languages %>%
+  group_by(language, loc_log) %>%
+  summarise(
+    loc_pct_min = min(loc_pct),
+    loc_pct_max = round(max(loc_pct), 1),
+    num_repos = n()
+  )
+
+all_repo_languages_pct_freq_top <- all_repo_languages_pct_freq %>%
+  filter(language %in% all_repo_languages_top$language)
+
+all_repo_languages_pct_freq_top <- merge(all_repo_languages_pct_freq_top, all_repo_languages_top, by="language")
+
+# TODO flip coord?
+
+ggplot(data = all_repo_languages_pct_freq_top, 
+       aes(x = reorder(language, -total_repos), 
+           y = num_repos,
+           fill=factor(loc_pct_max))) +
+  geom_bar(stat="identity", position="stack") +
+  ylab("Repos") +
+  xlab("Language") +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1))
+
+ggsave("all_repo_languages_pct_freq_top.png")
+  
+  
+```
+
+### Push Events
+
+```{r}
+push_repo_languages <- readRDS("push_repo_languages.rds")
+
+push_repo_languages <- push_repo_languages %>%
+  group_by(repo_slug) %>%
+  mutate(loc_sum = sum(loc))
+
+push_repo_languages <- push_repo_languages %>%
+  mutate(
+    loc_log = round(log(loc)),
+    loc_pct = loc/loc_sum
+  )
+
+push_repo_languages_top <- push_repo_languages %>%
+  group_by(language) %>%
+  summarise(
+    total_repos = n()
+  ) %>%
+  filter(total_repos > 1)
+
+push_repo_languages_pct_freq <- push_repo_languages %>%
+  group_by(language, loc_log) %>%
+  summarise(
+    loc_pct_min = min(loc_pct),
+    loc_pct_max = round(max(loc_pct), 1),
+    num_repos = n()
+  )
+
+push_repo_languages_pct_freq_top <- push_repo_languages_pct_freq %>%
+  filter(language %in% push_repo_languages_top$language)
+
+push_repo_languages_pct_freq_top <- merge(push_repo_languages_pct_freq_top, push_repo_languages_top, by="language")
+
+# TODO flip coord?
+
+ggplot(data = push_repo_languages_pct_freq_top, 
+       aes(x = reorder(language, -total_repos), 
+           y = num_repos,
+           fill=factor(loc_pct_max))) +
+  geom_bar(stat="identity", position="stack") +
+  ylab("Repos") +
+  xlab("Language") +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1))
+
+ggsave("push_repo_languages_pct_freq_top.png")
+  
+  
+```
+
+### Watch Events
+
 
 ```{r}
 watch_repo_languages <- readRDS("watch_repo_languages.rds")
@@ -1304,7 +1326,169 @@ ggsave("watch_repo_languages_pct_freq_top.png")
   
 ```
 
-### Releases
+
+### Fork Events
+
+### Release Events
+
+## Releases
+
+### All Events
+
+```{r}
+
+all_repo_releases <- readRDS("all_repo_releases.rds")
+
+all_repo_releases_change <- all_repo_releases %>%
+  group_by(repo_slug) %>%
+  arrange(repo_slug, published_at) %>%
+  mutate(
+    prev_published_at = lag(published_at),
+    published_at_interval = ceiling(difftime(published_at, prev_published_at, units="days")),
+    is_release = ifelse(is.na(id), 0, 1),
+    release_sum = sum(is_release)
+  )
+
+# repos with releases
+all_repo_releases_freq <- all_repo_releases_change %>%
+  group_by(repo_slug) %>%
+  summarise(
+    release_count = sum(is_release),
+    published_at_min = min(published_at),
+    published_at_max = max(published_at),
+    published_at_interval_max = ifelse(release_count == 1, 0, max(published_at_interval, na.rm=TRUE)),
+    published_at_interval_min = ifelse(release_count == 1, 0, min(published_at_interval, na.rm=TRUE)),
+    published_at_interval_mean = ifelse(release_count == 1, 0, round(mean(published_at_interval, na.rm=TRUE))),
+    published_at_interval_mean = ifelse(release_count == 0, mean(published_at_interval), published_at_interval_mean),
+    published_at_interval_med = ifelse(release_count == 1, 0, round(median(published_at_interval, na.rm=TRUE)))
+  )  %>%
+  mutate(
+    release_count_log = round(log(release_count))
+  )
+
+# number of releases
+
+all_repo_releases_freq_summary <- all_repo_releases_freq %>%
+  group_by(release_count_log) %>%
+  summarise(
+    num_repos = n(),
+    release_count_min = min(release_count),
+    release_count_max = max(release_count),
+    time_between_min = min(published_at_interval_min),
+    time_between_max = max(published_at_interval_max),
+    time_between_mean = mean(published_at_interval_mean),
+    time_between_med = median(published_at_interval_med),
+    release_count_min_max = ifelse(release_count_min == release_count_max,
+                                   paste(release_count_min),
+                                   paste(release_count_min, "-", release_count_max)),
+    time_between_min_max = ifelse(time_between_min == time_between_max, 
+                                  paste(time_between_min), 
+                                  paste(time_between_min, "-", time_between_max))
+  )
+
+ggplot(data = all_repo_releases_freq_summary, 
+       aes(x = release_count_min_max, 
+           y = num_repos,
+           fill=factor(release_count_log))) +
+  geom_bar(stat="identity") +
+  theme(legend.position="none") +
+  ylab("Repos") +
+  xlab("Releases")
+
+ggsave("all_repo_releases_freq_summary_cnt.png")
+
+# frequency of releases
+ggplot(data = all_repo_releases_change %>% filter(is_release==1 & published_at_interval > 0), 
+       aes(x = reorder(repo_slug, -release_sum), 
+           y = published_at_interval, fill=factor(published_at_interval))) +
+  geom_bar(stat="identity", position = "dodge") +
+  theme(legend.position="none") +
+  ylab("Time Between Releases (Days)") +
+  xlab("Repos") +
+  theme(axis.text.x = element_blank())
+
+ggsave("all_repo_releases_freq_summary_bt.png")
+```
+
+### Push Events
+
+```{r}
+
+push_repo_releases <- readRDS("push_repo_releases.rds")
+
+push_repo_releases_change <- push_repo_releases %>%
+  group_by(repo_slug) %>%
+  arrange(repo_slug, published_at) %>%
+  mutate(
+    prev_published_at = lag(published_at),
+    published_at_interval = ceiling(difftime(published_at, prev_published_at, units="days")),
+    is_release = ifelse(is.na(id), 0, 1),
+    release_sum = sum(is_release)
+  )
+
+# repos with releases
+push_repo_releases_freq <- push_repo_releases_change %>%
+  group_by(repo_slug) %>%
+  summarise(
+    release_count = sum(is_release),
+    published_at_min = min(published_at),
+    published_at_max = max(published_at),
+    published_at_interval_max = ifelse(release_count == 1, 0, max(published_at_interval, na.rm=TRUE)),
+    published_at_interval_min = ifelse(release_count == 1, 0, min(published_at_interval, na.rm=TRUE)),
+    published_at_interval_mean = ifelse(release_count == 1, 0, round(mean(published_at_interval, na.rm=TRUE))),
+    published_at_interval_mean = ifelse(release_count == 0, mean(published_at_interval), published_at_interval_mean),
+    published_at_interval_med = ifelse(release_count == 1, 0, round(median(published_at_interval, na.rm=TRUE)))
+  )  %>%
+  mutate(
+    release_count_log = round(log(release_count))
+  )
+
+# number of releases
+
+push_repo_releases_freq_summary <- push_repo_releases_freq %>%
+  group_by(release_count_log) %>%
+  summarise(
+    num_repos = n(),
+    release_count_min = min(release_count),
+    release_count_max = max(release_count),
+    time_between_min = min(published_at_interval_min),
+    time_between_max = max(published_at_interval_max),
+    time_between_mean = mean(published_at_interval_mean),
+    time_between_med = median(published_at_interval_med),
+    release_count_min_max = ifelse(release_count_min == release_count_max,
+                                   paste(release_count_min),
+                                   paste(release_count_min, "-", release_count_max)),
+    time_between_min_max = ifelse(time_between_min == time_between_max, 
+                                  paste(time_between_min), 
+                                  paste(time_between_min, "-", time_between_max))
+  )
+
+ggplot(data = push_repo_releases_freq_summary, 
+       aes(x = release_count_min_max, 
+           y = num_repos,
+           fill=factor(release_count_log))) +
+  geom_bar(stat="identity") +
+  theme(legend.position="none") +
+  ylab("Repos") +
+  xlab("Releases")
+
+ggsave("push_repo_releases_freq_summary_cnt.png")
+
+# frequency of releases
+ggplot(data = push_repo_releases_change %>% filter(is_release==1 & published_at_interval > 0), 
+       aes(x = reorder(repo_slug, -release_sum), 
+           y = published_at_interval, fill=factor(published_at_interval))) +
+  geom_bar(stat="identity", position = "dodge") +
+  theme(legend.position="none") +
+  ylab("Time Between Releases (Days)") +
+  xlab("Repos") +
+  theme(axis.text.x = element_blank())
+
+ggsave("push_repo_releases_freq_summary_bt.png")
+```
+
+### Watch Events
+
 
 ```{r}
 
@@ -1381,7 +1565,173 @@ ggplot(data = watch_repo_releases_change %>% filter(is_release==1 & published_at
 ggsave("watch_repo_releases_freq_summary_bt.png")
 ```
 
-### README
+
+
+
+### Fork Events
+
+### Release Events
+
+## README
+
+### All Events
+
+```{r}
+
+all_repo_readme <- readRDS("all_repo_readme.rds")
+
+all_repo_readme <- all_repo_readme %>%
+  mutate(
+    has_readme = ifelse(is.na(size), FALSE, TRUE),
+    size_log = round(log(size))
+  )
+
+# repos with a readme vs repos with no readme
+ggplot(data = all_repo_readme, 
+       aes(x = has_readme,
+           fill = factor(has_readme))) +
+  geom_bar() +
+  theme(legend.position="none") +
+  xlab("Readme?")
+
+all_repo_readme_size_freq <- all_repo_readme %>%
+  group_by(size_log) %>%
+  summarise(
+    num_repos = n(),
+    size_min = min(size),
+    size_max = max(size),
+    size_min_max = ifelse(is.na(size_min), paste(NA), paste(size_min, "-", size_max))
+  )
+
+ggplot(data = all_repo_readme_size_freq, 
+       aes(x = reorder(size_min_max, size_log),
+           y = num_repos,
+           fill = factor(size_log))) +
+  geom_bar(stat="identity") +
+  theme(legend.position="none") +
+  xlab("Readme Size") +
+  ylab("Repos") +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1))
+
+ggsave("all_repo_readme_size_freq.png")
+
+```
+```{r}
+
+# repos with a build status in the readme
+ggplot(data = all_repo_readme, 
+       aes(x = build_status_host, fill=build_status_host)) +
+  geom_bar() +
+  theme(legend.position="none") +
+  xlab("Build Status Host") +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1))
+  
+```
+```{r}
+# did any of the repos with build status do releases?
+all_repo_has_releases <- all_repo_releases_freq %>%
+  select(repo_slug, release_count)
+
+all_repo_readme_sub <- all_repo_readme %>%
+  select(repo_slug, has_readme, build_status_host, size, size_log)
+
+all_repo_readme_releases <- merge(all_repo_has_releases, all_repo_readme_sub)
+
+all_repo_readme_releases_true <- all_repo_readme_releases %>%
+  mutate(has_build_status=ifelse(is.na(build_status_host), FALSE, TRUE)) %>%
+  filter(has_build_status == TRUE)
+
+ggplot(data = all_repo_readme_releases_true, 
+       aes(x = reorder(repo_slug, -release_count), y = release_count, fill=build_status_host)) +
+  geom_bar(stat="identity") +
+  xlab("Repos with Build Status") +
+  ylab("Releases") +
+  theme(axis.text.x = element_blank())
+
+ggsave("all_repo_readme_buildstatus_host.png")
+```
+
+### Push Events
+
+```{r}
+
+push_repo_readme <- readRDS("push_repo_readme.rds")
+
+push_repo_readme <- push_repo_readme %>%
+  mutate(
+    has_readme = ifelse(is.na(size), FALSE, TRUE),
+    size_log = round(log(size))
+  )
+
+# repos with a readme vs repos with no readme
+ggplot(data = push_repo_readme, 
+       aes(x = has_readme,
+           fill = factor(has_readme))) +
+  geom_bar() +
+  theme(legend.position="none") +
+  xlab("Readme?")
+
+push_repo_readme_size_freq <- push_repo_readme %>%
+  group_by(size_log) %>%
+  summarise(
+    num_repos = n(),
+    size_min = min(size),
+    size_max = max(size),
+    size_min_max = ifelse(is.na(size_min), paste(NA), paste(size_min, "-", size_max))
+  )
+
+ggplot(data = push_repo_readme_size_freq, 
+       aes(x = reorder(size_min_max, size_log),
+           y = num_repos,
+           fill = factor(size_log))) +
+  geom_bar(stat="identity") +
+  theme(legend.position="none") +
+  xlab("Readme Size") +
+  ylab("Repos") +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1))
+
+ggsave("push_repo_readme_size_freq.png")
+
+```
+
+```{r}
+
+# repos with a build status in the readme
+ggplot(data = push_repo_readme, 
+       aes(x = build_status_host, fill=build_status_host)) +
+  geom_bar() +
+  theme(legend.position="none") +
+  xlab("Build Status Host") +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1))
+  
+```
+
+```{r}
+# did any of the repos with build status do releases?
+push_repo_has_releases <- push_repo_releases_freq %>%
+  select(repo_slug, release_count)
+
+push_repo_readme_sub <- push_repo_readme %>%
+  select(repo_slug, has_readme, build_status_host, size, size_log)
+
+push_repo_readme_releases <- merge(push_repo_has_releases, push_repo_readme_sub)
+
+push_repo_readme_releases_true <- push_repo_readme_releases %>%
+  mutate(has_build_status=ifelse(is.na(build_status_host), FALSE, TRUE)) %>%
+  filter(has_build_status == TRUE)
+
+ggplot(data = push_repo_readme_releases_true, 
+       aes(x = reorder(repo_slug, -release_count), y = release_count, fill=build_status_host)) +
+  geom_bar(stat="identity") +
+  xlab("Repos with Build Status") +
+  ylab("Releases") +
+  theme(axis.text.x = element_blank())
+
+ggsave("push_repo_readme_buildstatus_host.png")
+```
+
+### Watch Events
+
 
 ```{r}
 
@@ -1461,315 +1811,22 @@ ggsave("watch_repo_readme_buildstatus_host.png")
 ```
 
 
-## Fork Events
+### Fork Events
 
-Previous studies in this series have established that Fork events are well represented across higher levels of participation, but show a weaker correlation to the participation metrics used previously. Here, we explore how similar our results are to the repositories sampled through Watch Events.
+### Release Events
 
-```{r}
-fork_events_repo_summary <- readRDS("fork_events_repo_summary.rds")
-fork_events_repo_type_summary <- readRDS("fork_events_repo_type_summary.rds")
-```
+## Event Samples Summary
 
+# Conclusions
 
-### Event Type Frequency per Repository
+(Recap from above as a writing aid): 
+A sample drawn from repositories with a similar events-to-actor proportion will be less variable than a sample drawn from the entire Github population.
 
-How were event types distributed amongst repositories? The charts below count the number of repositories per event type frequency.
+A sample drawn from an event type occurring most frequently for repositories in a given events-to-actor proportions will result in a larger proportion of repositories in the sample with that events-to-actor proportion. Therefore if one is interested in researching higher participation repositories active in the past month, one could take a random sample of events corresponding to the type occuring most frequently in high participation repositories.
 
-```{r}
-fork_repo_event_type_freq <- fork_events_repo_type_summary %>%
-  group_by(type, num_events_log) %>%
-  summarise(
-    num_events_max = max(num_events),
-    num_events_min = min(num_events),
-    num_repos = n()
-  )
-```
+Samples based on event type will be more variable than samples based on events-to-actor proportion but still less variable than samples taken from the entire event population.
 
+Drawing repository samples from event types correlated with certain events-to-actor proportion results in a larger proportion of repositories matching the events-to-actor proportion.
 
-```{r}
-ggplot(data = fork_repo_event_type_freq, 
-       aes(x=reorder(type, -num_repos), 
-       y=num_repos,
-       fill=factor(num_events_log))) +
-  geom_bar(stat="identity", position="dodge") + 
-  theme(legend.position="none") +
-  ylab("Repos") +
-  xlab("Event Type") +
-  theme(axis.text.x = element_text(angle = 90, hjust = 1)) + 
-  ggtitle("Event Type Frequencies p/ Repo")
 
-ggsave("fork_repo_event_type_freq.png")
 
-fork_repo_max_events <- fork_repo_event_type_freq %>%
-  filter(num_repos >= 10)
-
-ggplot(data = fork_repo_max_events, 
-       aes(x=reorder(type, -num_repos), 
-       y=num_repos, 
-       fill=factor(num_events_max))) +
-  geom_bar(stat="identity", position="dodge") + 
-  ylab("Repos") +
-  xlab("Event Type") +
-  theme(axis.text.x = element_text(angle = 90, hjust = 1)) + 
-  ggtitle("Top Event Type Frequencies p/ Repo")
-
-ggsave("fork_repo_max_events.png")
-```
-
-
-### Actors per Repository
-
-In the sample, 3/4 of the repositories had 1-12 unique actors in 15 months.
-
-```{r}
-fork_repo_actors_freq <- fork_events_repo_summary %>%
-  group_by(total_actors_log) %>%
-  summarise(
-    total_actors_max = max(total_actors),
-    total_actors_min = min(total_actors),
-    num_repos = n()
-  )
-```
-
-
-```{r}
-ggplot(data = fork_repo_actors_freq, 
-       aes(x = factor(total_actors_max), 
-           y = num_repos,
-           fill=factor(total_actors_log))) +
-  geom_bar(stat="identity", position="stack") +
-  theme(legend.position="none") +
-  ylab("Repos with x Actors") +
-  xlab("Max Actors")
-
-ggsave("fork_repo_actors_freq.png")
-```
-
-### Actors per Event Type per Repo
-
-```{r}
-fork_repo_type_actors_freq <- fork_events_repo_type_summary %>%
-  group_by(type, num_actors_log) %>%
-  summarise(
-    num_actors_max = max(num_actors),
-    num_actors_min = min(num_actors),
-    num_repos = n()
-  )
-```
-
-```{r}
-ggplot(data = fork_repo_type_actors_freq, 
-       aes(x = type, 
-           y = num_repos,
-           fill=factor(num_actors_log))) +
-  geom_bar(stat="identity", position="dodge") +
-  theme(legend.position="none") +
-  ylab("Repos with x Actors per Event Type") +
-  xlab("Event Type") +
-  theme(axis.text.x = element_text(angle = 90, hjust = 1))
-
-ggsave("fork_repo_event_type_actors_freq.png")
-
-fork_repo_max_actors <- fork_repo_type_actors_freq %>%
-  filter(num_repos >= 10)
-
-ggplot(data = fork_repo_max_actors, 
-       aes(x=reorder(type, -num_repos), 
-       y=num_repos, 
-       fill=factor(num_actors_max))) +
-  geom_bar(stat="identity", position="dodge") + 
-  ylab("Repos") +
-  xlab("Event Type") +
-  theme(axis.text.x = element_text(angle = 90, hjust = 1)) + 
-  ggtitle("Top Event Type Actors p/ Repo")
-
-ggsave("fork_repo_max_actors.png")
-
-```
-
-### Events per Actor Percent Frequency
-
-```{r}
-fork_repo_e2a_pct_freq <- fork_events_repo_summary %>%
-  group_by(events_per_actor_pct_log) %>%
-  summarise(
-    events_per_actor_pct_max = max(events_per_actor_pct),
-    events_per_actor_pct_min = min(events_per_actor_pct),
-    events_per_actor_pct_max_rnd = round(events_per_actor_pct_max,3),
-    total_actors_max = max(total_actors),
-    total_actors_min = min(total_actors),
-    num_repos = n()
-  )
-```
-
-```{r}
-
-ggplot(data = fork_repo_e2a_pct_freq, 
-       aes(x = factor(total_actors_max), 
-           y = num_repos,
-           fill=factor(events_per_actor_pct_max_rnd))) +
-  geom_bar(stat="identity", position="dodge") +
-  ylab("Repos") +
-  xlab("Max Actors p/ Repo") +
-  theme(axis.text.x = element_text(angle = 90, hjust = 1))
-
-ggsave("fork_repo_e2a_pct_freq.png")
-
-```
-
-
-## Release Events
-
-Previous studies in this series have established that Fork events are well represented across Medium levels of participation, but show a weaker correlation to the participation metrics used previously. Previous studies also questioned whether the metrics used were sufficient to establish a "Medium" participation level at all. We don't expect to see a lot from these events, but it does provide some initial discovery for what kinds of project do releases and how they are doing them in GitHub.
-
-```{r}
-release_events_repo_summary <- readRDS("release_events_repo_summary.rds")
-release_events_repo_type_summary <- readRDS("release_events_repo_type_summary.rds")
-```
-
-
-### Event Type Frequency per Repository
-
-How were event types distributed amongst repositories? The charts below count the number of repositories per event type frequency.
-
-```{r}
-release_repo_event_type_freq <- release_events_repo_type_summary %>%
-  group_by(type, num_events_log) %>%
-  summarise(
-    num_events_max = max(num_events),
-    num_events_min = min(num_events),
-    num_repos = n()
-  )
-```
-
-
-```{r}
-ggplot(data = release_repo_event_type_freq, 
-       aes(x=reorder(type, -num_repos), 
-       y=num_repos,
-       fill=factor(num_events_log))) +
-  geom_bar(stat="identity", position="dodge") + 
-  theme(legend.position="none") +
-  ylab("Repos") +
-  xlab("Event Type") +
-  theme(axis.text.x = element_text(angle = 90, hjust = 1)) + 
-  ggtitle("Event Type Frequencies p/ Repo")
-
-ggsave("release_repo_event_type_freq.png")
-
-release_repo_max_events <- release_repo_event_type_freq %>%
-  filter(num_repos >= 10)
-
-ggplot(data = release_repo_max_events, 
-       aes(x=reorder(type, -num_repos), 
-       y=num_repos, 
-       fill=factor(num_events_max))) +
-  geom_bar(stat="identity", position="dodge") + 
-  ylab("Repos") +
-  xlab("Event Type") +
-  theme(axis.text.x = element_text(angle = 90, hjust = 1)) + 
-  ggtitle("Top Event Type Frequencies p/ Repo")
-
-ggsave("release_repo_max_events.png")
-```
-
-
-### Actors per Repository
-
-In the sample, 3/4 of the repositories had 1-12 unique actors in 15 months.
-
-```{r}
-release_repo_actors_freq <- release_events_repo_summary %>%
-  group_by(total_actors_log) %>%
-  summarise(
-    total_actors_max = max(total_actors),
-    total_actors_min = min(total_actors),
-    num_repos = n()
-  )
-```
-
-
-```{r}
-ggplot(data = release_repo_actors_freq, 
-       aes(x = factor(total_actors_max), 
-           y = num_repos,
-           fill=factor(total_actors_log))) +
-  geom_bar(stat="identity", position="stack") +
-  theme(legend.position="none") +
-  ylab("Repos with x Actors") +
-  xlab("Max Actors")
-
-ggsave("release_repo_actors_freq.png")
-```
-
-### Actors per Event Type per Repo
-
-```{r}
-release_repo_type_actors_freq <- release_events_repo_type_summary %>%
-  group_by(type, num_actors_log) %>%
-  summarise(
-    num_actors_max = max(num_actors),
-    num_actors_min = min(num_actors),
-    num_repos = n()
-  )
-```
-
-```{r}
-ggplot(data = release_repo_type_actors_freq, 
-       aes(x = type, 
-           y = num_repos,
-           fill=factor(num_actors_log))) +
-  geom_bar(stat="identity", position="dodge") +
-  theme(legend.position="none") +
-  ylab("Repos with x Actors per Event Type") +
-  xlab("Event Type") +
-  theme(axis.text.x = element_text(angle = 90, hjust = 1))
-
-ggsave("release_repo_event_type_actors_freq.png")
-
-release_repo_max_actors <- release_repo_type_actors_freq %>%
-  filter(num_repos >= 10)
-
-ggplot(data = release_repo_max_actors, 
-       aes(x=reorder(type, -num_repos), 
-       y=num_repos, 
-       fill=factor(num_actors_max))) +
-  geom_bar(stat="identity", position="dodge") + 
-  ylab("Repos") +
-  xlab("Event Type") +
-  theme(axis.text.x = element_text(angle = 90, hjust = 1)) + 
-  ggtitle("Top Event Type Actors p/ Repo")
-
-ggsave("release_repo_max_actors.png")
-
-```
-
-### Events per Actor Percent Frequency
-
-```{r}
-release_repo_e2a_pct_freq <- release_events_repo_summary %>%
-  group_by(events_per_actor_pct_log) %>%
-  summarise(
-    events_per_actor_pct_max = max(events_per_actor_pct),
-    events_per_actor_pct_min = min(events_per_actor_pct),
-    events_per_actor_pct_max_rnd = round(events_per_actor_pct_max,3),
-    total_actors_max = max(total_actors),
-    total_actors_min = min(total_actors),
-    num_repos = n()
-  )
-```
-
-```{r}
-
-ggplot(data = release_repo_e2a_pct_freq, 
-       aes(x = factor(total_actors_max), 
-           y = num_repos,
-           fill=factor(events_per_actor_pct_max_rnd))) +
-  geom_bar(stat="identity", position="dodge") +
-  ylab("Repos") +
-  xlab("Max Actors p/ Repo") +
-  theme(axis.text.x = element_text(angle = 90, hjust = 1))
-
-ggsave("release_repo_e2a_pct_freq.png")
-
-```
