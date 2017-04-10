@@ -135,7 +135,6 @@ saveRDS(all_repo_data, "all_repo_data.rds")
 ```
 
 #### Repo Owner Frequency
-How many repos came from the same owner?
 
 ```{r}
 # TODO summary should come from R not GBQ

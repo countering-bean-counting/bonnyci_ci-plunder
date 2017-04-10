@@ -889,7 +889,54 @@ ggsave("all_repo_owner_freq.png")
 
 ### Push Events
 
+
+```{r}
+push_repo_owner <- readRDS("push_repo_owner.rds")
+
+push_repo_owner_freq <- push_repo_owner %>%
+  mutate(public_repos_log = round(log(public_repos))) %>%
+  group_by(public_repos_log) %>%
+  summarise(num_actors = n(),
+            public_repos_max = max(public_repos),
+            public_repos_min = min(public_repos))
+
+ggplot(data = push_repo_owner_freq,
+       aes(x = factor(public_repos_max),
+           y = num_actors,
+           fill=factor(public_repos_log))) +
+  geom_bar(stat="identity", position="stack") +
+  theme(legend.position="none") +
+  ylab("Actors with x Repos") +
+  xlab("Max Repos") +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1))
+
+ggsave("push_repo_owner_freq.png")
+```
+
 ### Watch Events
+
+```{r}
+watch_repo_owner <- readRDS("watch_repo_owner.rds")
+
+watch_repo_owner_freq <- watch_repo_owner %>%
+  mutate(public_repos_log = round(log(public_repos))) %>%
+  group_by(public_repos_log) %>%
+  summarise(num_actors = n(),
+            public_repos_max = max(public_repos),
+            public_repos_min = min(public_repos))
+
+ggplot(data = watch_repo_owner_freq,
+       aes(x = factor(public_repos_max),
+           y = num_actors,
+           fill=factor(public_repos_log))) +
+  geom_bar(stat="identity", position="stack") +
+  theme(legend.position="none") +
+  ylab("Actors with x Repos") +
+  xlab("Max Repos") +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1))
+
+ggsave("watch_repo_owner_freq.png")
+```
 
 ### Fork Events
 
