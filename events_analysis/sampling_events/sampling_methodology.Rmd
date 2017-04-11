@@ -940,6 +940,29 @@ ggsave("watch_repo_owner_freq.png")
 
 ### Fork Events
 
+```{r}
+fork_repo_owner <- readRDS("fork_repo_owner.rds")
+
+fork_repo_owner_freq <- fork_repo_owner %>%
+  mutate(public_repos_log = round(log(public_repos))) %>%
+  group_by(public_repos_log) %>%
+  summarise(num_actors = n(),
+            public_repos_max = max(public_repos),
+            public_repos_min = min(public_repos))
+
+ggplot(data = fork_repo_owner_freq,
+       aes(x = factor(public_repos_max),
+           y = num_actors,
+           fill=factor(public_repos_log))) +
+  geom_bar(stat="identity", position="stack") +
+  theme(legend.position="none") +
+  ylab("Actors with x Repos") +
+  xlab("Max Repos") +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1))
+
+ggsave("fork_repo_owner_freq.png")
+```
+
 ### Release Events
 
 ## Age and Last Update
@@ -1225,6 +1248,98 @@ ggsave("watch_repo_age_vs_updated_freq.png")
 
 ### Fork Events
 
+```{r}
+fork_repo_age <- readRDS("fork_repo_age.rds")
+
+# age of repos
+fork_repo_age_freq <- fork_repo_age %>%
+  group_by(age_days_log) %>%
+  summarise(
+    num_repos = n(),
+    age_days_min = min(age_days),
+    age_days_max = max(age_days),
+    age_days_min_max = paste(age_days_min, "-", age_days_max)
+  )
+
+ggplot(data = fork_repo_age_freq, 
+       aes(x = reorder(age_days_min_max, age_days_log), 
+           y = num_repos,
+           fill=factor(age_days_log))) +
+  geom_bar(stat="identity", position="dodge") +
+  theme(legend.position="none") +
+  ylab("Repos") +
+  xlab("Age (days)") +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1))
+
+ggsave("fork_repo_age_freq.png")
+```
+
+
+```{r}
+fork_repo_age <- readRDS("fork_repo_age.rds")
+
+# updated since repos
+fork_repo_updated_freq <- fork_repo_age %>%
+  group_by(updated_since_days_log) %>%
+  summarise(
+    num_repos = n(),
+    updated_since_days_max = max(updated_since_days),
+    updated_since_days_min = min(updated_since_days),
+    updated_since_days_min_max = paste(updated_since_days_min, "-", updated_since_days_max)
+  )
+
+ggplot(data = fork_repo_updated_freq, 
+       aes(x = reorder(updated_since_days_min_max, updated_since_days_log), 
+           y = num_repos,
+           fill=updated_since_days_min_max)) +
+  geom_bar(stat="identity", position="dodge") +
+  theme(legend.position="none") +
+  ylab("Repos") +
+  xlab("Max Updated Since (days)") +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1))
+
+ggsave("fork_repo_updated_freq.png")
+
+```
+
+
+
+```{r}
+fork_repo_age <- readRDS("fork_repo_age.rds")
+
+fork_repo_updated_vs_age <- fork_repo_age %>% 
+  mutate(
+    updated_score = ifelse(updated_since_days_log >= 4, "Stale", "Fresh"),
+    age_score = ifelse(age_days_log >= 6, "Mature", "Young"),
+    updated_age_score = ifelse(
+      updated_since_days_log == age_days_log & updated_since_days_log > 2,
+      "Short-Lived",
+      paste(updated_score, "/", age_score)
+      )) %>%
+  group_by(updated_age_score) %>%
+  summarise(num_repos = n(),
+            updated_since_days_log = max(updated_since_days_log),
+            age_days_log = max(age_days_log),
+            updated_since_days_min = min(updated_since_days),
+            updated_since_days_max = max(updated_since_days),
+            age_days_min = min(age_days),
+            age_days_max = max(age_days),
+            updated_age_days = paste(updated_since_days_min, "-", updated_since_days_max, 
+                                         "/", age_days_min, "-", age_days_max)
+  )
+
+ggplot(data = fork_repo_updated_vs_age,
+       aes(x = updated_age_score,
+           y = num_repos,
+           fill = updated_age_days)) +
+  geom_bar(position="dodge", stat="identity") +
+  ylab("Repos") +
+  xlab("Updated Age Score")
+
+ggsave("fork_repo_age_vs_updated_freq.png")
+
+```
+
 ### Release Events
 
 ## Language
@@ -1376,6 +1491,55 @@ ggsave("watch_repo_languages_pct_freq_top.png")
 
 ### Fork Events
 
+```{r}
+fork_repo_languages <- readRDS("fork_repo_languages.rds")
+
+fork_repo_languages <- fork_repo_languages %>%
+  group_by(repo_slug) %>%
+  mutate(loc_sum = sum(loc))
+
+fork_repo_languages <- fork_repo_languages %>%
+  mutate(
+    loc_log = round(log(loc)),
+    loc_pct = loc/loc_sum
+  )
+
+fork_repo_languages_top <- fork_repo_languages %>%
+  group_by(language) %>%
+  summarise(
+    total_repos = n()
+  ) %>%
+  filter(total_repos > 1)
+
+fork_repo_languages_pct_freq <- fork_repo_languages %>%
+  group_by(language, loc_log) %>%
+  summarise(
+    loc_pct_min = min(loc_pct),
+    loc_pct_max = round(max(loc_pct), 1),
+    num_repos = n()
+  )
+
+fork_repo_languages_pct_freq_top <- fork_repo_languages_pct_freq %>%
+  filter(language %in% fork_repo_languages_top$language)
+
+fork_repo_languages_pct_freq_top <- merge(fork_repo_languages_pct_freq_top, fork_repo_languages_top, by="language")
+
+# TODO flip coord?
+
+ggplot(data = fork_repo_languages_pct_freq_top, 
+       aes(x = reorder(language, -total_repos), 
+           y = num_repos,
+           fill=factor(loc_pct_max))) +
+  geom_bar(stat="identity", position="stack") +
+  ylab("Repos") +
+  xlab("Language") +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1))
+
+ggsave("fork_repo_languages_pct_freq_top.png")
+  
+  
+```
+
 ### Release Events
 
 ## Releases
@@ -1434,7 +1598,7 @@ all_repo_releases_freq_summary <- all_repo_releases_freq %>%
   )
 
 ggplot(data = all_repo_releases_freq_summary, 
-       aes(x = release_count_min_max, 
+       aes(x = reorder(release_count_min_max, release_count_max), 
            y = num_repos,
            fill=factor(release_count_log))) +
   geom_bar(stat="identity") +
@@ -1511,7 +1675,7 @@ push_repo_releases_freq_summary <- push_repo_releases_freq %>%
   )
 
 ggplot(data = push_repo_releases_freq_summary, 
-       aes(x = release_count_min_max, 
+       aes(x = reorder(release_count_min_max, release_count_max), 
            y = num_repos,
            fill=factor(release_count_log))) +
   geom_bar(stat="identity") +
@@ -1589,7 +1753,7 @@ watch_repo_releases_freq_summary <- watch_repo_releases_freq %>%
   )
 
 ggplot(data = watch_repo_releases_freq_summary, 
-       aes(x = release_count_min_max, 
+       aes(x = reorder(release_count_min_max, release_count_max), 
            y = num_repos,
            fill=factor(release_count_log))) +
   geom_bar(stat="identity") +
@@ -1612,10 +1776,82 @@ ggplot(data = watch_repo_releases_change %>% filter(is_release==1 & published_at
 ggsave("watch_repo_releases_freq_summary_bt.png")
 ```
 
-
-
-
 ### Fork Events
+
+```{r}
+
+fork_repo_releases <- readRDS("fork_repo_releases.rds")
+
+fork_repo_releases_change <- fork_repo_releases %>%
+  group_by(repo_slug) %>%
+  arrange(repo_slug, published_at) %>%
+  mutate(
+    prev_published_at = lag(published_at),
+    published_at_interval = ceiling(difftime(published_at, prev_published_at, units="days")),
+    is_release = ifelse(is.na(id), 0, 1),
+    release_sum = sum(is_release)
+  )
+
+# repos with releases
+fork_repo_releases_freq <- fork_repo_releases_change %>%
+  group_by(repo_slug) %>%
+  summarise(
+    release_count = sum(is_release),
+    published_at_min = min(published_at),
+    published_at_max = max(published_at),
+    published_at_interval_max = ifelse(release_count == 1, 0, max(published_at_interval, na.rm=TRUE)),
+    published_at_interval_min = ifelse(release_count == 1, 0, min(published_at_interval, na.rm=TRUE)),
+    published_at_interval_mean = ifelse(release_count == 1, 0, round(mean(published_at_interval, na.rm=TRUE))),
+    published_at_interval_mean = ifelse(release_count == 0, mean(published_at_interval), published_at_interval_mean),
+    published_at_interval_med = ifelse(release_count == 1, 0, round(median(published_at_interval, na.rm=TRUE)))
+  )  %>%
+  mutate(
+    release_count_log = round(log(release_count))
+  )
+
+# number of releases
+
+fork_repo_releases_freq_summary <- fork_repo_releases_freq %>%
+  group_by(release_count_log) %>%
+  summarise(
+    num_repos = n(),
+    release_count_min = min(release_count),
+    release_count_max = max(release_count),
+    time_between_min = min(published_at_interval_min),
+    time_between_max = max(published_at_interval_max),
+    time_between_mean = mean(published_at_interval_mean),
+    time_between_med = median(published_at_interval_med),
+    release_count_min_max = ifelse(release_count_min == release_count_max,
+                                   paste(release_count_min),
+                                   paste(release_count_min, "-", release_count_max)),
+    time_between_min_max = ifelse(time_between_min == time_between_max, 
+                                  paste(time_between_min), 
+                                  paste(time_between_min, "-", time_between_max))
+  )
+
+ggplot(data = fork_repo_releases_freq_summary, 
+       aes(x = reorder(release_count_min_max, release_count_max), 
+           y = num_repos,
+           fill=factor(release_count_log))) +
+  geom_bar(stat="identity") +
+  theme(legend.position="none") +
+  ylab("Repos") +
+  xlab("Releases")
+
+ggsave("fork_repo_releases_freq_summary_cnt.png")
+
+# frequency of releases
+ggplot(data = fork_repo_releases_change %>% filter(is_release==1 & published_at_interval > 0), 
+       aes(x = reorder(repo_slug, -release_sum), 
+           y = published_at_interval, fill=factor(published_at_interval))) +
+  geom_bar(stat="identity", position = "dodge") +
+  theme(legend.position="none") +
+  ylab("Time Between Releases (Days)") +
+  xlab("Repos") +
+  theme(axis.text.x = element_blank())
+
+ggsave("fork_repo_releases_freq_summary_bt.png")
+```
 
 ### Release Events
 
@@ -1857,6 +2093,83 @@ ggsave("watch_repo_readme_buildstatus_host.png")
 ```
 
 ### Fork Events
+
+```{r}
+
+fork_repo_readme <- readRDS("fork_repo_readme.rds")
+
+fork_repo_readme <- fork_repo_readme %>%
+  mutate(
+    has_readme = ifelse(is.na(size), FALSE, TRUE),
+    size_log = round(log(size))
+  )
+
+# repos with a readme vs repos with no readme
+ggplot(data = fork_repo_readme, 
+       aes(x = has_readme,
+           fill = factor(has_readme))) +
+  geom_bar() +
+  theme(legend.position="none") +
+  xlab("Readme?")
+
+fork_repo_readme_size_freq <- fork_repo_readme %>%
+  group_by(size_log) %>%
+  summarise(
+    num_repos = n(),
+    size_min = min(size),
+    size_max = max(size),
+    size_min_max = ifelse(is.na(size_min), paste(NA), paste(size_min, "-", size_max))
+  )
+
+ggplot(data = fork_repo_readme_size_freq, 
+       aes(x = reorder(size_min_max, size_log),
+           y = num_repos,
+           fill = factor(size_log))) +
+  geom_bar(stat="identity") +
+  theme(legend.position="none") +
+  xlab("Readme Size") +
+  ylab("Repos") +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1))
+
+ggsave("fork_repo_readme_size_freq.png")
+
+```
+
+```{r}
+
+# repos with a build status in the readme
+ggplot(data = fork_repo_readme, 
+       aes(x = build_status_host, fill=build_status_host)) +
+  geom_bar() +
+  theme(legend.position="none") +
+  xlab("Build Status Host") +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1))
+  
+```
+
+```{r}
+# did any of the repos with build status do releases?
+fork_repo_has_releases <- fork_repo_releases_freq %>%
+  select(repo_slug, release_count)
+
+fork_repo_readme_sub <- fork_repo_readme %>%
+  select(repo_slug, has_readme, build_status_host, size, size_log)
+
+fork_repo_readme_releases <- merge(fork_repo_has_releases, fork_repo_readme_sub)
+
+fork_repo_readme_releases_true <- fork_repo_readme_releases %>%
+  mutate(has_build_status=ifelse(is.na(build_status_host), FALSE, TRUE)) %>%
+  filter(has_build_status == TRUE)
+
+ggplot(data = fork_repo_readme_releases_true, 
+       aes(x = reorder(repo_slug, -release_count), y = release_count, fill=build_status_host)) +
+  geom_bar(stat="identity") +
+  xlab("Repos with Build Status") +
+  ylab("Releases") +
+  theme(axis.text.x = element_blank())
+
+ggsave("fork_repo_readme_buildstatus_host.png")
+```
 
 ### Release Events
 
