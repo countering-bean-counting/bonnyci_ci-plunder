@@ -1,4 +1,4 @@
-Welcome to the BonnyCI CI Research Project!
+# Welcome to the BonnyCI CI Research Project!
 
 The goal of this project is to understand discover what value Continuous
 Integration provides to community-based projects.
@@ -36,4 +36,8 @@ Want to get involved? See our contributing guidelines:
 
 Additional project information and resources are available on the wiki:
  * https://github.com/BonnyCI/ci-plunder/wiki
+
+This research is open and available for all to use and to build upon, we only ask that you properly attribute it!
+
+This work is licensed under the Creative Commons Attribution 3.0 Unported License. To view a copy of this license, visit http://creativecommons.org/licenses/by/3.0/ or send a letter to Creative Commons, PO Box 1866, Mountain View, CA 94042, USA.
 
