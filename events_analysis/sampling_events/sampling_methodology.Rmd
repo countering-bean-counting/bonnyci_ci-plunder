@@ -371,6 +371,7 @@ repo_event_type_freq_summary <- repo_event_type_freq %>%
     num_events_buckets_count = n(),
     num_events_min = min(num_events_min),
     num_events_max = max(num_events_max),
+    num_events_max_med = median(num_events_max),
     num_repos = sum(num_repos)
   ) %>% 
   mutate(num_repos_quartile = ntile(num_repos, 4))
@@ -381,6 +382,7 @@ repo_event_type_freq_summary_top <- repo_event_type_freq_summary %>%
 ggplot(data = repo_event_type_freq_summary, 
        aes(x=sample, y=num_repos, fill=reorder(type, -num_repos))) +
   geom_bar(stat="identity", position="dodge") + 
+  theme(legend.position="none") +
   ylab("Repos") +
   xlab("Sample") +
   theme(axis.text.x = element_text(angle = 90, hjust = 1))
@@ -388,32 +390,193 @@ ggplot(data = repo_event_type_freq_summary,
 ggsave("repo_event_type_freq_summary.png")
 ```
 
+Standard Error
+
+```{r}
+pop_type_freq <- readRDS("pop_type_freq.rds")
+
+pop_type_freq_most <- pop_type_freq %>%
+  group_by(type) %>%
+  slice(which.max(num_repos)) %>% 
+  mutate(
+    num_repos = ceiling(num_repos_pct * 100),
+    sample = "population"
+  ) %>% select(type, num_events_log, num_events_max, num_events_min, num_repos, sample)
+```
+
 ```{r}
 repo_event_type_freq_type_summary <- repo_event_type_freq %>%
   group_by(type, sample) %>%
   slice(which.max(num_repos))
 
-ggplot(data = repo_event_type_freq_type_summary, 
-       aes(x=type, 
+repo_event_type_freq_type_summary <- bind_rows(pop_type_freq_most, repo_event_type_freq_type_summary)
+repo_event_type_freq_pop_vs_all <- repo_event_type_freq_type_summary %>% 
+  filter(sample == "population" | sample == "all")
+
+ggplot(data = repo_event_type_freq_pop_vs_all, 
+       aes(x=sample, 
        y=num_repos, 
-       fill=sample)) +
+       fill=type)) +
   geom_bar(stat="identity", position="dodge") + 
+  theme(legend.position="none") +
+  ylab("Most Repos") +
+  xlab("Sample") +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1))
+
+ggplot(data = repo_event_type_freq_pop_vs_all, 
+       aes(x=sample, 
+       y=num_events_max, 
+       fill=type)) +
+  geom_bar(stat="identity", position="dodge") + 
+  theme(legend.position="none") +
+  ylab("Max Events") +
+  xlab("Sample") +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1))
+```
+
+```{r}
+
+pop_repo_event_type_freq_type_summary <- repo_event_type_freq_type_summary %>% 
+  filter(sample == "population") %>%
+  mutate(pop_num_events_max = num_events_max,
+         pop_num_events_min = num_events_min,
+         pop_num_repos = num_repos) %>%
+  select(type, pop_num_events_max, pop_num_events_min, pop_num_repos)
+
+repo_event_type_std_err <- merge(repo_event_type_freq_pop_vs_all,
+                                     pop_repo_event_type_freq_type_summary, by="type")
+
+repo_event_type_std_err <- repo_event_type_std_err %>%
+  mutate(num_events_max_err = num_events_max - pop_num_events_max,
+         num_events_min_err = num_events_min - pop_num_events_min,
+         num_repos_err = num_repos - pop_num_repos) %>%
+  filter(sample != "population")
+
+ggplot(data = repo_event_type_std_err, 
+       aes(x=type, 
+       y=num_repos_err,
+       fill=type)) +
+  geom_bar(stat="identity", position="dodge") + 
+  theme(legend.position="none") +
   ylab("Most Repos") +
   xlab("Type") +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1))
+
+ggsave("repo_event_type_freq_ctl_vs_pop.png")
+
+ggplot(data = repo_event_type_std_err, 
+       aes(x=type, 
+       y=num_events_max_err,
+       fill=type)) +
+  geom_bar(stat="identity", position="dodge") + 
+  theme(legend.position="none") +
+  ylab("Max Events") +
+  xlab("Type") +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1))
+```
+
+```{r}
+ggplot(data = repo_event_type_freq_type_summary, 
+       aes(x=sample, 
+       y=num_repos, 
+       fill=type)) +
+  geom_bar(stat="identity", position="dodge") + 
+  theme(legend.position="none") +
+  ylab("Most Repos") +
+  xlab("Sample") +
   theme(axis.text.x = element_text(angle = 90, hjust = 1))
 
 ggsave("repo_event_type_freq_summary_num_repos.png")
 
 ggplot(data = repo_event_type_freq_type_summary, 
-       aes(x=type, 
+       aes(x=sample, 
        y=num_events_max, 
-       fill=sample)) +
+       fill=type)) +
   geom_bar(stat="identity", position="dodge") + 
+  theme(legend.position="none") +
   ylab("Max Events") +
-  xlab("Type") +
+  xlab("Sample") +
   theme(axis.text.x = element_text(angle = 90, hjust = 1))
 
 ggsave("repo_event_type_freq_summary_num_events_max.png")
+```
+
+Deviation from the "all" sample
+
+```{r}
+all_repo_event_type_freq_type_summary <- all_repo_event_type_freq %>%
+  group_by(type) %>%
+  slice(which.max(num_repos)) %>%
+  mutate(control_num_events_max = num_events_max,
+         control_num_events_min = num_events_min,
+         control_num_repos = num_repos) %>%
+  select(type, control_num_events_max, control_num_events_min, control_num_repos)
+
+repo_event_type_std_err2 <- repo_event_type_std_err %>% select(type, num_events_max_err, num_repos_err)
+
+repo_event_type_err <- merge(repo_event_type_std_err2, repo_event_type_freq_type_summary, by="type")
+
+repo_event_type_variability <- merge(repo_event_type_err,
+                                     all_repo_event_type_freq_type_summary, 
+                                     by="type")
+
+repo_event_type_variability <- repo_event_type_variability %>%
+  mutate(num_events_max_diff = num_events_max - control_num_events_max,
+         num_events_min_diff = num_events_min - control_num_events_min,
+         num_repos_diff = num_repos - control_num_repos,
+         # does the sample deviate more from the control sample than the control sample deviates from pop?
+         num_repos_dev = ifelse(abs(num_repos_diff) > abs(num_repos_err), 1, 0) 
+         ) %>%
+  filter(sample != "all" & sample != "population")
+```
+
+```{r}
+ggplot(data = repo_event_type_variability, 
+       aes(x=sample, 
+       y=num_events_max_diff,
+       fill=type)) +
+  geom_bar(stat="identity", position="dodge") + 
+  theme(legend.position="none") +
+  ylab("Max Events Variability from Control") +
+  xlab("Sample") +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1))
+
+ggplot(data = repo_event_type_variability, 
+       aes(x=sample, 
+       y=num_repos_diff,
+       fill=type)) +
+  geom_bar(stat="identity", position="dodge") + 
+  theme(legend.position="none") +
+  ylab("Repo Frequency Variability from Control") +
+  xlab("Sample") +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1))
+
+
+```
+```{r}
+repo_event_type_variability_top <- repo_event_type_variability %>%
+  filter(num_repos_dev == 1) %>% group_by(sample)
+
+ggplot(data = repo_event_type_variability_top, 
+       aes(x=sample, 
+       y=abs(num_repos_diff),
+       fill=type)) +
+  geom_bar(stat="identity", position="dodge") + 
+  ylab("Repo Frequency Variability from Control (abs)") +
+  xlab("Sample") +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1))
+
+ggsave("repo_event_type_variability_top_event_types.png")
+
+ggplot(data = repo_event_type_variability_top, 
+       aes(x=sample, y=num_repos_dev, fill=sample)) +
+  geom_bar(stat = "summary", fun.y = "sum") + 
+  theme(legend.position="none") +
+  ylab("Count of Deviating Event Types") +
+  xlab("Sample") +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1))
+
+ggsave("repo_event_type_variability_top_samples.png")
 ```
 
 

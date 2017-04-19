@@ -25,6 +25,15 @@ https://bigquery.cloud.google.com:443/savedquery/787787545662:1844b6d0dc164b0ea2
 ```
 
 
+```{r}
+pop_type_freq_sql <-
+  'select * from [bonnyci-github-archive:ci_plunder_repo_samples.population_event_types_repo_frequency]'
+
+pop_type_freq <- query_exec(pop_type_freq_sql, project = project)
+
+saveRDS(pop_type_freq, "pop_type_freq.rds")
+```
+
 ## All Events
 
 ### Random Sample of Events
