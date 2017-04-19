@@ -61,53 +61,24 @@ saveRDS(all_sample_event_type_freq, "all_sample_event_type_freq.rds")
 ```
 
 
-#### Event Type Frequency per Repository
-
 ```{r}
-all_repo_event_type_freq_sql <-
-  'select * from [bonnyci-github-archive:ci_plunder_repo_samples_all.ghevents_repo_event_types_frequency]'
+all_events_repo_summary_sql <-
+  'select * from [bonnyci-github-archive:ci_plunder_repo_samples_all.ghevents_repo_summary]'
 
-all_repo_event_type_freq <- query_exec(all_repo_event_type_freq_sql, project = project)
+all_events_repo_summary <- query_exec(all_events_repo_summary_sql, project = project)
 
-saveRDS(all_repo_event_type_freq, "all_repo_event_type_freq.rds")
+saveRDS(all_events_repo_summary, "all_events_repo_summary.rds")
+
 ```
 
-
-#### Actors per Repo
-How many unique actors did each repo have?
-
 ```{r}
-all_repo_actors_freq_sql <-
-  'select * from [bonnyci-github-archive:ci_plunder_repo_samples_all.ghevents_repo_actors_freq]'
+all_events_repo_type_summary_sql <-
+  'select * from [bonnyci-github-archive:ci_plunder_repo_samples_all.ghevents_repo_type_summary]'
 
-all_repo_actors_freq <- query_exec(all_repo_actors_freq_sql, project = project)
+all_events_repo_type_summary <- query_exec(all_events_repo_type_summary_sql, project = project)
 
-saveRDS(all_repo_actors_freq, "all_repo_actors_freq.rds")
-```
+saveRDS(all_events_repo_type_summary, "all_events_repo_type_summary.rds")
 
-
-#### Actors per Event Type per Repo
-How many unique actors did each event type in each repo have?
-
-```{r}
-all_repo_event_type_actors_freq_sql <-
-  'select * from [bonnyci-github-archive:ci_plunder_repo_samples_all.ghevents_repo_event_type_actors_freq]'
-
-all_repo_event_type_actors_freq <- query_exec(all_repo_event_type_actors_freq_sql, project = project)
-
-saveRDS(all_repo_event_type_actors_freq, "all_repo_event_type_actors_freq.rds")
-```
-
-#### Events per Actor Percent Frequency
-How are events distributed among actors in the repository?
-
-```{r}
-all_repo_e2a_pct_freq_sql <-
-  'select * from [bonnyci-github-archive:ci_plunder_repo_samples_all.ghevents_repo_events_per_actor_pct_freq]'
-
-all_repo_e2a_pct_freq <- query_exec(all_repo_e2a_pct_freq_sql, project = project)
-
-saveRDS(all_repo_e2a_pct_freq, "all_repo_e2a_pct_freq.rds")
 ```
 
 #### Repos per Owner in Sample

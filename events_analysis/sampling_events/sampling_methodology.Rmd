@@ -62,6 +62,11 @@ Each sample group explores the following parameters based on GitHub API data:
 
 ### All Events
 
+```{r}
+all_events_repo_summary <- readRDS("all_events_repo_summary.rds")
+all_events_repo_type_summary <- readRDS("all_events_repo_type_summary.rds")
+```
+
 ### Push Events
 
 Previous studies in this series have established that Push events are well represented across all levels of participation. We would expect the sample taken from Push Events to resemble the control sample in the previous section. 
@@ -111,7 +116,6 @@ The random sample of 100 events contained the following distribution of event ty
 ```{r}
 all_sample_event_type_freq <- readRDS("all_sample_event_type_freq.rds")
 
-
 ggplot(data = all_sample_event_type_freq, 
        aes(x=reorder(type, -num_events), 
        y=num_events, fill=type)) +
@@ -135,8 +139,18 @@ How were event types distributed amongst repositories? The charts below count th
 Create and Push events were the best represented in this group. This is consistent with previous work that showed these as being the most frequent events overall.
 
 ```{r}
-all_repo_event_type_freq <- readRDS("all_repo_event_type_freq.rds")
+all_repo_event_type_freq <- all_events_repo_type_summary %>%
+  group_by(type, num_events_log) %>%
+  summarise(
+    num_events_max = max(num_events),
+    num_events_min = min(num_events),
+    num_repos = n(),
+    sample = "all"
+  )
+```
 
+
+```{r}
 ggplot(data = all_repo_event_type_freq, 
        aes(x=reorder(type, -num_repos), 
        y=num_repos,
@@ -174,7 +188,8 @@ push_repo_event_type_freq <- push_events_repo_type_summary %>%
   summarise(
     num_events_max = max(num_events),
     num_events_min = min(num_events),
-    num_repos = n()
+    num_repos = n(),
+    sample = "push"
   )
 ```
 
@@ -220,7 +235,8 @@ watch_repo_event_type_freq <- watch_events_repo_type_summary %>%
   summarise(
     num_events_max = max(num_events),
     num_events_min = min(num_events),
-    num_repos = n()
+    num_repos = n(),
+    sample = "watch"
   )
 ```
 
@@ -263,7 +279,8 @@ fork_repo_event_type_freq <- fork_events_repo_type_summary %>%
   summarise(
     num_events_max = max(num_events),
     num_events_min = min(num_events),
-    num_repos = n()
+    num_repos = n(),
+    sample = "fork"
   )
 ```
 
@@ -307,7 +324,8 @@ release_repo_event_type_freq <- release_events_repo_type_summary %>%
   summarise(
     num_events_max = max(num_events),
     num_events_min = min(num_events),
-    num_repos = n()
+    num_repos = n(),
+    sample = "release"
   )
 ```
 
@@ -342,7 +360,61 @@ ggplot(data = release_repo_max_events,
 ggsave("release_repo_max_events.png")
 ```
 
+### Summary
 
+```{r}
+repo_event_type_freq <- bind_rows(all_repo_event_type_freq, push_repo_event_type_freq, watch_repo_event_type_freq, fork_repo_event_type_freq, release_repo_event_type_freq)
+
+repo_event_type_freq_summary <- repo_event_type_freq %>% 
+  group_by(sample, type) %>%
+  summarise(
+    num_events_buckets_count = n(),
+    num_events_min = min(num_events_min),
+    num_events_max = max(num_events_max),
+    num_repos = sum(num_repos)
+  ) %>% 
+  mutate(num_repos_quartile = ntile(num_repos, 4))
+
+repo_event_type_freq_summary_top <- repo_event_type_freq_summary %>%
+  filter(num_repos_quartile >= 3)
+
+ggplot(data = repo_event_type_freq_summary, 
+       aes(x=sample, y=num_repos, fill=reorder(type, -num_repos))) +
+  geom_bar(stat="identity", position="dodge") + 
+  ylab("Repos") +
+  xlab("Sample") +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1))
+
+ggsave("repo_event_type_freq_summary.png")
+```
+
+```{r}
+repo_event_type_freq_type_summary <- repo_event_type_freq %>%
+  group_by(type, sample) %>%
+  slice(which.max(num_repos))
+
+ggplot(data = repo_event_type_freq_type_summary, 
+       aes(x=type, 
+       y=num_repos, 
+       fill=sample)) +
+  geom_bar(stat="identity", position="dodge") + 
+  ylab("Most Repos") +
+  xlab("Type") +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1))
+
+ggsave("repo_event_type_freq_summary_num_repos.png")
+
+ggplot(data = repo_event_type_freq_type_summary, 
+       aes(x=type, 
+       y=num_events_max, 
+       fill=sample)) +
+  geom_bar(stat="identity", position="dodge") + 
+  ylab("Max Events") +
+  xlab("Type") +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1))
+
+ggsave("repo_event_type_freq_summary_num_events_max.png")
+```
 
 
 ## Actors per Repository

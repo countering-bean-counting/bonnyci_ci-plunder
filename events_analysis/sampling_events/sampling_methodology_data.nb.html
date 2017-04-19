@@ -206,16 +206,14 @@ project &lt;- &quot;bonnyci-github-archive&quot;</code></pre>
 <p><a href="https://bigquery.cloud.google.com:443/savedquery/787787545662:743dd041fa9c478ba66dbb336e587cbe" class="uri">https://bigquery.cloud.google.com:443/savedquery/787787545662:743dd041fa9c478ba66dbb336e587cbe</a></p>
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuYWxsX2V2ZW50c19zYW1wbGVfc3FsIDwtXG4gICdzZWxlY3QgKiBmcm9tIFtib25ueWNpLWdpdGh1Yi1hcmNoaXZlOmNpX3BsdW5kZXJfcmVwb19zYW1wbGVzLmFsbF9ldmVudHNfc2FtcGxlXSdcbmFsbF9ldmVudHNfc2FtcGxlIDwtIHF1ZXJ5X2V4ZWMoYWxsX2V2ZW50c19zYW1wbGVfc3FsLCBwcm9qZWN0ID0gcHJvamVjdClcbmBgYCJ9 -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuYWxsX2V2ZW50c19zYW1wbGVfc3FsIDwtXG4gICdzZWxlY3QgKiBmcm9tIFtib25ueWNpLWdpdGh1Yi1hcmNoaXZlOmNpX3BsdW5kZXJfcmVwb19zYW1wbGVzLmFsbF9ldmVudHNfc2FtcGxlXSdcblxuYWxsX2V2ZW50c19zYW1wbGUgPC0gcXVlcnlfZXhlYyhhbGxfZXZlbnRzX3NhbXBsZV9zcWwsIHByb2plY3QgPSBwcm9qZWN0KVxuXG5zYXZlUkRTKGFsbF9ldmVudHNfc2FtcGxlLCBcImFsbF9ldmVudHNfc2FtcGxlLnJkc1wiKVxuXG5gYGAifQ== -->
 <pre class="r"><code>all_events_sample_sql &lt;-
   'select * from [bonnyci-github-archive:ci_plunder_repo_samples.all_events_sample]'
-all_events_sample &lt;- query_exec(all_events_sample_sql, project = project)</code></pre>
-<!-- rnb-source-end -->
-<!-- rnb-output-begin eyJkYXRhIjoiQXV0by1yZWZyZXNoaW5nIHN0YWxlIE9BdXRoIHRva2VuLlxuIn0= -->
-<pre><code>Auto-refreshing stale OAuth token.</code></pre>
-<!-- rnb-output-end -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuc2F2ZVJEUyhhbGxfZXZlbnRzX3NhbXBsZSwgXCJhbGxfZXZlbnRzX3NhbXBsZS5yZHNcIilcbmBgYCJ9 -->
-<pre class="r"><code>saveRDS(all_events_sample, &quot;all_events_sample.rds&quot;)</code></pre>
+
+all_events_sample &lt;- query_exec(all_events_sample_sql, project = project)
+
+saveRDS(all_events_sample, &quot;all_events_sample.rds&quot;)
+</code></pre>
 <!-- rnb-source-end -->
 <!-- rnb-chunk-end -->
 <!-- rnb-text-begin -->
@@ -226,68 +224,32 @@ all_events_sample &lt;- query_exec(all_events_sample_sql, project = project)</co
 <h4>Event Types in Sample</h4>
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuYWxsX3NhbXBsZV9ldmVudF90eXBlX2ZyZXEgPC0gYWxsX2V2ZW50c19zYW1wbGUgJT4lXG4gIGdyb3VwX2J5KHR5cGUpICU+JVxuICBzdW1tYXJpc2UobnVtX2V2ZW50cyA9IG4oKSlcbnNhdmVSRFMoYWxsX3NhbXBsZV9ldmVudF90eXBlX2ZyZXEsIFwiYWxsX3NhbXBsZV9ldmVudF90eXBlX2ZyZXEucmRzXCIpXG5gYGAifQ== -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuYWxsX3NhbXBsZV9ldmVudF90eXBlX2ZyZXEgPC0gYWxsX2V2ZW50c19zYW1wbGUgJT4lXG4gIGdyb3VwX2J5KHR5cGUpICU+JVxuICBzdW1tYXJpc2UobnVtX2V2ZW50cyA9IG4oKSlcblxuc2F2ZVJEUyhhbGxfc2FtcGxlX2V2ZW50X3R5cGVfZnJlcSwgXCJhbGxfc2FtcGxlX2V2ZW50X3R5cGVfZnJlcS5yZHNcIilcbmBgYCJ9 -->
 <pre class="r"><code>all_sample_event_type_freq &lt;- all_events_sample %&gt;%
   group_by(type) %&gt;%
   summarise(num_events = n())
+
 saveRDS(all_sample_event_type_freq, &quot;all_sample_event_type_freq.rds&quot;)</code></pre>
 <!-- rnb-source-end -->
 <!-- rnb-chunk-end -->
 <!-- rnb-text-begin -->
-</div>
-<div id="event-type-frequency-per-repository" class="section level4">
-<h4>Event Type Frequency per Repository</h4>
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuYWxsX3JlcG9fZXZlbnRfdHlwZV9mcmVxX3NxbCA8LVxuICAnc2VsZWN0ICogZnJvbSBbYm9ubnljaS1naXRodWItYXJjaGl2ZTpjaV9wbHVuZGVyX3JlcG9fc2FtcGxlc19hbGwuZ2hldmVudHNfcmVwb19ldmVudF90eXBlc19mcmVxdWVuY3ldJ1xuXG5hbGxfcmVwb19ldmVudF90eXBlX2ZyZXEgPC0gcXVlcnlfZXhlYyhhbGxfcmVwb19ldmVudF90eXBlX2ZyZXFfc3FsLCBwcm9qZWN0ID0gcHJvamVjdClcblxuc2F2ZVJEUyhhbGxfcmVwb19ldmVudF90eXBlX2ZyZXEsIFwiYWxsX3JlcG9fZXZlbnRfdHlwZV9mcmVxLnJkc1wiKVxuYGBgIn0= -->
-<pre class="r"><code>all_repo_event_type_freq_sql &lt;-
-  'select * from [bonnyci-github-archive:ci_plunder_repo_samples_all.ghevents_repo_event_types_frequency]'
-
-all_repo_event_type_freq &lt;- query_exec(all_repo_event_type_freq_sql, project = project)
-
-saveRDS(all_repo_event_type_freq, &quot;all_repo_event_type_freq.rds&quot;)</code></pre>
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuYWxsX2V2ZW50c19yZXBvX3N1bW1hcnlfc3FsIDwtXG4gICdzZWxlY3QgKiBmcm9tIFtib25ueWNpLWdpdGh1Yi1hcmNoaXZlOmNpX3BsdW5kZXJfcmVwb19zYW1wbGVzX2FsbC5naGV2ZW50c19yZXBvX3N1bW1hcnldJ1xuYWxsX2V2ZW50c19yZXBvX3N1bW1hcnkgPC0gcXVlcnlfZXhlYyhhbGxfZXZlbnRzX3JlcG9fc3VtbWFyeV9zcWwsIHByb2plY3QgPSBwcm9qZWN0KVxuc2F2ZVJEUyhhbGxfZXZlbnRzX3JlcG9fc3VtbWFyeSwgXCJhbGxfZXZlbnRzX3JlcG9fc3VtbWFyeS5yZHNcIilcbmBgYCJ9 -->
+<pre class="r"><code>all_events_repo_summary_sql &lt;-
+  'select * from [bonnyci-github-archive:ci_plunder_repo_samples_all.ghevents_repo_summary]'
+all_events_repo_summary &lt;- query_exec(all_events_repo_summary_sql, project = project)
+saveRDS(all_events_repo_summary, &quot;all_events_repo_summary.rds&quot;)</code></pre>
 <!-- rnb-source-end -->
 <!-- rnb-chunk-end -->
 <!-- rnb-text-begin -->
-</div>
-<div id="actors-per-repo" class="section level4">
-<h4>Actors per Repo</h4>
-<p>How many unique actors did each repo have?</p>
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuYWxsX3JlcG9fYWN0b3JzX2ZyZXFfc3FsIDwtXG4gICdzZWxlY3QgKiBmcm9tIFtib25ueWNpLWdpdGh1Yi1hcmNoaXZlOmNpX3BsdW5kZXJfcmVwb19zYW1wbGVzX2FsbC5naGV2ZW50c19yZXBvX2FjdG9yc19mcmVxXSdcbmFsbF9yZXBvX2FjdG9yc19mcmVxIDwtIHF1ZXJ5X2V4ZWMoYWxsX3JlcG9fYWN0b3JzX2ZyZXFfc3FsLCBwcm9qZWN0ID0gcHJvamVjdClcbnNhdmVSRFMoYWxsX3JlcG9fYWN0b3JzX2ZyZXEsIFwiYWxsX3JlcG9fYWN0b3JzX2ZyZXEucmRzXCIpXG5gYGAifQ== -->
-<pre class="r"><code>all_repo_actors_freq_sql &lt;-
-  'select * from [bonnyci-github-archive:ci_plunder_repo_samples_all.ghevents_repo_actors_freq]'
-all_repo_actors_freq &lt;- query_exec(all_repo_actors_freq_sql, project = project)
-saveRDS(all_repo_actors_freq, &quot;all_repo_actors_freq.rds&quot;)</code></pre>
-<!-- rnb-source-end -->
-<!-- rnb-chunk-end -->
-<!-- rnb-text-begin -->
-</div>
-<div id="actors-per-event-type-per-repo" class="section level4">
-<h4>Actors per Event Type per Repo</h4>
-<p>How many unique actors did each event type in each repo have?</p>
-<!-- rnb-text-end -->
-<!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuYWxsX3JlcG9fZXZlbnRfdHlwZV9hY3RvcnNfZnJlcV9zcWwgPC1cbiAgJ3NlbGVjdCAqIGZyb20gW2Jvbm55Y2ktZ2l0aHViLWFyY2hpdmU6Y2lfcGx1bmRlcl9yZXBvX3NhbXBsZXNfYWxsLmdoZXZlbnRzX3JlcG9fZXZlbnRfdHlwZV9hY3RvcnNfZnJlcV0nXG5hbGxfcmVwb19ldmVudF90eXBlX2FjdG9yc19mcmVxIDwtIHF1ZXJ5X2V4ZWMoYWxsX3JlcG9fZXZlbnRfdHlwZV9hY3RvcnNfZnJlcV9zcWwsIHByb2plY3QgPSBwcm9qZWN0KVxuc2F2ZVJEUyhhbGxfcmVwb19ldmVudF90eXBlX2FjdG9yc19mcmVxLCBcImFsbF9yZXBvX2V2ZW50X3R5cGVfYWN0b3JzX2ZyZXEucmRzXCIpXG5gYGAifQ== -->
-<pre class="r"><code>all_repo_event_type_actors_freq_sql &lt;-
-  'select * from [bonnyci-github-archive:ci_plunder_repo_samples_all.ghevents_repo_event_type_actors_freq]'
-all_repo_event_type_actors_freq &lt;- query_exec(all_repo_event_type_actors_freq_sql, project = project)
-saveRDS(all_repo_event_type_actors_freq, &quot;all_repo_event_type_actors_freq.rds&quot;)</code></pre>
-<!-- rnb-source-end -->
-<!-- rnb-chunk-end -->
-<!-- rnb-text-begin -->
-</div>
-<div id="events-per-actor-percent-frequency" class="section level4">
-<h4>Events per Actor Percent Frequency</h4>
-<p>How are events distributed among actors in the repository?</p>
-<!-- rnb-text-end -->
-<!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuYWxsX3JlcG9fZTJhX3BjdF9mcmVxX3NxbCA8LVxuICAnc2VsZWN0ICogZnJvbSBbYm9ubnljaS1naXRodWItYXJjaGl2ZTpjaV9wbHVuZGVyX3JlcG9fc2FtcGxlc19hbGwuZ2hldmVudHNfcmVwb19ldmVudHNfcGVyX2FjdG9yX3BjdF9mcmVxXSdcbmFsbF9yZXBvX2UyYV9wY3RfZnJlcSA8LSBxdWVyeV9leGVjKGFsbF9yZXBvX2UyYV9wY3RfZnJlcV9zcWwsIHByb2plY3QgPSBwcm9qZWN0KVxuc2F2ZVJEUyhhbGxfcmVwb19lMmFfcGN0X2ZyZXEsIFwiYWxsX3JlcG9fZTJhX3BjdF9mcmVxLnJkc1wiKVxuYGBgIn0= -->
-<pre class="r"><code>all_repo_e2a_pct_freq_sql &lt;-
-  'select * from [bonnyci-github-archive:ci_plunder_repo_samples_all.ghevents_repo_events_per_actor_pct_freq]'
-all_repo_e2a_pct_freq &lt;- query_exec(all_repo_e2a_pct_freq_sql, project = project)
-saveRDS(all_repo_e2a_pct_freq, &quot;all_repo_e2a_pct_freq.rds&quot;)</code></pre>
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuYWxsX2V2ZW50c19yZXBvX3R5cGVfc3VtbWFyeV9zcWwgPC1cbiAgJ3NlbGVjdCAqIGZyb20gW2Jvbm55Y2ktZ2l0aHViLWFyY2hpdmU6Y2lfcGx1bmRlcl9yZXBvX3NhbXBsZXNfYWxsLmdoZXZlbnRzX3JlcG9fdHlwZV9zdW1tYXJ5XSdcbmFsbF9ldmVudHNfcmVwb190eXBlX3N1bW1hcnkgPC0gcXVlcnlfZXhlYyhhbGxfZXZlbnRzX3JlcG9fdHlwZV9zdW1tYXJ5X3NxbCwgcHJvamVjdCA9IHByb2plY3QpXG5zYXZlUkRTKGFsbF9ldmVudHNfcmVwb190eXBlX3N1bW1hcnksIFwiYWxsX2V2ZW50c19yZXBvX3R5cGVfc3VtbWFyeS5yZHNcIilcbmBgYCJ9 -->
+<pre class="r"><code>all_events_repo_type_summary_sql &lt;-
+  'select * from [bonnyci-github-archive:ci_plunder_repo_samples_all.ghevents_repo_type_summary]'
+all_events_repo_type_summary &lt;- query_exec(all_events_repo_type_summary_sql, project = project)
+saveRDS(all_events_repo_type_summary, &quot;all_events_repo_type_summary.rds&quot;)</code></pre>
 <!-- rnb-source-end -->
 <!-- rnb-chunk-end -->
 <!-- rnb-text-begin -->
@@ -297,16 +259,13 @@ saveRDS(all_repo_e2a_pct_freq, &quot;all_repo_e2a_pct_freq.rds&quot;)</code></pr
 <p>How many separate repos did repo owners in the sample contribute to? Did any actors contribute across samples?</p>
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuYWxsX2FjdG9yX3JlcG9fZnJlcV9zcWwgPC1cbiAgJ3NlbGVjdCAqIGZyb20gW2Jvbm55Y2ktZ2l0aHViLWFyY2hpdmU6Y2lfcGx1bmRlcl9yZXBvX3NhbXBsZXNfYWxsLmdoZXZlbnRzX2FjdG9yX3JlcG9fZnJlcV0nXG5hbGxfYWN0b3JfcmVwb19mcmVxIDwtIHF1ZXJ5X2V4ZWMoYWxsX2FjdG9yX3JlcG9fZnJlcV9zcWwsIHByb2plY3QgPSBwcm9qZWN0KVxuYGBgIn0= -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuYWxsX2FjdG9yX3JlcG9fZnJlcV9zcWwgPC1cbiAgJ3NlbGVjdCAqIGZyb20gW2Jvbm55Y2ktZ2l0aHViLWFyY2hpdmU6Y2lfcGx1bmRlcl9yZXBvX3NhbXBsZXNfYWxsLmdoZXZlbnRzX2FjdG9yX3JlcG9fZnJlcV0nXG5cbmFsbF9hY3Rvcl9yZXBvX2ZyZXEgPC0gcXVlcnlfZXhlYyhhbGxfYWN0b3JfcmVwb19mcmVxX3NxbCwgcHJvamVjdCA9IHByb2plY3QpXG5cbnNhdmVSRFMoYWxsX2FjdG9yX3JlcG9fZnJlcSwgXCJhbGxfYWN0b3JfcmVwb19mcmVxLnJkc1wiKVxuYGBgIn0= -->
 <pre class="r"><code>all_actor_repo_freq_sql &lt;-
   'select * from [bonnyci-github-archive:ci_plunder_repo_samples_all.ghevents_actor_repo_freq]'
-all_actor_repo_freq &lt;- query_exec(all_actor_repo_freq_sql, project = project)</code></pre>
-<!-- rnb-source-end -->
-<!-- rnb-output-begin eyJkYXRhIjoiQXV0by1yZWZyZXNoaW5nIHN0YWxlIE9BdXRoIHRva2VuLlxuIn0= -->
-<pre><code>Auto-refreshing stale OAuth token.</code></pre>
-<!-- rnb-output-end -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuc2F2ZVJEUyhhbGxfYWN0b3JfcmVwb19mcmVxLCBcImFsbF9hY3Rvcl9yZXBvX2ZyZXEucmRzXCIpXG5gYGAifQ== -->
-<pre class="r"><code>saveRDS(all_actor_repo_freq, &quot;all_actor_repo_freq.rds&quot;)</code></pre>
+
+all_actor_repo_freq &lt;- query_exec(all_actor_repo_freq_sql, project = project)
+
+saveRDS(all_actor_repo_freq, &quot;all_actor_repo_freq.rds&quot;)</code></pre>
 <!-- rnb-source-end -->
 <!-- rnb-chunk-end -->
 <!-- rnb-text-begin -->
@@ -316,11 +275,14 @@ all_actor_repo_freq &lt;- query_exec(all_actor_repo_freq_sql, project = project)
 <h3>GitHub API Data</h3>
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuYWxsX3JlcG9fZGF0YV9zcWwgPC1cbiAgJ3NlbGVjdCAqIGZyb20gW2Jvbm55Y2ktZ2l0aHViLWFyY2hpdmU6Y2lfcGx1bmRlcl9yZXBvX3NhbXBsZXNfYWxsLnJlcG9fZGF0YV90cmltbWVkXSdcbmFsbF9yZXBvX2RhdGEgPC0gcXVlcnlfZXhlYyhhbGxfcmVwb19kYXRhX3NxbCwgcHJvamVjdCA9IHByb2plY3QpXG5zYXZlUkRTKGFsbF9yZXBvX2RhdGEsIFwiYWxsX3JlcG9fZGF0YS5yZHNcIilcbmBgYCJ9 -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuYWxsX3JlcG9fZGF0YV9zcWwgPC1cbiAgJ3NlbGVjdCAqIGZyb20gW2Jvbm55Y2ktZ2l0aHViLWFyY2hpdmU6Y2lfcGx1bmRlcl9yZXBvX3NhbXBsZXNfYWxsLnJlcG9fZGF0YV90cmltbWVkXSdcblxuYWxsX3JlcG9fZGF0YSA8LSBxdWVyeV9leGVjKGFsbF9yZXBvX2RhdGFfc3FsLCBwcm9qZWN0ID0gcHJvamVjdClcblxuc2F2ZVJEUyhhbGxfcmVwb19kYXRhLCBcImFsbF9yZXBvX2RhdGEucmRzXCIpXG5cbmBgYCJ9 -->
 <pre class="r"><code>all_repo_data_sql &lt;-
   'select * from [bonnyci-github-archive:ci_plunder_repo_samples_all.repo_data_trimmed]'
+
 all_repo_data &lt;- query_exec(all_repo_data_sql, project = project)
-saveRDS(all_repo_data, &quot;all_repo_data.rds&quot;)</code></pre>
+
+saveRDS(all_repo_data, &quot;all_repo_data.rds&quot;)
+</code></pre>
 <!-- rnb-source-end -->
 <!-- rnb-chunk-end -->
 <!-- rnb-text-begin -->
@@ -328,11 +290,13 @@ saveRDS(all_repo_data, &quot;all_repo_data.rds&quot;)</code></pre>
 <h4>Repo Owner Frequency</h4>
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuIyBUT0RPIHN1bW1hcnkgc2hvdWxkIGNvbWUgZnJvbSBSIG5vdCBHQlFcbmFsbF9yZXBvX293bmVyX3NxbCA8LVxuICAnc2VsZWN0ICogZnJvbSBbYm9ubnljaS1naXRodWItYXJjaGl2ZTpjaV9wbHVuZGVyX3JlcG9fc2FtcGxlc19hbGwucmVwb19vd25lcl0nXG5hbGxfcmVwb19vd25lciA8LSBxdWVyeV9leGVjKGFsbF9yZXBvX293bmVyX3NxbCwgcHJvamVjdCA9IHByb2plY3QpXG5zYXZlUkRTKGFsbF9yZXBvX293bmVyLCBcImFsbF9yZXBvX293bmVyLnJkc1wiKVxuYGBgIn0= -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuIyBUT0RPIHN1bW1hcnkgc2hvdWxkIGNvbWUgZnJvbSBSIG5vdCBHQlFcbmFsbF9yZXBvX293bmVyX3NxbCA8LVxuICAnc2VsZWN0ICogZnJvbSBbYm9ubnljaS1naXRodWItYXJjaGl2ZTpjaV9wbHVuZGVyX3JlcG9fc2FtcGxlc19hbGwucmVwb19vd25lcl0nXG5cbmFsbF9yZXBvX293bmVyIDwtIHF1ZXJ5X2V4ZWMoYWxsX3JlcG9fb3duZXJfc3FsLCBwcm9qZWN0ID0gcHJvamVjdClcblxuc2F2ZVJEUyhhbGxfcmVwb19vd25lciwgXCJhbGxfcmVwb19vd25lci5yZHNcIilcbmBgYCJ9 -->
 <pre class="r"><code># TODO summary should come from R not GBQ
 all_repo_owner_sql &lt;-
   'select * from [bonnyci-github-archive:ci_plunder_repo_samples_all.repo_owner]'
+
 all_repo_owner &lt;- query_exec(all_repo_owner_sql, project = project)
+
 saveRDS(all_repo_owner, &quot;all_repo_owner.rds&quot;)</code></pre>
 <!-- rnb-source-end -->
 <!-- rnb-chunk-end -->
@@ -344,11 +308,14 @@ saveRDS(all_repo_owner, &quot;all_repo_owner.rds&quot;)</code></pre>
 <p>I did some exploratory analysis with ratios to see if I could find any interesting patterns but nothing really stuck. One thing I did find is a ratio of age to updated_since that is &lt;1 suggests repos were only acted upon when they were created. There may be further analysis that could be interesting here but I’m not sure that it’s telling us anything we can’t learn elsewhere.</p>
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuYWxsX3JlcG9fYWdlX3NxbCA8LVxuICAnc2VsZWN0ICogZnJvbSBbYm9ubnljaS1naXRodWItYXJjaGl2ZTpjaV9wbHVuZGVyX3JlcG9fc2FtcGxlc19hbGwucmVwb19kYXRhX2FnZV0nXG5hbGxfcmVwb19hZ2UgPC0gcXVlcnlfZXhlYyhhbGxfcmVwb19hZ2Vfc3FsLCBwcm9qZWN0ID0gcHJvamVjdClcbnNhdmVSRFMoYWxsX3JlcG9fYWdlLCBcImFsbF9yZXBvX2FnZS5yZHNcIilcbmBgYCJ9 -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuYWxsX3JlcG9fYWdlX3NxbCA8LVxuICAnc2VsZWN0ICogZnJvbSBbYm9ubnljaS1naXRodWItYXJjaGl2ZTpjaV9wbHVuZGVyX3JlcG9fc2FtcGxlc19hbGwucmVwb19kYXRhX2FnZV0nXG5cbmFsbF9yZXBvX2FnZSA8LSBxdWVyeV9leGVjKGFsbF9yZXBvX2FnZV9zcWwsIHByb2plY3QgPSBwcm9qZWN0KVxuXG5zYXZlUkRTKGFsbF9yZXBvX2FnZSwgXCJhbGxfcmVwb19hZ2UucmRzXCIpXG5cbmBgYCJ9 -->
 <pre class="r"><code>all_repo_age_sql &lt;-
   'select * from [bonnyci-github-archive:ci_plunder_repo_samples_all.repo_data_age]'
+
 all_repo_age &lt;- query_exec(all_repo_age_sql, project = project)
-saveRDS(all_repo_age, &quot;all_repo_age.rds&quot;)</code></pre>
+
+saveRDS(all_repo_age, &quot;all_repo_age.rds&quot;)
+</code></pre>
 <!-- rnb-source-end -->
 <!-- rnb-chunk-end -->
 <!-- rnb-text-begin -->
@@ -358,10 +325,12 @@ saveRDS(all_repo_age, &quot;all_repo_age.rds&quot;)</code></pre>
 <p>What languages were represented in the repositories? What proportion of the repository’s code was in that language?</p>
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuYWxsX3JlcG9fbGFuZ3VhZ2VzX3NxbCA8LVxuICAnc2VsZWN0ICogZnJvbSBbYm9ubnljaS1naXRodWItYXJjaGl2ZTpjaV9wbHVuZGVyX3JlcG9fc2FtcGxlc19hbGwucmVwb19sYW5ndWFnZXNdJ1xuYWxsX3JlcG9fbGFuZ3VhZ2VzIDwtIHF1ZXJ5X2V4ZWMoYWxsX3JlcG9fbGFuZ3VhZ2VzX3NxbCwgcHJvamVjdCA9IHByb2plY3QpXG5hbGxfcmVwb19sYW5ndWFnZXMgPC0gYWxsX3JlcG9fbGFuZ3VhZ2VzICU+JVxuICBncm91cF9ieShyZXBvX3NsdWcpICU+JVxuICBtdXRhdGUoXG4gICAgbG9jX3N1bSA9IHN1bShsb2MpLFxuICAgIGxvY19wY3QgPSBsb2MvbG9jX3N1bSxcbiAgICBsb2NfbG9nID0gcm91bmQobG9nKGxvY19wY3QpKVxuICApXG5zYXZlUkRTKGFsbF9yZXBvX2xhbmd1YWdlcywgXCJhbGxfcmVwb19sYW5ndWFnZXMucmRzXCIpXG5gYGAifQ== -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuYWxsX3JlcG9fbGFuZ3VhZ2VzX3NxbCA8LVxuICAnc2VsZWN0ICogZnJvbSBbYm9ubnljaS1naXRodWItYXJjaGl2ZTpjaV9wbHVuZGVyX3JlcG9fc2FtcGxlc19hbGwucmVwb19sYW5ndWFnZXNdJ1xuXG5hbGxfcmVwb19sYW5ndWFnZXMgPC0gcXVlcnlfZXhlYyhhbGxfcmVwb19sYW5ndWFnZXNfc3FsLCBwcm9qZWN0ID0gcHJvamVjdClcblxuYWxsX3JlcG9fbGFuZ3VhZ2VzIDwtIGFsbF9yZXBvX2xhbmd1YWdlcyAlPiVcbiAgZ3JvdXBfYnkocmVwb19zbHVnKSAlPiVcbiAgbXV0YXRlKFxuICAgIGxvY19zdW0gPSBzdW0obG9jKSxcbiAgICBsb2NfcGN0ID0gbG9jL2xvY19zdW0sXG4gICAgbG9jX2xvZyA9IHJvdW5kKGxvZyhsb2NfcGN0KSlcbiAgKVxuXG5zYXZlUkRTKGFsbF9yZXBvX2xhbmd1YWdlcywgXCJhbGxfcmVwb19sYW5ndWFnZXMucmRzXCIpXG5cbmBgYCJ9 -->
 <pre class="r"><code>all_repo_languages_sql &lt;-
   'select * from [bonnyci-github-archive:ci_plunder_repo_samples_all.repo_languages]'
+
 all_repo_languages &lt;- query_exec(all_repo_languages_sql, project = project)
+
 all_repo_languages &lt;- all_repo_languages %&gt;%
   group_by(repo_slug) %&gt;%
   mutate(
@@ -369,7 +338,9 @@ all_repo_languages &lt;- all_repo_languages %&gt;%
     loc_pct = loc/loc_sum,
     loc_log = round(log(loc_pct))
   )
-saveRDS(all_repo_languages, &quot;all_repo_languages.rds&quot;)</code></pre>
+
+saveRDS(all_repo_languages, &quot;all_repo_languages.rds&quot;)
+</code></pre>
 <!-- rnb-source-end -->
 <!-- rnb-chunk-end -->
 <!-- rnb-text-begin -->
@@ -379,16 +350,20 @@ saveRDS(all_repo_languages, &quot;all_repo_languages.rds&quot;)</code></pre>
 <p>What proportion of repos had Releases? How many releases did each repo have? What were the characteristics of repositories that had releases and the ones that didn’t?</p>
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuYWxsX3JlcG9fcmVsZWFzZXNfc3FsIDwtXG4gICdzZWxlY3QgKiBmcm9tIFtib25ueWNpLWdpdGh1Yi1hcmNoaXZlOmNpX3BsdW5kZXJfcmVwb19zYW1wbGVzX2FsbC5yZXBvX3JlbGVhc2VzXSdcbmFsbF9yZXBvX3JlbGVhc2VzIDwtIHF1ZXJ5X2V4ZWMoYWxsX3JlcG9fcmVsZWFzZXNfc3FsLCBwcm9qZWN0ID0gcHJvamVjdClcbnNhdmVSRFMoYWxsX3JlcG9fcmVsZWFzZXMsIFwiYWxsX3JlcG9fcmVsZWFzZXMucmRzXCIpXG4jIGNoYXJhY3RlcmlzdGljcyBvZiByZXBvcyB3aXRoIHZzIHdpdGhvdXRcbiMgYWdlXG4jIG51bWJlciBvZiBhY3RvcnNcbiMgZXZlbnRzIHRvIGFjdG9yIHBlcmNlbnRcbiMgbGFuZ3VhZ2VzP1xuYGBgIn0= -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuYWxsX3JlcG9fcmVsZWFzZXNfc3FsIDwtXG4gICdzZWxlY3QgKiBmcm9tIFtib25ueWNpLWdpdGh1Yi1hcmNoaXZlOmNpX3BsdW5kZXJfcmVwb19zYW1wbGVzX2FsbC5yZXBvX3JlbGVhc2VzXSdcblxuYWxsX3JlcG9fcmVsZWFzZXMgPC0gcXVlcnlfZXhlYyhhbGxfcmVwb19yZWxlYXNlc19zcWwsIHByb2plY3QgPSBwcm9qZWN0KVxuXG5zYXZlUkRTKGFsbF9yZXBvX3JlbGVhc2VzLCBcImFsbF9yZXBvX3JlbGVhc2VzLnJkc1wiKVxuXG4jIGNoYXJhY3RlcmlzdGljcyBvZiByZXBvcyB3aXRoIHZzIHdpdGhvdXRcbiMgYWdlXG4jIG51bWJlciBvZiBhY3RvcnNcbiMgZXZlbnRzIHRvIGFjdG9yIHBlcmNlbnRcbiMgbGFuZ3VhZ2VzP1xuXG5gYGAifQ== -->
 <pre class="r"><code>all_repo_releases_sql &lt;-
   'select * from [bonnyci-github-archive:ci_plunder_repo_samples_all.repo_releases]'
+
 all_repo_releases &lt;- query_exec(all_repo_releases_sql, project = project)
+
 saveRDS(all_repo_releases, &quot;all_repo_releases.rds&quot;)
+
 # characteristics of repos with vs without
 # age
 # number of actors
 # events to actor percent
-# languages?</code></pre>
+# languages?
+</code></pre>
 <!-- rnb-source-end -->
 <!-- rnb-chunk-end -->
 <!-- rnb-text-begin -->
@@ -399,11 +374,14 @@ saveRDS(all_repo_releases, &quot;all_repo_releases.rds&quot;)
 <p>Of those, how many had a Build status tag (indicates possible CI)? What are the characterstics of repositories that had a Build status tag vs those that didn’t?</p>
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuYWxsX3JlcG9fcmVhZG1lX3NxbCA8LVxuICAnc2VsZWN0ICogZnJvbSBbYm9ubnljaS1naXRodWItYXJjaGl2ZTpjaV9wbHVuZGVyX3JlcG9fc2FtcGxlc19hbGwucmVwb19yZWFkbWVfYnVpbGRzdGF0dXNdJ1xuYWxsX3JlcG9fcmVhZG1lIDwtIHF1ZXJ5X2V4ZWMoYWxsX3JlcG9fcmVhZG1lX3NxbCwgcHJvamVjdCA9IHByb2plY3QpXG5zYXZlUkRTKGFsbF9yZXBvX3JlYWRtZSwgXCJhbGxfcmVwb19yZWFkbWUucmRzXCIpXG5gYGAifQ== -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuYWxsX3JlcG9fcmVhZG1lX3NxbCA8LVxuICAnc2VsZWN0ICogZnJvbSBbYm9ubnljaS1naXRodWItYXJjaGl2ZTpjaV9wbHVuZGVyX3JlcG9fc2FtcGxlc19hbGwucmVwb19yZWFkbWVfYnVpbGRzdGF0dXNdJ1xuXG5hbGxfcmVwb19yZWFkbWUgPC0gcXVlcnlfZXhlYyhhbGxfcmVwb19yZWFkbWVfc3FsLCBwcm9qZWN0ID0gcHJvamVjdClcblxuc2F2ZVJEUyhhbGxfcmVwb19yZWFkbWUsIFwiYWxsX3JlcG9fcmVhZG1lLnJkc1wiKVxuXG5gYGAifQ== -->
 <pre class="r"><code>all_repo_readme_sql &lt;-
   'select * from [bonnyci-github-archive:ci_plunder_repo_samples_all.repo_readme_buildstatus]'
+
 all_repo_readme &lt;- query_exec(all_repo_readme_sql, project = project)
-saveRDS(all_repo_readme, &quot;all_repo_readme.rds&quot;)</code></pre>
+
+saveRDS(all_repo_readme, &quot;all_repo_readme.rds&quot;)
+</code></pre>
 <!-- rnb-source-end -->
 <!-- rnb-chunk-end -->
 <!-- rnb-text-begin -->
@@ -421,11 +399,14 @@ saveRDS(all_repo_readme, &quot;all_repo_readme.rds&quot;)</code></pre>
   limit 100</code></pre>
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxucHVzaF9ldmVudHNfc2FtcGxlX3NxbCA8LVxuICAnc2VsZWN0ICogZnJvbSBbYm9ubnljaS1naXRodWItYXJjaGl2ZTpjaV9wbHVuZGVyX3JlcG9fc2FtcGxlcy5wdXNoX2V2ZW50c19zYW1wbGVdJ1xucHVzaF9ldmVudHNfc2FtcGxlIDwtIHF1ZXJ5X2V4ZWMocHVzaF9ldmVudHNfc2FtcGxlX3NxbCwgcHJvamVjdCA9IHByb2plY3QpXG5zYXZlUkRTKHB1c2hfZXZlbnRzX3NhbXBsZSwgXCJwdXNoX2V2ZW50c19zYW1wbGUucmRzXCIpXG5gYGAifQ== -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxucHVzaF9ldmVudHNfc2FtcGxlX3NxbCA8LVxuICAnc2VsZWN0ICogZnJvbSBbYm9ubnljaS1naXRodWItYXJjaGl2ZTpjaV9wbHVuZGVyX3JlcG9fc2FtcGxlcy5wdXNoX2V2ZW50c19zYW1wbGVdJ1xuXG5wdXNoX2V2ZW50c19zYW1wbGUgPC0gcXVlcnlfZXhlYyhwdXNoX2V2ZW50c19zYW1wbGVfc3FsLCBwcm9qZWN0ID0gcHJvamVjdClcblxuc2F2ZVJEUyhwdXNoX2V2ZW50c19zYW1wbGUsIFwicHVzaF9ldmVudHNfc2FtcGxlLnJkc1wiKVxuXG5gYGAifQ== -->
 <pre class="r"><code>push_events_sample_sql &lt;-
   'select * from [bonnyci-github-archive:ci_plunder_repo_samples.push_events_sample]'
+
 push_events_sample &lt;- query_exec(push_events_sample_sql, project = project)
-saveRDS(push_events_sample, &quot;push_events_sample.rds&quot;)</code></pre>
+
+saveRDS(push_events_sample, &quot;push_events_sample.rds&quot;)
+</code></pre>
 <!-- rnb-source-end -->
 <!-- rnb-chunk-end -->
 <!-- rnb-text-begin -->
@@ -434,21 +415,27 @@ saveRDS(push_events_sample, &quot;push_events_sample.rds&quot;)</code></pre>
 <h3>Events Data</h3>
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxucHVzaF9ldmVudHNfcmVwb19zdW1tYXJ5X3NxbCA8LVxuICAnc2VsZWN0ICogZnJvbSBbYm9ubnljaS1naXRodWItYXJjaGl2ZTpjaV9wbHVuZGVyX3JlcG9fc2FtcGxlc19wdXNoLmdoZXZlbnRzX3JlcG9fc3VtbWFyeV0nXG5wdXNoX2V2ZW50c19yZXBvX3N1bW1hcnkgPC0gcXVlcnlfZXhlYyhwdXNoX2V2ZW50c19yZXBvX3N1bW1hcnlfc3FsLCBwcm9qZWN0ID0gcHJvamVjdClcbnNhdmVSRFMocHVzaF9ldmVudHNfcmVwb19zdW1tYXJ5LCBcInB1c2hfZXZlbnRzX3JlcG9fc3VtbWFyeS5yZHNcIilcbmBgYCJ9 -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxucHVzaF9ldmVudHNfcmVwb19zdW1tYXJ5X3NxbCA8LVxuICAnc2VsZWN0ICogZnJvbSBbYm9ubnljaS1naXRodWItYXJjaGl2ZTpjaV9wbHVuZGVyX3JlcG9fc2FtcGxlc19wdXNoLmdoZXZlbnRzX3JlcG9fc3VtbWFyeV0nXG5cbnB1c2hfZXZlbnRzX3JlcG9fc3VtbWFyeSA8LSBxdWVyeV9leGVjKHB1c2hfZXZlbnRzX3JlcG9fc3VtbWFyeV9zcWwsIHByb2plY3QgPSBwcm9qZWN0KVxuXG5zYXZlUkRTKHB1c2hfZXZlbnRzX3JlcG9fc3VtbWFyeSwgXCJwdXNoX2V2ZW50c19yZXBvX3N1bW1hcnkucmRzXCIpXG5cbmBgYCJ9 -->
 <pre class="r"><code>push_events_repo_summary_sql &lt;-
   'select * from [bonnyci-github-archive:ci_plunder_repo_samples_push.ghevents_repo_summary]'
+
 push_events_repo_summary &lt;- query_exec(push_events_repo_summary_sql, project = project)
-saveRDS(push_events_repo_summary, &quot;push_events_repo_summary.rds&quot;)</code></pre>
+
+saveRDS(push_events_repo_summary, &quot;push_events_repo_summary.rds&quot;)
+</code></pre>
 <!-- rnb-source-end -->
 <!-- rnb-chunk-end -->
 <!-- rnb-text-begin -->
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxucHVzaF9ldmVudHNfcmVwb190eXBlX3N1bW1hcnlfc3FsIDwtXG4gICdzZWxlY3QgKiBmcm9tIFtib25ueWNpLWdpdGh1Yi1hcmNoaXZlOmNpX3BsdW5kZXJfcmVwb19zYW1wbGVzX3B1c2guZ2hldmVudHNfcmVwb190eXBlX3N1bW1hcnldJ1xucHVzaF9ldmVudHNfcmVwb190eXBlX3N1bW1hcnkgPC0gcXVlcnlfZXhlYyhwdXNoX2V2ZW50c19yZXBvX3R5cGVfc3VtbWFyeV9zcWwsIHByb2plY3QgPSBwcm9qZWN0KVxuc2F2ZVJEUyhwdXNoX2V2ZW50c19yZXBvX3R5cGVfc3VtbWFyeSwgXCJwdXNoX2V2ZW50c19yZXBvX3R5cGVfc3VtbWFyeS5yZHNcIilcbmBgYCJ9 -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxucHVzaF9ldmVudHNfcmVwb190eXBlX3N1bW1hcnlfc3FsIDwtXG4gICdzZWxlY3QgKiBmcm9tIFtib25ueWNpLWdpdGh1Yi1hcmNoaXZlOmNpX3BsdW5kZXJfcmVwb19zYW1wbGVzX3B1c2guZ2hldmVudHNfcmVwb190eXBlX3N1bW1hcnldJ1xuXG5wdXNoX2V2ZW50c19yZXBvX3R5cGVfc3VtbWFyeSA8LSBxdWVyeV9leGVjKHB1c2hfZXZlbnRzX3JlcG9fdHlwZV9zdW1tYXJ5X3NxbCwgcHJvamVjdCA9IHByb2plY3QpXG5cbnNhdmVSRFMocHVzaF9ldmVudHNfcmVwb190eXBlX3N1bW1hcnksIFwicHVzaF9ldmVudHNfcmVwb190eXBlX3N1bW1hcnkucmRzXCIpXG5cbmBgYCJ9 -->
 <pre class="r"><code>push_events_repo_type_summary_sql &lt;-
   'select * from [bonnyci-github-archive:ci_plunder_repo_samples_push.ghevents_repo_type_summary]'
+
 push_events_repo_type_summary &lt;- query_exec(push_events_repo_type_summary_sql, project = project)
-saveRDS(push_events_repo_type_summary, &quot;push_events_repo_type_summary.rds&quot;)</code></pre>
+
+saveRDS(push_events_repo_type_summary, &quot;push_events_repo_type_summary.rds&quot;)
+</code></pre>
 <!-- rnb-source-end -->
 <!-- rnb-chunk-end -->
 <!-- rnb-text-begin -->
@@ -457,41 +444,53 @@ saveRDS(push_events_repo_type_summary, &quot;push_events_repo_type_summary.rds&q
 <h3>Github API</h3>
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxucHVzaF9yZXBvX2RhdGFfc3FsIDwtXG4gICdzZWxlY3QgKiBmcm9tIFtib25ueWNpLWdpdGh1Yi1hcmNoaXZlOmNpX3BsdW5kZXJfcmVwb19zYW1wbGVzX3B1c2gucmVwb19kYXRhX3RyaW1tZWRdJ1xucHVzaF9yZXBvX2RhdGEgPC0gcXVlcnlfZXhlYyhwdXNoX3JlcG9fZGF0YV9zcWwsIHByb2plY3QgPSBwcm9qZWN0KVxuc2F2ZVJEUyhwdXNoX3JlcG9fZGF0YSwgXCJwdXNoX3JlcG9fZGF0YS5yZHNcIilcbmBgYCJ9 -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxucHVzaF9yZXBvX2RhdGFfc3FsIDwtXG4gICdzZWxlY3QgKiBmcm9tIFtib25ueWNpLWdpdGh1Yi1hcmNoaXZlOmNpX3BsdW5kZXJfcmVwb19zYW1wbGVzX3B1c2gucmVwb19kYXRhX3RyaW1tZWRdJ1xuXG5wdXNoX3JlcG9fZGF0YSA8LSBxdWVyeV9leGVjKHB1c2hfcmVwb19kYXRhX3NxbCwgcHJvamVjdCA9IHByb2plY3QpXG5cbnNhdmVSRFMocHVzaF9yZXBvX2RhdGEsIFwicHVzaF9yZXBvX2RhdGEucmRzXCIpXG5cbmBgYCJ9 -->
 <pre class="r"><code>push_repo_data_sql &lt;-
   'select * from [bonnyci-github-archive:ci_plunder_repo_samples_push.repo_data_trimmed]'
+
 push_repo_data &lt;- query_exec(push_repo_data_sql, project = project)
-saveRDS(push_repo_data, &quot;push_repo_data.rds&quot;)</code></pre>
+
+saveRDS(push_repo_data, &quot;push_repo_data.rds&quot;)
+</code></pre>
 <!-- rnb-source-end -->
 <!-- rnb-chunk-end -->
 <!-- rnb-text-begin -->
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxucHVzaF9yZXBvX293bmVyX3NxbCA8LVxuICAnc2VsZWN0ICogZnJvbSBbYm9ubnljaS1naXRodWItYXJjaGl2ZTpjaV9wbHVuZGVyX3JlcG9fc2FtcGxlc19wdXNoLnJlcG9fb3duZXJdJ1xucHVzaF9yZXBvX293bmVyIDwtIHF1ZXJ5X2V4ZWMocHVzaF9yZXBvX293bmVyX3NxbCwgcHJvamVjdCA9IHByb2plY3QpXG5zYXZlUkRTKHB1c2hfcmVwb19vd25lciwgXCJwdXNoX3JlcG9fb3duZXIucmRzXCIpXG5gYGAifQ== -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxucHVzaF9yZXBvX293bmVyX3NxbCA8LVxuICAnc2VsZWN0ICogZnJvbSBbYm9ubnljaS1naXRodWItYXJjaGl2ZTpjaV9wbHVuZGVyX3JlcG9fc2FtcGxlc19wdXNoLnJlcG9fb3duZXJdJ1xuXG5wdXNoX3JlcG9fb3duZXIgPC0gcXVlcnlfZXhlYyhwdXNoX3JlcG9fb3duZXJfc3FsLCBwcm9qZWN0ID0gcHJvamVjdClcblxuc2F2ZVJEUyhwdXNoX3JlcG9fb3duZXIsIFwicHVzaF9yZXBvX293bmVyLnJkc1wiKVxuXG5gYGAifQ== -->
 <pre class="r"><code>push_repo_owner_sql &lt;-
   'select * from [bonnyci-github-archive:ci_plunder_repo_samples_push.repo_owner]'
+
 push_repo_owner &lt;- query_exec(push_repo_owner_sql, project = project)
-saveRDS(push_repo_owner, &quot;push_repo_owner.rds&quot;)</code></pre>
+
+saveRDS(push_repo_owner, &quot;push_repo_owner.rds&quot;)
+</code></pre>
 <!-- rnb-source-end -->
 <!-- rnb-chunk-end -->
 <!-- rnb-text-begin -->
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxucHVzaF9yZXBvX2xhbmd1YWdlc19zcWwgPC1cbiAgJ3NlbGVjdCAqIGZyb20gW2Jvbm55Y2ktZ2l0aHViLWFyY2hpdmU6Y2lfcGx1bmRlcl9yZXBvX3NhbXBsZXNfcHVzaC5yZXBvX2xhbmd1YWdlc10nXG5wdXNoX3JlcG9fbGFuZ3VhZ2VzIDwtIHF1ZXJ5X2V4ZWMocHVzaF9yZXBvX2xhbmd1YWdlc19zcWwsIHByb2plY3QgPSBwcm9qZWN0KVxuc2F2ZVJEUyhwdXNoX3JlcG9fbGFuZ3VhZ2VzLCBcInB1c2hfcmVwb19sYW5ndWFnZXMucmRzXCIpXG5gYGAifQ== -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxucHVzaF9yZXBvX2xhbmd1YWdlc19zcWwgPC1cbiAgJ3NlbGVjdCAqIGZyb20gW2Jvbm55Y2ktZ2l0aHViLWFyY2hpdmU6Y2lfcGx1bmRlcl9yZXBvX3NhbXBsZXNfcHVzaC5yZXBvX2xhbmd1YWdlc10nXG5cbnB1c2hfcmVwb19sYW5ndWFnZXMgPC0gcXVlcnlfZXhlYyhwdXNoX3JlcG9fbGFuZ3VhZ2VzX3NxbCwgcHJvamVjdCA9IHByb2plY3QpXG5cbnNhdmVSRFMocHVzaF9yZXBvX2xhbmd1YWdlcywgXCJwdXNoX3JlcG9fbGFuZ3VhZ2VzLnJkc1wiKVxuXG5gYGAifQ== -->
 <pre class="r"><code>push_repo_languages_sql &lt;-
   'select * from [bonnyci-github-archive:ci_plunder_repo_samples_push.repo_languages]'
+
 push_repo_languages &lt;- query_exec(push_repo_languages_sql, project = project)
-saveRDS(push_repo_languages, &quot;push_repo_languages.rds&quot;)</code></pre>
+
+saveRDS(push_repo_languages, &quot;push_repo_languages.rds&quot;)
+</code></pre>
 <!-- rnb-source-end -->
 <!-- rnb-chunk-end -->
 <!-- rnb-text-begin -->
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxucHVzaF9yZXBvX2FnZV9zcWwgPC1cbiAgJ3NlbGVjdCAqIGZyb20gW2Jvbm55Y2ktZ2l0aHViLWFyY2hpdmU6Y2lfcGx1bmRlcl9yZXBvX3NhbXBsZXNfcHVzaC5yZXBvX2RhdGFfYWdlXSdcbnB1c2hfcmVwb19hZ2UgPC0gcXVlcnlfZXhlYyhwdXNoX3JlcG9fYWdlX3NxbCwgcHJvamVjdCA9IHByb2plY3QpXG5zYXZlUkRTKHB1c2hfcmVwb19hZ2UsIFwicHVzaF9yZXBvX2FnZS5yZHNcIilcbmBgYCJ9 -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxucHVzaF9yZXBvX2FnZV9zcWwgPC1cbiAgJ3NlbGVjdCAqIGZyb20gW2Jvbm55Y2ktZ2l0aHViLWFyY2hpdmU6Y2lfcGx1bmRlcl9yZXBvX3NhbXBsZXNfcHVzaC5yZXBvX2RhdGFfYWdlXSdcblxucHVzaF9yZXBvX2FnZSA8LSBxdWVyeV9leGVjKHB1c2hfcmVwb19hZ2Vfc3FsLCBwcm9qZWN0ID0gcHJvamVjdClcblxuc2F2ZVJEUyhwdXNoX3JlcG9fYWdlLCBcInB1c2hfcmVwb19hZ2UucmRzXCIpXG5cbmBgYCJ9 -->
 <pre class="r"><code>push_repo_age_sql &lt;-
   'select * from [bonnyci-github-archive:ci_plunder_repo_samples_push.repo_data_age]'
+
 push_repo_age &lt;- query_exec(push_repo_age_sql, project = project)
-saveRDS(push_repo_age, &quot;push_repo_age.rds&quot;)</code></pre>
+
+saveRDS(push_repo_age, &quot;push_repo_age.rds&quot;)
+</code></pre>
 <!-- rnb-source-end -->
 <!-- rnb-chunk-end -->
 <!-- rnb-text-begin -->
@@ -500,16 +499,13 @@ saveRDS(push_repo_age, &quot;push_repo_age.rds&quot;)</code></pre>
 <p>What proportion of repos had Releases? How many releases did each repo have? What were the characteristics of repositories that had releases and the ones that didn’t?</p>
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxucHVzaF9yZXBvX3JlbGVhc2VzX3NxbCA8LVxuICAnc2VsZWN0ICogZnJvbSBbYm9ubnljaS1naXRodWItYXJjaGl2ZTpjaV9wbHVuZGVyX3JlcG9fc2FtcGxlc19wdXNoLnJlcG9fcmVsZWFzZXNdJ1xucHVzaF9yZXBvX3JlbGVhc2VzIDwtIHF1ZXJ5X2V4ZWMocHVzaF9yZXBvX3JlbGVhc2VzX3NxbCwgcHJvamVjdCA9IHByb2plY3QpXG5gYGAifQ== -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxucHVzaF9yZXBvX3JlbGVhc2VzX3NxbCA8LVxuICAnc2VsZWN0ICogZnJvbSBbYm9ubnljaS1naXRodWItYXJjaGl2ZTpjaV9wbHVuZGVyX3JlcG9fc2FtcGxlc19wdXNoLnJlcG9fcmVsZWFzZXNdJ1xuXG5wdXNoX3JlcG9fcmVsZWFzZXMgPC0gcXVlcnlfZXhlYyhwdXNoX3JlcG9fcmVsZWFzZXNfc3FsLCBwcm9qZWN0ID0gcHJvamVjdClcblxuc2F2ZVJEUyhwdXNoX3JlcG9fcmVsZWFzZXMsIFwicHVzaF9yZXBvX3JlbGVhc2VzLnJkc1wiKVxuYGBgIn0= -->
 <pre class="r"><code>push_repo_releases_sql &lt;-
   'select * from [bonnyci-github-archive:ci_plunder_repo_samples_push.repo_releases]'
-push_repo_releases &lt;- query_exec(push_repo_releases_sql, project = project)</code></pre>
-<!-- rnb-source-end -->
-<!-- rnb-output-begin eyJkYXRhIjoiQXV0by1yZWZyZXNoaW5nIHN0YWxlIE9BdXRoIHRva2VuLlxuIn0= -->
-<pre><code>Auto-refreshing stale OAuth token.</code></pre>
-<!-- rnb-output-end -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuc2F2ZVJEUyhwdXNoX3JlcG9fcmVsZWFzZXMsIFwicHVzaF9yZXBvX3JlbGVhc2VzLnJkc1wiKVxuYGBgIn0= -->
-<pre class="r"><code>saveRDS(push_repo_releases, &quot;push_repo_releases.rds&quot;)</code></pre>
+
+push_repo_releases &lt;- query_exec(push_repo_releases_sql, project = project)
+
+saveRDS(push_repo_releases, &quot;push_repo_releases.rds&quot;)</code></pre>
 <!-- rnb-source-end -->
 <!-- rnb-chunk-end -->
 <!-- rnb-text-begin -->
@@ -520,11 +516,14 @@ push_repo_releases &lt;- query_exec(push_repo_releases_sql, project = project)</
 <p>Of those, how many had a Build status tag (indicates possible CI)? What are the characterstics of repositories that had a Build status tag vs those that didn’t?</p>
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxucHVzaF9yZXBvX3JlYWRtZV9zcWwgPC1cbiAgJ3NlbGVjdCAqIGZyb20gW2Jvbm55Y2ktZ2l0aHViLWFyY2hpdmU6Y2lfcGx1bmRlcl9yZXBvX3NhbXBsZXNfcHVzaC5yZXBvX3JlYWRtZV9idWlsZHN0YXR1c10nXG5wdXNoX3JlcG9fcmVhZG1lIDwtIHF1ZXJ5X2V4ZWMocHVzaF9yZXBvX3JlYWRtZV9zcWwsIHByb2plY3QgPSBwcm9qZWN0KVxuc2F2ZVJEUyhwdXNoX3JlcG9fcmVhZG1lLCBcInB1c2hfcmVwb19yZWFkbWUucmRzXCIpXG5gYGAifQ== -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxucHVzaF9yZXBvX3JlYWRtZV9zcWwgPC1cbiAgJ3NlbGVjdCAqIGZyb20gW2Jvbm55Y2ktZ2l0aHViLWFyY2hpdmU6Y2lfcGx1bmRlcl9yZXBvX3NhbXBsZXNfcHVzaC5yZXBvX3JlYWRtZV9idWlsZHN0YXR1c10nXG5cbnB1c2hfcmVwb19yZWFkbWUgPC0gcXVlcnlfZXhlYyhwdXNoX3JlcG9fcmVhZG1lX3NxbCwgcHJvamVjdCA9IHByb2plY3QpXG5cbnNhdmVSRFMocHVzaF9yZXBvX3JlYWRtZSwgXCJwdXNoX3JlcG9fcmVhZG1lLnJkc1wiKVxuXG5gYGAifQ== -->
 <pre class="r"><code>push_repo_readme_sql &lt;-
   'select * from [bonnyci-github-archive:ci_plunder_repo_samples_push.repo_readme_buildstatus]'
+
 push_repo_readme &lt;- query_exec(push_repo_readme_sql, project = project)
-saveRDS(push_repo_readme, &quot;push_repo_readme.rds&quot;)</code></pre>
+
+saveRDS(push_repo_readme, &quot;push_repo_readme.rds&quot;)
+</code></pre>
 <!-- rnb-source-end -->
 <!-- rnb-chunk-end -->
 <!-- rnb-text-begin -->
@@ -574,64 +573,78 @@ saveRDS(watch_events_repo_type_summary, &quot;watch_events_repo_type_summary.rds
 <h3>Github API</h3>
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxud2F0Y2hfcmVwb19kYXRhX3NxbCA8LVxuICAnc2VsZWN0ICogZnJvbSBbYm9ubnljaS1naXRodWItYXJjaGl2ZTpjaV9wbHVuZGVyX3JlcG9fc2FtcGxlc193YXRjaC5yZXBvX2RhdGFfdHJpbW1lZF0nXG53YXRjaF9yZXBvX2RhdGEgPC0gcXVlcnlfZXhlYyh3YXRjaF9yZXBvX2RhdGFfc3FsLCBwcm9qZWN0ID0gcHJvamVjdClcbmBgYCJ9 -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxud2F0Y2hfcmVwb19kYXRhX3NxbCA8LVxuICAnc2VsZWN0ICogZnJvbSBbYm9ubnljaS1naXRodWItYXJjaGl2ZTpjaV9wbHVuZGVyX3JlcG9fc2FtcGxlc193YXRjaC5yZXBvX2RhdGFfdHJpbW1lZF0nXG5cbndhdGNoX3JlcG9fZGF0YSA8LSBxdWVyeV9leGVjKHdhdGNoX3JlcG9fZGF0YV9zcWwsIHByb2plY3QgPSBwcm9qZWN0KVxuXG5zYXZlUkRTKHdhdGNoX3JlcG9fZGF0YSwgXCJ3YXRjaF9yZXBvX2RhdGEucmRzXCIpXG5cbmBgYCJ9 -->
 <pre class="r"><code>watch_repo_data_sql &lt;-
   'select * from [bonnyci-github-archive:ci_plunder_repo_samples_watch.repo_data_trimmed]'
-watch_repo_data &lt;- query_exec(watch_repo_data_sql, project = project)</code></pre>
+
+watch_repo_data &lt;- query_exec(watch_repo_data_sql, project = project)
+
+saveRDS(watch_repo_data, &quot;watch_repo_data.rds&quot;)
+</code></pre>
 <!-- rnb-source-end -->
-<!-- rnb-output-begin eyJkYXRhIjoiQXV0by1yZWZyZXNoaW5nIHN0YWxlIE9BdXRoIHRva2VuLlxuRXJyb3I6IE5vdCBmb3VuZDogVGFibGUgYm9ubnljaS1naXRodWItYXJjaGl2ZTpjaV9wbHVuZGVyX3JlcG9fc2FtcGxlc193YXRjaC5yZXBvX2RhdGFfdHJpbW1lZFxuIn0= -->
-<pre><code>Auto-refreshing stale OAuth token.
-Error: Not found: Table bonnyci-github-archive:ci_plunder_repo_samples_watch.repo_data_trimmed</code></pre>
-<!-- rnb-output-end -->
 <!-- rnb-chunk-end -->
 <!-- rnb-text-begin -->
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxud2F0Y2hfcmVwb19vd25lcl9zcWwgPC1cbiAgJ3NlbGVjdCAqIGZyb20gW2Jvbm55Y2ktZ2l0aHViLWFyY2hpdmU6Y2lfcGx1bmRlcl9yZXBvX3NhbXBsZXNfd2F0Y2gucmVwb19vd25lcl0nXG53YXRjaF9yZXBvX293bmVyIDwtIHF1ZXJ5X2V4ZWMod2F0Y2hfcmVwb19vd25lcl9zcWwsIHByb2plY3QgPSBwcm9qZWN0KVxuc2F2ZVJEUyh3YXRjaF9yZXBvX293bmVyLCBcIndhdGNoX3JlcG9fb3duZXIucmRzXCIpXG5gYGAifQ== -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxud2F0Y2hfcmVwb19vd25lcl9zcWwgPC1cbiAgJ3NlbGVjdCAqIGZyb20gW2Jvbm55Y2ktZ2l0aHViLWFyY2hpdmU6Y2lfcGx1bmRlcl9yZXBvX3NhbXBsZXNfd2F0Y2gucmVwb19vd25lcl0nXG5cbndhdGNoX3JlcG9fb3duZXIgPC0gcXVlcnlfZXhlYyh3YXRjaF9yZXBvX293bmVyX3NxbCwgcHJvamVjdCA9IHByb2plY3QpXG5cbnNhdmVSRFMod2F0Y2hfcmVwb19vd25lciwgXCJ3YXRjaF9yZXBvX293bmVyLnJkc1wiKVxuXG5gYGAifQ== -->
 <pre class="r"><code>watch_repo_owner_sql &lt;-
   'select * from [bonnyci-github-archive:ci_plunder_repo_samples_watch.repo_owner]'
+
 watch_repo_owner &lt;- query_exec(watch_repo_owner_sql, project = project)
-saveRDS(watch_repo_owner, &quot;watch_repo_owner.rds&quot;)</code></pre>
+
+saveRDS(watch_repo_owner, &quot;watch_repo_owner.rds&quot;)
+</code></pre>
 <!-- rnb-source-end -->
 <!-- rnb-chunk-end -->
 <!-- rnb-text-begin -->
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxud2F0Y2hfcmVwb19sYW5ndWFnZXNfc3FsIDwtXG4gICdzZWxlY3QgKiBmcm9tIFtib25ueWNpLWdpdGh1Yi1hcmNoaXZlOmNpX3BsdW5kZXJfcmVwb19zYW1wbGVzX3dhdGNoLnJlcG9fbGFuZ3VhZ2VzXSdcbndhdGNoX3JlcG9fbGFuZ3VhZ2VzIDwtIHF1ZXJ5X2V4ZWMod2F0Y2hfcmVwb19sYW5ndWFnZXNfc3FsLCBwcm9qZWN0ID0gcHJvamVjdClcbnNhdmVSRFMod2F0Y2hfcmVwb19sYW5ndWFnZXMsIFwid2F0Y2hfcmVwb19sYW5ndWFnZXMucmRzXCIpXG5gYGAifQ== -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxud2F0Y2hfcmVwb19sYW5ndWFnZXNfc3FsIDwtXG4gICdzZWxlY3QgKiBmcm9tIFtib25ueWNpLWdpdGh1Yi1hcmNoaXZlOmNpX3BsdW5kZXJfcmVwb19zYW1wbGVzX3dhdGNoLnJlcG9fbGFuZ3VhZ2VzXSdcblxud2F0Y2hfcmVwb19sYW5ndWFnZXMgPC0gcXVlcnlfZXhlYyh3YXRjaF9yZXBvX2xhbmd1YWdlc19zcWwsIHByb2plY3QgPSBwcm9qZWN0KVxuXG5zYXZlUkRTKHdhdGNoX3JlcG9fbGFuZ3VhZ2VzLCBcIndhdGNoX3JlcG9fbGFuZ3VhZ2VzLnJkc1wiKVxuXG5gYGAifQ== -->
 <pre class="r"><code>watch_repo_languages_sql &lt;-
   'select * from [bonnyci-github-archive:ci_plunder_repo_samples_watch.repo_languages]'
+
 watch_repo_languages &lt;- query_exec(watch_repo_languages_sql, project = project)
-saveRDS(watch_repo_languages, &quot;watch_repo_languages.rds&quot;)</code></pre>
+
+saveRDS(watch_repo_languages, &quot;watch_repo_languages.rds&quot;)
+</code></pre>
 <!-- rnb-source-end -->
 <!-- rnb-chunk-end -->
 <!-- rnb-text-begin -->
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxud2F0Y2hfcmVwb19hZ2Vfc3FsIDwtXG4gICdzZWxlY3QgKiBmcm9tIFtib25ueWNpLWdpdGh1Yi1hcmNoaXZlOmNpX3BsdW5kZXJfcmVwb19zYW1wbGVzX3dhdGNoLnJlcG9fZGF0YV9hZ2VdJ1xud2F0Y2hfcmVwb19hZ2UgPC0gcXVlcnlfZXhlYyh3YXRjaF9yZXBvX2FnZV9zcWwsIHByb2plY3QgPSBwcm9qZWN0KVxuc2F2ZVJEUyh3YXRjaF9yZXBvX2FnZSwgXCJ3YXRjaF9yZXBvX2FnZS5yZHNcIilcbmBgYCJ9 -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxud2F0Y2hfcmVwb19hZ2Vfc3FsIDwtXG4gICdzZWxlY3QgKiBmcm9tIFtib25ueWNpLWdpdGh1Yi1hcmNoaXZlOmNpX3BsdW5kZXJfcmVwb19zYW1wbGVzX3dhdGNoLnJlcG9fZGF0YV9hZ2VdJ1xuXG53YXRjaF9yZXBvX2FnZSA8LSBxdWVyeV9leGVjKHdhdGNoX3JlcG9fYWdlX3NxbCwgcHJvamVjdCA9IHByb2plY3QpXG5cbnNhdmVSRFMod2F0Y2hfcmVwb19hZ2UsIFwid2F0Y2hfcmVwb19hZ2UucmRzXCIpXG5cbmBgYCJ9 -->
 <pre class="r"><code>watch_repo_age_sql &lt;-
   'select * from [bonnyci-github-archive:ci_plunder_repo_samples_watch.repo_data_age]'
+
 watch_repo_age &lt;- query_exec(watch_repo_age_sql, project = project)
-saveRDS(watch_repo_age, &quot;watch_repo_age.rds&quot;)</code></pre>
+
+saveRDS(watch_repo_age, &quot;watch_repo_age.rds&quot;)
+</code></pre>
 <!-- rnb-source-end -->
 <!-- rnb-chunk-end -->
 <!-- rnb-text-begin -->
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxud2F0Y2hfcmVwb19yZWxlYXNlc19zcWwgPC1cbiAgJ3NlbGVjdCAqIGZyb20gW2Jvbm55Y2ktZ2l0aHViLWFyY2hpdmU6Y2lfcGx1bmRlcl9yZXBvX3NhbXBsZXNfd2F0Y2gucmVwb19yZWxlYXNlc10nXG53YXRjaF9yZXBvX3JlbGVhc2VzIDwtIHF1ZXJ5X2V4ZWMod2F0Y2hfcmVwb19yZWxlYXNlc19zcWwsIHByb2plY3QgPSBwcm9qZWN0KVxuc2F2ZVJEUyh3YXRjaF9yZXBvX3JlbGVhc2VzLCBcIndhdGNoX3JlcG9fcmVsZWFzZXMucmRzXCIpXG5gYGAifQ== -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxud2F0Y2hfcmVwb19yZWxlYXNlc19zcWwgPC1cbiAgJ3NlbGVjdCAqIGZyb20gW2Jvbm55Y2ktZ2l0aHViLWFyY2hpdmU6Y2lfcGx1bmRlcl9yZXBvX3NhbXBsZXNfd2F0Y2gucmVwb19yZWxlYXNlc10nXG5cbndhdGNoX3JlcG9fcmVsZWFzZXMgPC0gcXVlcnlfZXhlYyh3YXRjaF9yZXBvX3JlbGVhc2VzX3NxbCwgcHJvamVjdCA9IHByb2plY3QpXG5cbnNhdmVSRFMod2F0Y2hfcmVwb19yZWxlYXNlcywgXCJ3YXRjaF9yZXBvX3JlbGVhc2VzLnJkc1wiKVxuYGBgIn0= -->
 <pre class="r"><code>watch_repo_releases_sql &lt;-
   'select * from [bonnyci-github-archive:ci_plunder_repo_samples_watch.repo_releases]'
+
 watch_repo_releases &lt;- query_exec(watch_repo_releases_sql, project = project)
+
 saveRDS(watch_repo_releases, &quot;watch_repo_releases.rds&quot;)</code></pre>
 <!-- rnb-source-end -->
 <!-- rnb-chunk-end -->
 <!-- rnb-text-begin -->
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxud2F0Y2hfcmVwb19yZWFkbWVfc3FsIDwtXG4gICdzZWxlY3QgKiBmcm9tIFtib25ueWNpLWdpdGh1Yi1hcmNoaXZlOmNpX3BsdW5kZXJfcmVwb19zYW1wbGVzX3dhdGNoLnJlcG9fcmVhZG1lX2J1aWxkc3RhdHVzXSdcbndhdGNoX3JlcG9fcmVhZG1lIDwtIHF1ZXJ5X2V4ZWMod2F0Y2hfcmVwb19yZWFkbWVfc3FsLCBwcm9qZWN0ID0gcHJvamVjdClcbnNhdmVSRFMod2F0Y2hfcmVwb19yZWFkbWUsIFwid2F0Y2hfcmVwb19yZWFkbWUucmRzXCIpXG5gYGAifQ== -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxud2F0Y2hfcmVwb19yZWFkbWVfc3FsIDwtXG4gICdzZWxlY3QgKiBmcm9tIFtib25ueWNpLWdpdGh1Yi1hcmNoaXZlOmNpX3BsdW5kZXJfcmVwb19zYW1wbGVzX3dhdGNoLnJlcG9fcmVhZG1lX2J1aWxkc3RhdHVzXSdcblxud2F0Y2hfcmVwb19yZWFkbWUgPC0gcXVlcnlfZXhlYyh3YXRjaF9yZXBvX3JlYWRtZV9zcWwsIHByb2plY3QgPSBwcm9qZWN0KVxuXG5zYXZlUkRTKHdhdGNoX3JlcG9fcmVhZG1lLCBcIndhdGNoX3JlcG9fcmVhZG1lLnJkc1wiKVxuXG5gYGAifQ== -->
 <pre class="r"><code>watch_repo_readme_sql &lt;-
   'select * from [bonnyci-github-archive:ci_plunder_repo_samples_watch.repo_readme_buildstatus]'
+
 watch_repo_readme &lt;- query_exec(watch_repo_readme_sql, project = project)
-saveRDS(watch_repo_readme, &quot;watch_repo_readme.rds&quot;)</code></pre>
+
+saveRDS(watch_repo_readme, &quot;watch_repo_readme.rds&quot;)
+</code></pre>
 <!-- rnb-source-end -->
 <!-- rnb-chunk-end -->
 <!-- rnb-text-begin -->
@@ -680,66 +693,78 @@ saveRDS(fork_events_repo_type_summary, &quot;fork_events_repo_type_summary.rds&q
 <h3>Github API</h3>
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuZm9ya19yZXBvX2RhdGFfc3FsIDwtXG4gICdzZWxlY3QgKiBmcm9tIFtib25ueWNpLWdpdGh1Yi1hcmNoaXZlOmNpX3BsdW5kZXJfcmVwb19zYW1wbGVzX2ZvcmsucmVwb19kYXRhX3RyaW1tZWRdJ1xuZm9ya19yZXBvX2RhdGEgPC0gcXVlcnlfZXhlYyhmb3JrX3JlcG9fZGF0YV9zcWwsIHByb2plY3QgPSBwcm9qZWN0KVxuc2F2ZVJEUyhmb3JrX3JlcG9fZGF0YSwgXCJmb3JrX3JlcG9fZGF0YS5yZHNcIilcbmBgYCJ9 -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuZm9ya19yZXBvX2RhdGFfc3FsIDwtXG4gICdzZWxlY3QgKiBmcm9tIFtib25ueWNpLWdpdGh1Yi1hcmNoaXZlOmNpX3BsdW5kZXJfcmVwb19zYW1wbGVzX2ZvcmsucmVwb19kYXRhX3RyaW1tZWRdJ1xuXG5mb3JrX3JlcG9fZGF0YSA8LSBxdWVyeV9leGVjKGZvcmtfcmVwb19kYXRhX3NxbCwgcHJvamVjdCA9IHByb2plY3QpXG5cbnNhdmVSRFMoZm9ya19yZXBvX2RhdGEsIFwiZm9ya19yZXBvX2RhdGEucmRzXCIpXG5cbmBgYCJ9 -->
 <pre class="r"><code>fork_repo_data_sql &lt;-
   'select * from [bonnyci-github-archive:ci_plunder_repo_samples_fork.repo_data_trimmed]'
+
 fork_repo_data &lt;- query_exec(fork_repo_data_sql, project = project)
-saveRDS(fork_repo_data, &quot;fork_repo_data.rds&quot;)</code></pre>
+
+saveRDS(fork_repo_data, &quot;fork_repo_data.rds&quot;)
+</code></pre>
 <!-- rnb-source-end -->
 <!-- rnb-chunk-end -->
 <!-- rnb-text-begin -->
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuZm9ya19yZXBvX293bmVyX3NxbCA8LVxuICAnc2VsZWN0ICogZnJvbSBbYm9ubnljaS1naXRodWItYXJjaGl2ZTpjaV9wbHVuZGVyX3JlcG9fc2FtcGxlc19mb3JrLnJlcG9fb3duZXJdJ1xuZm9ya19yZXBvX293bmVyIDwtIHF1ZXJ5X2V4ZWMoZm9ya19yZXBvX293bmVyX3NxbCwgcHJvamVjdCA9IHByb2plY3QpXG5zYXZlUkRTKGZvcmtfcmVwb19vd25lciwgXCJmb3JrX3JlcG9fb3duZXIucmRzXCIpXG5gYGAifQ== -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuZm9ya19yZXBvX293bmVyX3NxbCA8LVxuICAnc2VsZWN0ICogZnJvbSBbYm9ubnljaS1naXRodWItYXJjaGl2ZTpjaV9wbHVuZGVyX3JlcG9fc2FtcGxlc19mb3JrLnJlcG9fb3duZXJdJ1xuXG5mb3JrX3JlcG9fb3duZXIgPC0gcXVlcnlfZXhlYyhmb3JrX3JlcG9fb3duZXJfc3FsLCBwcm9qZWN0ID0gcHJvamVjdClcblxuc2F2ZVJEUyhmb3JrX3JlcG9fb3duZXIsIFwiZm9ya19yZXBvX293bmVyLnJkc1wiKVxuXG5gYGAifQ== -->
 <pre class="r"><code>fork_repo_owner_sql &lt;-
   'select * from [bonnyci-github-archive:ci_plunder_repo_samples_fork.repo_owner]'
+
 fork_repo_owner &lt;- query_exec(fork_repo_owner_sql, project = project)
-saveRDS(fork_repo_owner, &quot;fork_repo_owner.rds&quot;)</code></pre>
+
+saveRDS(fork_repo_owner, &quot;fork_repo_owner.rds&quot;)
+</code></pre>
 <!-- rnb-source-end -->
 <!-- rnb-chunk-end -->
 <!-- rnb-text-begin -->
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuZm9ya19yZXBvX2xhbmd1YWdlc19zcWwgPC1cbiAgJ3NlbGVjdCAqIGZyb20gW2Jvbm55Y2ktZ2l0aHViLWFyY2hpdmU6Y2lfcGx1bmRlcl9yZXBvX3NhbXBsZXNfZm9yay5yZXBvX2xhbmd1YWdlc10nXG5mb3JrX3JlcG9fbGFuZ3VhZ2VzIDwtIHF1ZXJ5X2V4ZWMoZm9ya19yZXBvX2xhbmd1YWdlc19zcWwsIHByb2plY3QgPSBwcm9qZWN0KVxuc2F2ZVJEUyhmb3JrX3JlcG9fbGFuZ3VhZ2VzLCBcImZvcmtfcmVwb19sYW5ndWFnZXMucmRzXCIpXG5gYGAifQ== -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuZm9ya19yZXBvX2xhbmd1YWdlc19zcWwgPC1cbiAgJ3NlbGVjdCAqIGZyb20gW2Jvbm55Y2ktZ2l0aHViLWFyY2hpdmU6Y2lfcGx1bmRlcl9yZXBvX3NhbXBsZXNfZm9yay5yZXBvX2xhbmd1YWdlc10nXG5cbmZvcmtfcmVwb19sYW5ndWFnZXMgPC0gcXVlcnlfZXhlYyhmb3JrX3JlcG9fbGFuZ3VhZ2VzX3NxbCwgcHJvamVjdCA9IHByb2plY3QpXG5cbnNhdmVSRFMoZm9ya19yZXBvX2xhbmd1YWdlcywgXCJmb3JrX3JlcG9fbGFuZ3VhZ2VzLnJkc1wiKVxuXG5gYGAifQ== -->
 <pre class="r"><code>fork_repo_languages_sql &lt;-
   'select * from [bonnyci-github-archive:ci_plunder_repo_samples_fork.repo_languages]'
+
 fork_repo_languages &lt;- query_exec(fork_repo_languages_sql, project = project)
-saveRDS(fork_repo_languages, &quot;fork_repo_languages.rds&quot;)</code></pre>
+
+saveRDS(fork_repo_languages, &quot;fork_repo_languages.rds&quot;)
+</code></pre>
 <!-- rnb-source-end -->
 <!-- rnb-chunk-end -->
 <!-- rnb-text-begin -->
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuZm9ya19yZXBvX2FnZV9zcWwgPC1cbiAgJ3NlbGVjdCAqIGZyb20gW2Jvbm55Y2ktZ2l0aHViLWFyY2hpdmU6Y2lfcGx1bmRlcl9yZXBvX3NhbXBsZXNfZm9yay5yZXBvX2RhdGFfYWdlXSdcbmZvcmtfcmVwb19hZ2UgPC0gcXVlcnlfZXhlYyhmb3JrX3JlcG9fYWdlX3NxbCwgcHJvamVjdCA9IHByb2plY3QpXG5zYXZlUkRTKGZvcmtfcmVwb19hZ2UsIFwiZm9ya19yZXBvX2FnZS5yZHNcIilcbmBgYCJ9 -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuZm9ya19yZXBvX2FnZV9zcWwgPC1cbiAgJ3NlbGVjdCAqIGZyb20gW2Jvbm55Y2ktZ2l0aHViLWFyY2hpdmU6Y2lfcGx1bmRlcl9yZXBvX3NhbXBsZXNfZm9yay5yZXBvX2RhdGFfYWdlXSdcblxuZm9ya19yZXBvX2FnZSA8LSBxdWVyeV9leGVjKGZvcmtfcmVwb19hZ2Vfc3FsLCBwcm9qZWN0ID0gcHJvamVjdClcblxuc2F2ZVJEUyhmb3JrX3JlcG9fYWdlLCBcImZvcmtfcmVwb19hZ2UucmRzXCIpXG5cbmBgYCJ9 -->
 <pre class="r"><code>fork_repo_age_sql &lt;-
   'select * from [bonnyci-github-archive:ci_plunder_repo_samples_fork.repo_data_age]'
+
 fork_repo_age &lt;- query_exec(fork_repo_age_sql, project = project)
-saveRDS(fork_repo_age, &quot;fork_repo_age.rds&quot;)</code></pre>
+
+saveRDS(fork_repo_age, &quot;fork_repo_age.rds&quot;)
+</code></pre>
 <!-- rnb-source-end -->
 <!-- rnb-chunk-end -->
 <!-- rnb-text-begin -->
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuZm9ya19yZXBvX3JlbGVhc2VzX3NxbCA8LVxuICAnc2VsZWN0ICogZnJvbSBbYm9ubnljaS1naXRodWItYXJjaGl2ZTpjaV9wbHVuZGVyX3JlcG9fc2FtcGxlc19mb3JrLnJlcG9fcmVsZWFzZXNdJ1xuZm9ya19yZXBvX3JlbGVhc2VzIDwtIHF1ZXJ5X2V4ZWMoZm9ya19yZXBvX3JlbGVhc2VzX3NxbCwgcHJvamVjdCA9IHByb2plY3QpXG5zYXZlUkRTKGZvcmtfcmVwb19yZWxlYXNlcywgXCJmb3JrX3JlcG9fcmVsZWFzZXMucmRzXCIpXG5gYGAifQ== -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuZm9ya19yZXBvX3JlbGVhc2VzX3NxbCA8LVxuICAnc2VsZWN0ICogZnJvbSBbYm9ubnljaS1naXRodWItYXJjaGl2ZTpjaV9wbHVuZGVyX3JlcG9fc2FtcGxlc19mb3JrLnJlcG9fcmVsZWFzZXNdJ1xuXG5mb3JrX3JlcG9fcmVsZWFzZXMgPC0gcXVlcnlfZXhlYyhmb3JrX3JlcG9fcmVsZWFzZXNfc3FsLCBwcm9qZWN0ID0gcHJvamVjdClcblxuc2F2ZVJEUyhmb3JrX3JlcG9fcmVsZWFzZXMsIFwiZm9ya19yZXBvX3JlbGVhc2VzLnJkc1wiKVxuYGBgIn0= -->
 <pre class="r"><code>fork_repo_releases_sql &lt;-
   'select * from [bonnyci-github-archive:ci_plunder_repo_samples_fork.repo_releases]'
+
 fork_repo_releases &lt;- query_exec(fork_repo_releases_sql, project = project)
+
 saveRDS(fork_repo_releases, &quot;fork_repo_releases.rds&quot;)</code></pre>
 <!-- rnb-source-end -->
 <!-- rnb-chunk-end -->
 <!-- rnb-text-begin -->
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuZm9ya19yZXBvX3JlYWRtZV9zcWwgPC1cbiAgJ3NlbGVjdCAqIGZyb20gW2Jvbm55Y2ktZ2l0aHViLWFyY2hpdmU6Y2lfcGx1bmRlcl9yZXBvX3NhbXBsZXNfZm9yay5yZXBvX3JlYWRtZV9idWlsZHN0YXR1c10nXG5mb3JrX3JlcG9fcmVhZG1lIDwtIHF1ZXJ5X2V4ZWMoZm9ya19yZXBvX3JlYWRtZV9zcWwsIHByb2plY3QgPSBwcm9qZWN0KVxuYGBgIn0= -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuZm9ya19yZXBvX3JlYWRtZV9zcWwgPC1cbiAgJ3NlbGVjdCAqIGZyb20gW2Jvbm55Y2ktZ2l0aHViLWFyY2hpdmU6Y2lfcGx1bmRlcl9yZXBvX3NhbXBsZXNfZm9yay5yZXBvX3JlYWRtZV9idWlsZHN0YXR1c10nXG5cbmZvcmtfcmVwb19yZWFkbWUgPC0gcXVlcnlfZXhlYyhmb3JrX3JlcG9fcmVhZG1lX3NxbCwgcHJvamVjdCA9IHByb2plY3QpXG5cbnNhdmVSRFMoZm9ya19yZXBvX3JlYWRtZSwgXCJmb3JrX3JlcG9fcmVhZG1lLnJkc1wiKVxuXG5gYGAifQ== -->
 <pre class="r"><code>fork_repo_readme_sql &lt;-
   'select * from [bonnyci-github-archive:ci_plunder_repo_samples_fork.repo_readme_buildstatus]'
-fork_repo_readme &lt;- query_exec(fork_repo_readme_sql, project = project)</code></pre>
-<!-- rnb-source-end -->
-<!-- rnb-output-begin eyJkYXRhIjoiQXV0by1yZWZyZXNoaW5nIHN0YWxlIE9BdXRoIHRva2VuLlxuIn0= -->
-<pre><code>Auto-refreshing stale OAuth token.</code></pre>
-<!-- rnb-output-end -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuc2F2ZVJEUyhmb3JrX3JlcG9fcmVhZG1lLCBcImZvcmtfcmVwb19yZWFkbWUucmRzXCIpXG5gYGAifQ== -->
-<pre class="r"><code>saveRDS(fork_repo_readme, &quot;fork_repo_readme.rds&quot;)</code></pre>
+
+fork_repo_readme &lt;- query_exec(fork_repo_readme_sql, project = project)
+
+saveRDS(fork_repo_readme, &quot;fork_repo_readme.rds&quot;)
+</code></pre>
 <!-- rnb-source-end -->
 <!-- rnb-chunk-end -->
 <!-- rnb-text-begin -->
@@ -783,12 +808,92 @@ saveRDS(release_events_repo_type_summary, &quot;release_events_repo_type_summary
 <!-- rnb-source-end -->
 <!-- rnb-chunk-end -->
 <!-- rnb-text-begin -->
+</div>
+<div id="github-api-3" class="section level3">
+<h3>Github API</h3>
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxucmVsZWFzZV9yZXBvX2RhdGFfc3FsIDwtXG4gICdzZWxlY3QgKiBmcm9tIFtib25ueWNpLWdpdGh1Yi1hcmNoaXZlOmNpX3BsdW5kZXJfcmVwb19zYW1wbGVzX3JlbGVhc2UucmVwb19kYXRhX3RyaW1tZWRdJ1xuXG5yZWxlYXNlX3JlcG9fZGF0YSA8LSBxdWVyeV9leGVjKHJlbGVhc2VfcmVwb19kYXRhX3NxbCwgcHJvamVjdCA9IHByb2plY3QpXG5cbnNhdmVSRFMocmVsZWFzZV9yZXBvX2RhdGEsIFwicmVsZWFzZV9yZXBvX2RhdGEucmRzXCIpXG5cbmBgYCJ9 -->
+<pre class="r"><code>release_repo_data_sql &lt;-
+  'select * from [bonnyci-github-archive:ci_plunder_repo_samples_release.repo_data_trimmed]'
+
+release_repo_data &lt;- query_exec(release_repo_data_sql, project = project)
+
+saveRDS(release_repo_data, &quot;release_repo_data.rds&quot;)
+</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxucmVsZWFzZV9yZXBvX293bmVyX3NxbCA8LVxuICAnc2VsZWN0ICogZnJvbSBbYm9ubnljaS1naXRodWItYXJjaGl2ZTpjaV9wbHVuZGVyX3JlcG9fc2FtcGxlc19yZWxlYXNlLnJlcG9fb3duZXJdJ1xuXG5yZWxlYXNlX3JlcG9fb3duZXIgPC0gcXVlcnlfZXhlYyhyZWxlYXNlX3JlcG9fb3duZXJfc3FsLCBwcm9qZWN0ID0gcHJvamVjdClcblxuc2F2ZVJEUyhyZWxlYXNlX3JlcG9fb3duZXIsIFwicmVsZWFzZV9yZXBvX293bmVyLnJkc1wiKVxuXG5gYGAifQ== -->
+<pre class="r"><code>release_repo_owner_sql &lt;-
+  'select * from [bonnyci-github-archive:ci_plunder_repo_samples_release.repo_owner]'
+
+release_repo_owner &lt;- query_exec(release_repo_owner_sql, project = project)
+
+saveRDS(release_repo_owner, &quot;release_repo_owner.rds&quot;)
+</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxucmVsZWFzZV9yZXBvX2xhbmd1YWdlc19zcWwgPC1cbiAgJ3NlbGVjdCAqIGZyb20gW2Jvbm55Y2ktZ2l0aHViLWFyY2hpdmU6Y2lfcGx1bmRlcl9yZXBvX3NhbXBsZXNfcmVsZWFzZS5yZXBvX2xhbmd1YWdlc10nXG5cbnJlbGVhc2VfcmVwb19sYW5ndWFnZXMgPC0gcXVlcnlfZXhlYyhyZWxlYXNlX3JlcG9fbGFuZ3VhZ2VzX3NxbCwgcHJvamVjdCA9IHByb2plY3QpXG5cbnNhdmVSRFMocmVsZWFzZV9yZXBvX2xhbmd1YWdlcywgXCJyZWxlYXNlX3JlcG9fbGFuZ3VhZ2VzLnJkc1wiKVxuXG5gYGAifQ== -->
+<pre class="r"><code>release_repo_languages_sql &lt;-
+  'select * from [bonnyci-github-archive:ci_plunder_repo_samples_release.repo_languages]'
+
+release_repo_languages &lt;- query_exec(release_repo_languages_sql, project = project)
+
+saveRDS(release_repo_languages, &quot;release_repo_languages.rds&quot;)
+</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxucmVsZWFzZV9yZXBvX2FnZV9zcWwgPC1cbiAgJ3NlbGVjdCAqIGZyb20gW2Jvbm55Y2ktZ2l0aHViLWFyY2hpdmU6Y2lfcGx1bmRlcl9yZXBvX3NhbXBsZXNfcmVsZWFzZS5yZXBvX2RhdGFfYWdlXSdcblxucmVsZWFzZV9yZXBvX2FnZSA8LSBxdWVyeV9leGVjKHJlbGVhc2VfcmVwb19hZ2Vfc3FsLCBwcm9qZWN0ID0gcHJvamVjdClcblxuc2F2ZVJEUyhyZWxlYXNlX3JlcG9fYWdlLCBcInJlbGVhc2VfcmVwb19hZ2UucmRzXCIpXG5cbmBgYCJ9 -->
+<pre class="r"><code>release_repo_age_sql &lt;-
+  'select * from [bonnyci-github-archive:ci_plunder_repo_samples_release.repo_data_age]'
+
+release_repo_age &lt;- query_exec(release_repo_age_sql, project = project)
+
+saveRDS(release_repo_age, &quot;release_repo_age.rds&quot;)
+</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxucmVsZWFzZV9yZXBvX3JlbGVhc2VzX3NxbCA8LVxuICAnc2VsZWN0ICogZnJvbSBbYm9ubnljaS1naXRodWItYXJjaGl2ZTpjaV9wbHVuZGVyX3JlcG9fc2FtcGxlc19yZWxlYXNlLnJlcG9fcmVsZWFzZXNdJ1xuXG5yZWxlYXNlX3JlcG9fcmVsZWFzZXMgPC0gcXVlcnlfZXhlYyhyZWxlYXNlX3JlcG9fcmVsZWFzZXNfc3FsLCBwcm9qZWN0ID0gcHJvamVjdClcblxuc2F2ZVJEUyhyZWxlYXNlX3JlcG9fcmVsZWFzZXMsIFwicmVsZWFzZV9yZXBvX3JlbGVhc2VzLnJkc1wiKVxuYGBgIn0= -->
+<pre class="r"><code>release_repo_releases_sql &lt;-
+  'select * from [bonnyci-github-archive:ci_plunder_repo_samples_release.repo_releases]'
+
+release_repo_releases &lt;- query_exec(release_repo_releases_sql, project = project)
+
+saveRDS(release_repo_releases, &quot;release_repo_releases.rds&quot;)</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxucmVsZWFzZV9yZXBvX3JlYWRtZV9zcWwgPC1cbiAgJ3NlbGVjdCAqIGZyb20gW2Jvbm55Y2ktZ2l0aHViLWFyY2hpdmU6Y2lfcGx1bmRlcl9yZXBvX3NhbXBsZXNfcmVsZWFzZS5yZXBvX3JlYWRtZV9idWlsZHN0YXR1c10nXG5cbnJlbGVhc2VfcmVwb19yZWFkbWUgPC0gcXVlcnlfZXhlYyhyZWxlYXNlX3JlcG9fcmVhZG1lX3NxbCwgcHJvamVjdCA9IHByb2plY3QpXG5cbnNhdmVSRFMocmVsZWFzZV9yZXBvX3JlYWRtZSwgXCJyZWxlYXNlX3JlcG9fcmVhZG1lLnJkc1wiKVxuXG5gYGAifQ== -->
+<pre class="r"><code>release_repo_readme_sql &lt;-
+  'select * from [bonnyci-github-archive:ci_plunder_repo_samples_release.repo_readme_buildstatus]'
+
+release_repo_readme &lt;- query_exec(release_repo_readme_sql, project = project)
+
+saveRDS(release_repo_readme, &quot;release_repo_readme.rds&quot;)
+</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
 <!-- rnb-text-end -->
 </div>
 </div>
 </div>
 
-<div id="rmd-source-code">LS0tCnRpdGxlOiAiU2FtcGxpbmcgTWV0aG9kbG9neSBEYXRhIgpvdXRwdXQ6IGh0bWxfbm90ZWJvb2sKLS0tCgpgYGB7cn0KbGlicmFyeShkcGx5cikKbGlicmFyeShiaWdycXVlcnkpCgpwcm9qZWN0IDwtICJib25ueWNpLWdpdGh1Yi1hcmNoaXZlIgpgYGAKCiMgRXhwZXJpbWVudHMKCiMjIFBvcHVsYXRpb24KCmBgYApTRUxFQ1QgKCopIEZST00gZ2l0aHViYXJjaGl2ZTptb250aC4yMDE3MDMsIGdpdGh1YmFyY2hpdmU6bW9udGguMjAxNzAyCmBgYAoKaHR0cHM6Ly9iaWdxdWVyeS5jbG91ZC5nb29nbGUuY29tOjQ0My9zYXZlZHF1ZXJ5Lzc4Nzc4NzU0NTY2MjoxODQ0YjZkMGRjMTY0YjBlYTIxMDNjYTI2NTNmNTc5MAoKYGBge3J9CiMgVE9ETyB0aW1lIHBlcmlvZCBzdW1tYXJ5IGJ5IGV2ZW50IHR5cGUgLSBudW1iZXIgb2YgZXZlbnRzLCBudW1iZXIgb2YgcmVwb3MsIG51bWJlciBvZiBhY3RvcnMsIG51bWJlciBvZiBpbmRlcGVuZGVudCByZXBvcyAobm90IHBhcnQgb2Ygc2FtZSB1c2VyL29yZykKYGBgCgoKIyMgQWxsIEV2ZW50cwoKIyMjIFJhbmRvbSBTYW1wbGUgb2YgRXZlbnRzCgpgYGAKU0VMRUNUICosIHJhbmQoKSBhcyByYW5kCiAgRlJPTSBbYm9ubnljaS1naXRodWItYXJjaGl2ZTpjaV9wbHVuZGVyX3JlcG9fc2FtcGxlcy4yMDE3XzAyXzAzXzIxXQogIG9yZGVyIGJ5IHJhbmQKICBsaW1pdCAxMDAKYGBgCgpodHRwczovL2JpZ3F1ZXJ5LmNsb3VkLmdvb2dsZS5jb206NDQzL3NhdmVkcXVlcnkvNzg3Nzg3NTQ1NjYyOjc0M2RkMDQxZmE5YzQ3OGJhNjZkYmIzMzZlNTg3Y2JlCgpgYGB7cn0KYWxsX2V2ZW50c19zYW1wbGVfc3FsIDwtCiAgJ3NlbGVjdCAqIGZyb20gW2Jvbm55Y2ktZ2l0aHViLWFyY2hpdmU6Y2lfcGx1bmRlcl9yZXBvX3NhbXBsZXMuYWxsX2V2ZW50c19zYW1wbGVdJwoKYWxsX2V2ZW50c19zYW1wbGUgPC0gcXVlcnlfZXhlYyhhbGxfZXZlbnRzX3NhbXBsZV9zcWwsIHByb2plY3QgPSBwcm9qZWN0KQoKc2F2ZVJEUyhhbGxfZXZlbnRzX3NhbXBsZSwgImFsbF9ldmVudHNfc2FtcGxlLnJkcyIpCgpgYGAKCiMjIyBFdmVudHMgRGF0YQoKIyMjIyBFdmVudCBUeXBlcyBpbiBTYW1wbGUKCmBgYHtyfQphbGxfc2FtcGxlX2V2ZW50X3R5cGVfZnJlcSA8LSBhbGxfZXZlbnRzX3NhbXBsZSAlPiUKICBncm91cF9ieSh0eXBlKSAlPiUKICBzdW1tYXJpc2UobnVtX2V2ZW50cyA9IG4oKSkKCnNhdmVSRFMoYWxsX3NhbXBsZV9ldmVudF90eXBlX2ZyZXEsICJhbGxfc2FtcGxlX2V2ZW50X3R5cGVfZnJlcS5yZHMiKQpgYGAKCgojIyMjIEV2ZW50IFR5cGUgRnJlcXVlbmN5IHBlciBSZXBvc2l0b3J5CgpgYGB7cn0KYWxsX3JlcG9fZXZlbnRfdHlwZV9mcmVxX3NxbCA8LQogICdzZWxlY3QgKiBmcm9tIFtib25ueWNpLWdpdGh1Yi1hcmNoaXZlOmNpX3BsdW5kZXJfcmVwb19zYW1wbGVzX2FsbC5naGV2ZW50c19yZXBvX2V2ZW50X3R5cGVzX2ZyZXF1ZW5jeV0nCgphbGxfcmVwb19ldmVudF90eXBlX2ZyZXEgPC0gcXVlcnlfZXhlYyhhbGxfcmVwb19ldmVudF90eXBlX2ZyZXFfc3FsLCBwcm9qZWN0ID0gcHJvamVjdCkKCnNhdmVSRFMoYWxsX3JlcG9fZXZlbnRfdHlwZV9mcmVxLCAiYWxsX3JlcG9fZXZlbnRfdHlwZV9mcmVxLnJkcyIpCmBgYAoKCiMjIyMgQWN0b3JzIHBlciBSZXBvCkhvdyBtYW55IHVuaXF1ZSBhY3RvcnMgZGlkIGVhY2ggcmVwbyBoYXZlPwoKYGBge3J9CmFsbF9yZXBvX2FjdG9yc19mcmVxX3NxbCA8LQogICdzZWxlY3QgKiBmcm9tIFtib25ueWNpLWdpdGh1Yi1hcmNoaXZlOmNpX3BsdW5kZXJfcmVwb19zYW1wbGVzX2FsbC5naGV2ZW50c19yZXBvX2FjdG9yc19mcmVxXScKCmFsbF9yZXBvX2FjdG9yc19mcmVxIDwtIHF1ZXJ5X2V4ZWMoYWxsX3JlcG9fYWN0b3JzX2ZyZXFfc3FsLCBwcm9qZWN0ID0gcHJvamVjdCkKCnNhdmVSRFMoYWxsX3JlcG9fYWN0b3JzX2ZyZXEsICJhbGxfcmVwb19hY3RvcnNfZnJlcS5yZHMiKQpgYGAKCgojIyMjIEFjdG9ycyBwZXIgRXZlbnQgVHlwZSBwZXIgUmVwbwpIb3cgbWFueSB1bmlxdWUgYWN0b3JzIGRpZCBlYWNoIGV2ZW50IHR5cGUgaW4gZWFjaCByZXBvIGhhdmU/CgpgYGB7cn0KYWxsX3JlcG9fZXZlbnRfdHlwZV9hY3RvcnNfZnJlcV9zcWwgPC0KICAnc2VsZWN0ICogZnJvbSBbYm9ubnljaS1naXRodWItYXJjaGl2ZTpjaV9wbHVuZGVyX3JlcG9fc2FtcGxlc19hbGwuZ2hldmVudHNfcmVwb19ldmVudF90eXBlX2FjdG9yc19mcmVxXScKCmFsbF9yZXBvX2V2ZW50X3R5cGVfYWN0b3JzX2ZyZXEgPC0gcXVlcnlfZXhlYyhhbGxfcmVwb19ldmVudF90eXBlX2FjdG9yc19mcmVxX3NxbCwgcHJvamVjdCA9IHByb2plY3QpCgpzYXZlUkRTKGFsbF9yZXBvX2V2ZW50X3R5cGVfYWN0b3JzX2ZyZXEsICJhbGxfcmVwb19ldmVudF90eXBlX2FjdG9yc19mcmVxLnJkcyIpCmBgYAoKIyMjIyBFdmVudHMgcGVyIEFjdG9yIFBlcmNlbnQgRnJlcXVlbmN5CkhvdyBhcmUgZXZlbnRzIGRpc3RyaWJ1dGVkIGFtb25nIGFjdG9ycyBpbiB0aGUgcmVwb3NpdG9yeT8KCmBgYHtyfQphbGxfcmVwb19lMmFfcGN0X2ZyZXFfc3FsIDwtCiAgJ3NlbGVjdCAqIGZyb20gW2Jvbm55Y2ktZ2l0aHViLWFyY2hpdmU6Y2lfcGx1bmRlcl9yZXBvX3NhbXBsZXNfYWxsLmdoZXZlbnRzX3JlcG9fZXZlbnRzX3Blcl9hY3Rvcl9wY3RfZnJlcV0nCgphbGxfcmVwb19lMmFfcGN0X2ZyZXEgPC0gcXVlcnlfZXhlYyhhbGxfcmVwb19lMmFfcGN0X2ZyZXFfc3FsLCBwcm9qZWN0ID0gcHJvamVjdCkKCnNhdmVSRFMoYWxsX3JlcG9fZTJhX3BjdF9mcmVxLCAiYWxsX3JlcG9fZTJhX3BjdF9mcmVxLnJkcyIpCmBgYAoKIyMjIyBSZXBvcyBwZXIgT3duZXIgaW4gU2FtcGxlCkhvdyBtYW55IHNlcGFyYXRlIHJlcG9zIGRpZCByZXBvIG93bmVycyBpbiB0aGUgc2FtcGxlIGNvbnRyaWJ1dGUgdG8/IERpZCBhbnkgYWN0b3JzIGNvbnRyaWJ1dGUgYWNyb3NzIHNhbXBsZXM/CgpgYGB7cn0KYWxsX2FjdG9yX3JlcG9fZnJlcV9zcWwgPC0KICAnc2VsZWN0ICogZnJvbSBbYm9ubnljaS1naXRodWItYXJjaGl2ZTpjaV9wbHVuZGVyX3JlcG9fc2FtcGxlc19hbGwuZ2hldmVudHNfYWN0b3JfcmVwb19mcmVxXScKCmFsbF9hY3Rvcl9yZXBvX2ZyZXEgPC0gcXVlcnlfZXhlYyhhbGxfYWN0b3JfcmVwb19mcmVxX3NxbCwgcHJvamVjdCA9IHByb2plY3QpCgpzYXZlUkRTKGFsbF9hY3Rvcl9yZXBvX2ZyZXEsICJhbGxfYWN0b3JfcmVwb19mcmVxLnJkcyIpCmBgYAoKIyMjIEdpdEh1YiBBUEkgRGF0YQoKYGBge3J9CmFsbF9yZXBvX2RhdGFfc3FsIDwtCiAgJ3NlbGVjdCAqIGZyb20gW2Jvbm55Y2ktZ2l0aHViLWFyY2hpdmU6Y2lfcGx1bmRlcl9yZXBvX3NhbXBsZXNfYWxsLnJlcG9fZGF0YV90cmltbWVkXScKCmFsbF9yZXBvX2RhdGEgPC0gcXVlcnlfZXhlYyhhbGxfcmVwb19kYXRhX3NxbCwgcHJvamVjdCA9IHByb2plY3QpCgpzYXZlUkRTKGFsbF9yZXBvX2RhdGEsICJhbGxfcmVwb19kYXRhLnJkcyIpCgpgYGAKCiMjIyMgUmVwbyBPd25lciBGcmVxdWVuY3kKCmBgYHtyfQojIFRPRE8gc3VtbWFyeSBzaG91bGQgY29tZSBmcm9tIFIgbm90IEdCUQphbGxfcmVwb19vd25lcl9zcWwgPC0KICAnc2VsZWN0ICogZnJvbSBbYm9ubnljaS1naXRodWItYXJjaGl2ZTpjaV9wbHVuZGVyX3JlcG9fc2FtcGxlc19hbGwucmVwb19vd25lcl0nCgphbGxfcmVwb19vd25lciA8LSBxdWVyeV9leGVjKGFsbF9yZXBvX293bmVyX3NxbCwgcHJvamVjdCA9IHByb2plY3QpCgpzYXZlUkRTKGFsbF9yZXBvX293bmVyLCAiYWxsX3JlcG9fb3duZXIucmRzIikKYGBgCgoKIyMjIyBSZXBvIEFnZQpIb3cgb2xkIGFyZSB0aGUgcmVwb3MgaW4gdGhlIHNhbXBsZT8gSG93IHJlY2VudGx5IHdlcmUgdGhleSBsYXN0IHVwZGF0ZWQ/CgpJIGRpZCBzb21lIGV4cGxvcmF0b3J5IGFuYWx5c2lzIHdpdGggcmF0aW9zIHRvIHNlZSBpZiBJIGNvdWxkIGZpbmQgYW55IGludGVyZXN0aW5nIHBhdHRlcm5zIGJ1dCBub3RoaW5nIHJlYWxseSBzdHVjay4gT25lIHRoaW5nIEkgZGlkIGZpbmQgaXMgYSByYXRpbyBvZiBhZ2UgdG8gdXBkYXRlZF9zaW5jZSB0aGF0IGlzIDwxIHN1Z2dlc3RzIHJlcG9zIHdlcmUgb25seSBhY3RlZCB1cG9uIHdoZW4gdGhleSB3ZXJlIGNyZWF0ZWQuIFRoZXJlIG1heSBiZSBmdXJ0aGVyIGFuYWx5c2lzIHRoYXQgY291bGQgYmUgaW50ZXJlc3RpbmcgaGVyZSBidXQgSSdtIG5vdCBzdXJlIHRoYXQgaXQncyB0ZWxsaW5nIHVzIGFueXRoaW5nIHdlIGNhbid0IGxlYXJuIGVsc2V3aGVyZS4KCmBgYHtyfQphbGxfcmVwb19hZ2Vfc3FsIDwtCiAgJ3NlbGVjdCAqIGZyb20gW2Jvbm55Y2ktZ2l0aHViLWFyY2hpdmU6Y2lfcGx1bmRlcl9yZXBvX3NhbXBsZXNfYWxsLnJlcG9fZGF0YV9hZ2VdJwoKYWxsX3JlcG9fYWdlIDwtIHF1ZXJ5X2V4ZWMoYWxsX3JlcG9fYWdlX3NxbCwgcHJvamVjdCA9IHByb2plY3QpCgpzYXZlUkRTKGFsbF9yZXBvX2FnZSwgImFsbF9yZXBvX2FnZS5yZHMiKQoKYGBgCgojIyMjIFJlcG8gTGFuZ3VhZ2UgRnJlcXVlbmN5CldoYXQgbGFuZ3VhZ2VzIHdlcmUgcmVwcmVzZW50ZWQgaW4gdGhlIHJlcG9zaXRvcmllcz8gV2hhdCBwcm9wb3J0aW9uIG9mIHRoZSByZXBvc2l0b3J5J3MgY29kZSB3YXMgaW4gdGhhdCBsYW5ndWFnZT8KCmBgYHtyfQphbGxfcmVwb19sYW5ndWFnZXNfc3FsIDwtCiAgJ3NlbGVjdCAqIGZyb20gW2Jvbm55Y2ktZ2l0aHViLWFyY2hpdmU6Y2lfcGx1bmRlcl9yZXBvX3NhbXBsZXNfYWxsLnJlcG9fbGFuZ3VhZ2VzXScKCmFsbF9yZXBvX2xhbmd1YWdlcyA8LSBxdWVyeV9leGVjKGFsbF9yZXBvX2xhbmd1YWdlc19zcWwsIHByb2plY3QgPSBwcm9qZWN0KQoKYWxsX3JlcG9fbGFuZ3VhZ2VzIDwtIGFsbF9yZXBvX2xhbmd1YWdlcyAlPiUKICBncm91cF9ieShyZXBvX3NsdWcpICU+JQogIG11dGF0ZSgKICAgIGxvY19zdW0gPSBzdW0obG9jKSwKICAgIGxvY19wY3QgPSBsb2MvbG9jX3N1bSwKICAgIGxvY19sb2cgPSByb3VuZChsb2cobG9jX3BjdCkpCiAgKQoKc2F2ZVJEUyhhbGxfcmVwb19sYW5ndWFnZXMsICJhbGxfcmVwb19sYW5ndWFnZXMucmRzIikKCmBgYAoKCiMjIyMgUmVsZWFzZXMKV2hhdCBwcm9wb3J0aW9uIG9mIHJlcG9zIGhhZCBSZWxlYXNlcz8gSG93IG1hbnkgcmVsZWFzZXMgZGlkIGVhY2ggcmVwbyBoYXZlPyBXaGF0IHdlcmUgdGhlIGNoYXJhY3RlcmlzdGljcyBvZiByZXBvc2l0b3JpZXMgdGhhdCBoYWQgcmVsZWFzZXMgYW5kIHRoZSBvbmVzIHRoYXQgZGlkbid0PwoKYGBge3J9CmFsbF9yZXBvX3JlbGVhc2VzX3NxbCA8LQogICdzZWxlY3QgKiBmcm9tIFtib25ueWNpLWdpdGh1Yi1hcmNoaXZlOmNpX3BsdW5kZXJfcmVwb19zYW1wbGVzX2FsbC5yZXBvX3JlbGVhc2VzXScKCmFsbF9yZXBvX3JlbGVhc2VzIDwtIHF1ZXJ5X2V4ZWMoYWxsX3JlcG9fcmVsZWFzZXNfc3FsLCBwcm9qZWN0ID0gcHJvamVjdCkKCnNhdmVSRFMoYWxsX3JlcG9fcmVsZWFzZXMsICJhbGxfcmVwb19yZWxlYXNlcy5yZHMiKQoKIyBjaGFyYWN0ZXJpc3RpY3Mgb2YgcmVwb3Mgd2l0aCB2cyB3aXRob3V0CiMgYWdlCiMgbnVtYmVyIG9mIGFjdG9ycwojIGV2ZW50cyB0byBhY3RvciBwZXJjZW50CiMgbGFuZ3VhZ2VzPwoKYGBgCgojIyMjIFJlYWRtZQpXaGF0IHByb3BvcnRpb24gb2YgcmVwb3MgaGFkIGEgUkVBRE1FIGRldGVjdGVkIGJ5IEdpdGh1Yj8gV2hhdCB3ZXJlIHRoZSBjaGFyYWN0ZXJpc3RpY3Mgb2YgcmVwb3NpdG9yaWVzIHRoYXQgaGFkIGEgUkVBRE1FIGFuZCB0aGUgb25lcyB0aGF0IGRpZG4ndD8KCk9mIHRob3NlLCBob3cgbWFueSBoYWQgYSBCdWlsZCBzdGF0dXMgdGFnIChpbmRpY2F0ZXMgcG9zc2libGUgQ0kpPyBXaGF0IGFyZSB0aGUgY2hhcmFjdGVyc3RpY3Mgb2YgcmVwb3NpdG9yaWVzIHRoYXQgaGFkIGEgQnVpbGQgc3RhdHVzIHRhZyB2cyB0aG9zZSB0aGF0IGRpZG4ndD8KCmBgYHtyfQphbGxfcmVwb19yZWFkbWVfc3FsIDwtCiAgJ3NlbGVjdCAqIGZyb20gW2Jvbm55Y2ktZ2l0aHViLWFyY2hpdmU6Y2lfcGx1bmRlcl9yZXBvX3NhbXBsZXNfYWxsLnJlcG9fcmVhZG1lX2J1aWxkc3RhdHVzXScKCmFsbF9yZXBvX3JlYWRtZSA8LSBxdWVyeV9leGVjKGFsbF9yZXBvX3JlYWRtZV9zcWwsIHByb2plY3QgPSBwcm9qZWN0KQoKc2F2ZVJEUyhhbGxfcmVwb19yZWFkbWUsICJhbGxfcmVwb19yZWFkbWUucmRzIikKCmBgYAoKCiMjIFB1c2ggRXZlbnRzCgojIyMgUmFuZG9tIFNhbXBsZSBvZiBFdmVudHMKCmBgYApTRUxFQ1QgKiwgcmFuZCgpIGFzIHJhbmQKICBGUk9NIFtib25ueWNpLWdpdGh1Yi1hcmNoaXZlOmNpX3BsdW5kZXJfcmVwb19zYW1wbGVzLjIwMTdfMDJfMDNfMjFdCiAgd2hlcmUgdHlwZSA9PSAiUHVzaEV2ZW50IgogIG9yZGVyIGJ5IHJhbmQKICBsaW1pdCAxMDAKYGBgCgpgYGB7cn0KcHVzaF9ldmVudHNfc2FtcGxlX3NxbCA8LQogICdzZWxlY3QgKiBmcm9tIFtib25ueWNpLWdpdGh1Yi1hcmNoaXZlOmNpX3BsdW5kZXJfcmVwb19zYW1wbGVzLnB1c2hfZXZlbnRzX3NhbXBsZV0nCgpwdXNoX2V2ZW50c19zYW1wbGUgPC0gcXVlcnlfZXhlYyhwdXNoX2V2ZW50c19zYW1wbGVfc3FsLCBwcm9qZWN0ID0gcHJvamVjdCkKCnNhdmVSRFMocHVzaF9ldmVudHNfc2FtcGxlLCAicHVzaF9ldmVudHNfc2FtcGxlLnJkcyIpCgpgYGAKCgojIyMgRXZlbnRzIERhdGEKCmBgYHtyfQpwdXNoX2V2ZW50c19yZXBvX3N1bW1hcnlfc3FsIDwtCiAgJ3NlbGVjdCAqIGZyb20gW2Jvbm55Y2ktZ2l0aHViLWFyY2hpdmU6Y2lfcGx1bmRlcl9yZXBvX3NhbXBsZXNfcHVzaC5naGV2ZW50c19yZXBvX3N1bW1hcnldJwoKcHVzaF9ldmVudHNfcmVwb19zdW1tYXJ5IDwtIHF1ZXJ5X2V4ZWMocHVzaF9ldmVudHNfcmVwb19zdW1tYXJ5X3NxbCwgcHJvamVjdCA9IHByb2plY3QpCgpzYXZlUkRTKHB1c2hfZXZlbnRzX3JlcG9fc3VtbWFyeSwgInB1c2hfZXZlbnRzX3JlcG9fc3VtbWFyeS5yZHMiKQoKYGBgCgpgYGB7cn0KcHVzaF9ldmVudHNfcmVwb190eXBlX3N1bW1hcnlfc3FsIDwtCiAgJ3NlbGVjdCAqIGZyb20gW2Jvbm55Y2ktZ2l0aHViLWFyY2hpdmU6Y2lfcGx1bmRlcl9yZXBvX3NhbXBsZXNfcHVzaC5naGV2ZW50c19yZXBvX3R5cGVfc3VtbWFyeV0nCgpwdXNoX2V2ZW50c19yZXBvX3R5cGVfc3VtbWFyeSA8LSBxdWVyeV9leGVjKHB1c2hfZXZlbnRzX3JlcG9fdHlwZV9zdW1tYXJ5X3NxbCwgcHJvamVjdCA9IHByb2plY3QpCgpzYXZlUkRTKHB1c2hfZXZlbnRzX3JlcG9fdHlwZV9zdW1tYXJ5LCAicHVzaF9ldmVudHNfcmVwb190eXBlX3N1bW1hcnkucmRzIikKCmBgYAoKIyMjIEdpdGh1YiBBUEkKCmBgYHtyfQpwdXNoX3JlcG9fZGF0YV9zcWwgPC0KICAnc2VsZWN0ICogZnJvbSBbYm9ubnljaS1naXRodWItYXJjaGl2ZTpjaV9wbHVuZGVyX3JlcG9fc2FtcGxlc19wdXNoLnJlcG9fZGF0YV90cmltbWVkXScKCnB1c2hfcmVwb19kYXRhIDwtIHF1ZXJ5X2V4ZWMocHVzaF9yZXBvX2RhdGFfc3FsLCBwcm9qZWN0ID0gcHJvamVjdCkKCnNhdmVSRFMocHVzaF9yZXBvX2RhdGEsICJwdXNoX3JlcG9fZGF0YS5yZHMiKQoKYGBgCgpgYGB7cn0KcHVzaF9yZXBvX293bmVyX3NxbCA8LQogICdzZWxlY3QgKiBmcm9tIFtib25ueWNpLWdpdGh1Yi1hcmNoaXZlOmNpX3BsdW5kZXJfcmVwb19zYW1wbGVzX3B1c2gucmVwb19vd25lcl0nCgpwdXNoX3JlcG9fb3duZXIgPC0gcXVlcnlfZXhlYyhwdXNoX3JlcG9fb3duZXJfc3FsLCBwcm9qZWN0ID0gcHJvamVjdCkKCnNhdmVSRFMocHVzaF9yZXBvX293bmVyLCAicHVzaF9yZXBvX293bmVyLnJkcyIpCgpgYGAKCgpgYGB7cn0KcHVzaF9yZXBvX2xhbmd1YWdlc19zcWwgPC0KICAnc2VsZWN0ICogZnJvbSBbYm9ubnljaS1naXRodWItYXJjaGl2ZTpjaV9wbHVuZGVyX3JlcG9fc2FtcGxlc19wdXNoLnJlcG9fbGFuZ3VhZ2VzXScKCnB1c2hfcmVwb19sYW5ndWFnZXMgPC0gcXVlcnlfZXhlYyhwdXNoX3JlcG9fbGFuZ3VhZ2VzX3NxbCwgcHJvamVjdCA9IHByb2plY3QpCgpzYXZlUkRTKHB1c2hfcmVwb19sYW5ndWFnZXMsICJwdXNoX3JlcG9fbGFuZ3VhZ2VzLnJkcyIpCgpgYGAKCgpgYGB7cn0KcHVzaF9yZXBvX2FnZV9zcWwgPC0KICAnc2VsZWN0ICogZnJvbSBbYm9ubnljaS1naXRodWItYXJjaGl2ZTpjaV9wbHVuZGVyX3JlcG9fc2FtcGxlc19wdXNoLnJlcG9fZGF0YV9hZ2VdJwoKcHVzaF9yZXBvX2FnZSA8LSBxdWVyeV9leGVjKHB1c2hfcmVwb19hZ2Vfc3FsLCBwcm9qZWN0ID0gcHJvamVjdCkKCnNhdmVSRFMocHVzaF9yZXBvX2FnZSwgInB1c2hfcmVwb19hZ2UucmRzIikKCmBgYAoKIyMjIyBSZWxlYXNlcwpXaGF0IHByb3BvcnRpb24gb2YgcmVwb3MgaGFkIFJlbGVhc2VzPyBIb3cgbWFueSByZWxlYXNlcyBkaWQgZWFjaCByZXBvIGhhdmU/IFdoYXQgd2VyZSB0aGUgY2hhcmFjdGVyaXN0aWNzIG9mIHJlcG9zaXRvcmllcyB0aGF0IGhhZCByZWxlYXNlcyBhbmQgdGhlIG9uZXMgdGhhdCBkaWRuJ3Q/CgpgYGB7cn0KcHVzaF9yZXBvX3JlbGVhc2VzX3NxbCA8LQogICdzZWxlY3QgKiBmcm9tIFtib25ueWNpLWdpdGh1Yi1hcmNoaXZlOmNpX3BsdW5kZXJfcmVwb19zYW1wbGVzX3B1c2gucmVwb19yZWxlYXNlc10nCgpwdXNoX3JlcG9fcmVsZWFzZXMgPC0gcXVlcnlfZXhlYyhwdXNoX3JlcG9fcmVsZWFzZXNfc3FsLCBwcm9qZWN0ID0gcHJvamVjdCkKCnNhdmVSRFMocHVzaF9yZXBvX3JlbGVhc2VzLCAicHVzaF9yZXBvX3JlbGVhc2VzLnJkcyIpCmBgYAoKIyMjIyBSZWFkbWUKV2hhdCBwcm9wb3J0aW9uIG9mIHJlcG9zIGhhZCBhIFJFQURNRSBkZXRlY3RlZCBieSBHaXRodWI/IFdoYXQgd2VyZSB0aGUgY2hhcmFjdGVyaXN0aWNzIG9mIHJlcG9zaXRvcmllcyB0aGF0IGhhZCBhIFJFQURNRSBhbmQgdGhlIG9uZXMgdGhhdCBkaWRuJ3Q/CgpPZiB0aG9zZSwgaG93IG1hbnkgaGFkIGEgQnVpbGQgc3RhdHVzIHRhZyAoaW5kaWNhdGVzIHBvc3NpYmxlIENJKT8gV2hhdCBhcmUgdGhlIGNoYXJhY3RlcnN0aWNzIG9mIHJlcG9zaXRvcmllcyB0aGF0IGhhZCBhIEJ1aWxkIHN0YXR1cyB0YWcgdnMgdGhvc2UgdGhhdCBkaWRuJ3Q/CgpgYGB7cn0KcHVzaF9yZXBvX3JlYWRtZV9zcWwgPC0KICAnc2VsZWN0ICogZnJvbSBbYm9ubnljaS1naXRodWItYXJjaGl2ZTpjaV9wbHVuZGVyX3JlcG9fc2FtcGxlc19wdXNoLnJlcG9fcmVhZG1lX2J1aWxkc3RhdHVzXScKCnB1c2hfcmVwb19yZWFkbWUgPC0gcXVlcnlfZXhlYyhwdXNoX3JlcG9fcmVhZG1lX3NxbCwgcHJvamVjdCA9IHByb2plY3QpCgpzYXZlUkRTKHB1c2hfcmVwb19yZWFkbWUsICJwdXNoX3JlcG9fcmVhZG1lLnJkcyIpCgpgYGAKCiMjIFdhdGNoIEV2ZW50cwoKIyMjIFJhbmRvbSBTYW1wbGUgb2YgRXZlbnRzCgpgYGAKU0VMRUNUICosIHJhbmQoKSBhcyByYW5kCiAgRlJPTSBbYm9ubnljaS1naXRodWItYXJjaGl2ZTpjaV9wbHVuZGVyX3JlcG9fc2FtcGxlcy4yMDE3XzAyXzAzXzIxXQogIHdoZXJlIHR5cGUgPT0gIldhdGNoRXZlbnQiCiAgb3JkZXIgYnkgcmFuZAogIGxpbWl0IDEwMApgYGAKIyMjIEV2ZW50cyBEYXRhCgpgYGB7cn0Kd2F0Y2hfZXZlbnRzX3JlcG9fc3VtbWFyeV9zcWwgPC0KICAnc2VsZWN0ICogZnJvbSBbYm9ubnljaS1naXRodWItYXJjaGl2ZTpjaV9wbHVuZGVyX3JlcG9fc2FtcGxlc193YXRjaC5naGV2ZW50c19yZXBvX3N1bW1hcnldJwoKd2F0Y2hfZXZlbnRzX3JlcG9fc3VtbWFyeSA8LSBxdWVyeV9leGVjKHdhdGNoX2V2ZW50c19yZXBvX3N1bW1hcnlfc3FsLCBwcm9qZWN0ID0gcHJvamVjdCkKCnNhdmVSRFMod2F0Y2hfZXZlbnRzX3JlcG9fc3VtbWFyeSwgIndhdGNoX2V2ZW50c19yZXBvX3N1bW1hcnkucmRzIikKCmBgYAoKYGBge3J9CndhdGNoX2V2ZW50c19yZXBvX3R5cGVfc3VtbWFyeV9zcWwgPC0KICAnc2VsZWN0ICogZnJvbSBbYm9ubnljaS1naXRodWItYXJjaGl2ZTpjaV9wbHVuZGVyX3JlcG9fc2FtcGxlc193YXRjaC5naGV2ZW50c19yZXBvX3R5cGVfc3VtbWFyeV0nCgp3YXRjaF9ldmVudHNfcmVwb190eXBlX3N1bW1hcnkgPC0gcXVlcnlfZXhlYyh3YXRjaF9ldmVudHNfcmVwb190eXBlX3N1bW1hcnlfc3FsLCBwcm9qZWN0ID0gcHJvamVjdCkKCnNhdmVSRFMod2F0Y2hfZXZlbnRzX3JlcG9fdHlwZV9zdW1tYXJ5LCAid2F0Y2hfZXZlbnRzX3JlcG9fdHlwZV9zdW1tYXJ5LnJkcyIpCgpgYGAKCiMjIyBHaXRodWIgQVBJCgpgYGB7cn0Kd2F0Y2hfcmVwb19kYXRhX3NxbCA8LQogICdzZWxlY3QgKiBmcm9tIFtib25ueWNpLWdpdGh1Yi1hcmNoaXZlOmNpX3BsdW5kZXJfcmVwb19zYW1wbGVzX3dhdGNoLnJlcG9fZGF0YV90cmltbWVkXScKCndhdGNoX3JlcG9fZGF0YSA8LSBxdWVyeV9leGVjKHdhdGNoX3JlcG9fZGF0YV9zcWwsIHByb2plY3QgPSBwcm9qZWN0KQoKc2F2ZVJEUyh3YXRjaF9yZXBvX2RhdGEsICJ3YXRjaF9yZXBvX2RhdGEucmRzIikKCmBgYAoKYGBge3J9CndhdGNoX3JlcG9fb3duZXJfc3FsIDwtCiAgJ3NlbGVjdCAqIGZyb20gW2Jvbm55Y2ktZ2l0aHViLWFyY2hpdmU6Y2lfcGx1bmRlcl9yZXBvX3NhbXBsZXNfd2F0Y2gucmVwb19vd25lcl0nCgp3YXRjaF9yZXBvX293bmVyIDwtIHF1ZXJ5X2V4ZWMod2F0Y2hfcmVwb19vd25lcl9zcWwsIHByb2plY3QgPSBwcm9qZWN0KQoKc2F2ZVJEUyh3YXRjaF9yZXBvX293bmVyLCAid2F0Y2hfcmVwb19vd25lci5yZHMiKQoKYGBgCgoKYGBge3J9CndhdGNoX3JlcG9fbGFuZ3VhZ2VzX3NxbCA8LQogICdzZWxlY3QgKiBmcm9tIFtib25ueWNpLWdpdGh1Yi1hcmNoaXZlOmNpX3BsdW5kZXJfcmVwb19zYW1wbGVzX3dhdGNoLnJlcG9fbGFuZ3VhZ2VzXScKCndhdGNoX3JlcG9fbGFuZ3VhZ2VzIDwtIHF1ZXJ5X2V4ZWMod2F0Y2hfcmVwb19sYW5ndWFnZXNfc3FsLCBwcm9qZWN0ID0gcHJvamVjdCkKCnNhdmVSRFMod2F0Y2hfcmVwb19sYW5ndWFnZXMsICJ3YXRjaF9yZXBvX2xhbmd1YWdlcy5yZHMiKQoKYGBgCgoKYGBge3J9CndhdGNoX3JlcG9fYWdlX3NxbCA8LQogICdzZWxlY3QgKiBmcm9tIFtib25ueWNpLWdpdGh1Yi1hcmNoaXZlOmNpX3BsdW5kZXJfcmVwb19zYW1wbGVzX3dhdGNoLnJlcG9fZGF0YV9hZ2VdJwoKd2F0Y2hfcmVwb19hZ2UgPC0gcXVlcnlfZXhlYyh3YXRjaF9yZXBvX2FnZV9zcWwsIHByb2plY3QgPSBwcm9qZWN0KQoKc2F2ZVJEUyh3YXRjaF9yZXBvX2FnZSwgIndhdGNoX3JlcG9fYWdlLnJkcyIpCgpgYGAKCmBgYHtyfQp3YXRjaF9yZXBvX3JlbGVhc2VzX3NxbCA8LQogICdzZWxlY3QgKiBmcm9tIFtib25ueWNpLWdpdGh1Yi1hcmNoaXZlOmNpX3BsdW5kZXJfcmVwb19zYW1wbGVzX3dhdGNoLnJlcG9fcmVsZWFzZXNdJwoKd2F0Y2hfcmVwb19yZWxlYXNlcyA8LSBxdWVyeV9leGVjKHdhdGNoX3JlcG9fcmVsZWFzZXNfc3FsLCBwcm9qZWN0ID0gcHJvamVjdCkKCnNhdmVSRFMod2F0Y2hfcmVwb19yZWxlYXNlcywgIndhdGNoX3JlcG9fcmVsZWFzZXMucmRzIikKYGBgCgpgYGB7cn0Kd2F0Y2hfcmVwb19yZWFkbWVfc3FsIDwtCiAgJ3NlbGVjdCAqIGZyb20gW2Jvbm55Y2ktZ2l0aHViLWFyY2hpdmU6Y2lfcGx1bmRlcl9yZXBvX3NhbXBsZXNfd2F0Y2gucmVwb19yZWFkbWVfYnVpbGRzdGF0dXNdJwoKd2F0Y2hfcmVwb19yZWFkbWUgPC0gcXVlcnlfZXhlYyh3YXRjaF9yZXBvX3JlYWRtZV9zcWwsIHByb2plY3QgPSBwcm9qZWN0KQoKc2F2ZVJEUyh3YXRjaF9yZXBvX3JlYWRtZSwgIndhdGNoX3JlcG9fcmVhZG1lLnJkcyIpCgpgYGAKCiMjIEZvcmsgRXZlbnRzCgojIyMgUmFuZG9tIFNhbXBsZSBvZiBFdmVudHMKYGBgClNFTEVDVCAqLCByYW5kKCkgYXMgcmFuZAogIEZST00gW2Jvbm55Y2ktZ2l0aHViLWFyY2hpdmU6Y2lfcGx1bmRlcl9yZXBvX3NhbXBsZXMuMjAxN18wMl8wM18yMV0KICB3aGVyZSB0eXBlID09ICJGb3JrRXZlbnQiCiAgb3JkZXIgYnkgcmFuZAogIGxpbWl0IDEwMApgYGAKCiMjIyBFdmVudHMgRGF0YQoKYGBge3J9CmZvcmtfZXZlbnRzX3JlcG9fc3VtbWFyeV9zcWwgPC0KICAnc2VsZWN0ICogZnJvbSBbYm9ubnljaS1naXRodWItYXJjaGl2ZTpjaV9wbHVuZGVyX3JlcG9fc2FtcGxlc19mb3JrLmdoZXZlbnRzX3JlcG9fc3VtbWFyeV0nCgpmb3JrX2V2ZW50c19yZXBvX3N1bW1hcnkgPC0gcXVlcnlfZXhlYyhmb3JrX2V2ZW50c19yZXBvX3N1bW1hcnlfc3FsLCBwcm9qZWN0ID0gcHJvamVjdCkKCnNhdmVSRFMoZm9ya19ldmVudHNfcmVwb19zdW1tYXJ5LCAiZm9ya19ldmVudHNfcmVwb19zdW1tYXJ5LnJkcyIpCgpgYGAKCmBgYHtyfQpmb3JrX2V2ZW50c19yZXBvX3R5cGVfc3VtbWFyeV9zcWwgPC0KICAnc2VsZWN0ICogZnJvbSBbYm9ubnljaS1naXRodWItYXJjaGl2ZTpjaV9wbHVuZGVyX3JlcG9fc2FtcGxlc19mb3JrLmdoZXZlbnRzX3JlcG9fdHlwZV9zdW1tYXJ5XScKCmZvcmtfZXZlbnRzX3JlcG9fdHlwZV9zdW1tYXJ5IDwtIHF1ZXJ5X2V4ZWMoZm9ya19ldmVudHNfcmVwb190eXBlX3N1bW1hcnlfc3FsLCBwcm9qZWN0ID0gcHJvamVjdCkKCnNhdmVSRFMoZm9ya19ldmVudHNfcmVwb190eXBlX3N1bW1hcnksICJmb3JrX2V2ZW50c19yZXBvX3R5cGVfc3VtbWFyeS5yZHMiKQoKYGBgCgojIyMgR2l0aHViIEFQSQoKYGBge3J9CmZvcmtfcmVwb19kYXRhX3NxbCA8LQogICdzZWxlY3QgKiBmcm9tIFtib25ueWNpLWdpdGh1Yi1hcmNoaXZlOmNpX3BsdW5kZXJfcmVwb19zYW1wbGVzX2ZvcmsucmVwb19kYXRhX3RyaW1tZWRdJwoKZm9ya19yZXBvX2RhdGEgPC0gcXVlcnlfZXhlYyhmb3JrX3JlcG9fZGF0YV9zcWwsIHByb2plY3QgPSBwcm9qZWN0KQoKc2F2ZVJEUyhmb3JrX3JlcG9fZGF0YSwgImZvcmtfcmVwb19kYXRhLnJkcyIpCgpgYGAKCmBgYHtyfQpmb3JrX3JlcG9fb3duZXJfc3FsIDwtCiAgJ3NlbGVjdCAqIGZyb20gW2Jvbm55Y2ktZ2l0aHViLWFyY2hpdmU6Y2lfcGx1bmRlcl9yZXBvX3NhbXBsZXNfZm9yay5yZXBvX293bmVyXScKCmZvcmtfcmVwb19vd25lciA8LSBxdWVyeV9leGVjKGZvcmtfcmVwb19vd25lcl9zcWwsIHByb2plY3QgPSBwcm9qZWN0KQoKc2F2ZVJEUyhmb3JrX3JlcG9fb3duZXIsICJmb3JrX3JlcG9fb3duZXIucmRzIikKCmBgYAoKCmBgYHtyfQpmb3JrX3JlcG9fbGFuZ3VhZ2VzX3NxbCA8LQogICdzZWxlY3QgKiBmcm9tIFtib25ueWNpLWdpdGh1Yi1hcmNoaXZlOmNpX3BsdW5kZXJfcmVwb19zYW1wbGVzX2ZvcmsucmVwb19sYW5ndWFnZXNdJwoKZm9ya19yZXBvX2xhbmd1YWdlcyA8LSBxdWVyeV9leGVjKGZvcmtfcmVwb19sYW5ndWFnZXNfc3FsLCBwcm9qZWN0ID0gcHJvamVjdCkKCnNhdmVSRFMoZm9ya19yZXBvX2xhbmd1YWdlcywgImZvcmtfcmVwb19sYW5ndWFnZXMucmRzIikKCmBgYAoKCmBgYHtyfQpmb3JrX3JlcG9fYWdlX3NxbCA8LQogICdzZWxlY3QgKiBmcm9tIFtib25ueWNpLWdpdGh1Yi1hcmNoaXZlOmNpX3BsdW5kZXJfcmVwb19zYW1wbGVzX2ZvcmsucmVwb19kYXRhX2FnZV0nCgpmb3JrX3JlcG9fYWdlIDwtIHF1ZXJ5X2V4ZWMoZm9ya19yZXBvX2FnZV9zcWwsIHByb2plY3QgPSBwcm9qZWN0KQoKc2F2ZVJEUyhmb3JrX3JlcG9fYWdlLCAiZm9ya19yZXBvX2FnZS5yZHMiKQoKYGBgCgpgYGB7cn0KZm9ya19yZXBvX3JlbGVhc2VzX3NxbCA8LQogICdzZWxlY3QgKiBmcm9tIFtib25ueWNpLWdpdGh1Yi1hcmNoaXZlOmNpX3BsdW5kZXJfcmVwb19zYW1wbGVzX2ZvcmsucmVwb19yZWxlYXNlc10nCgpmb3JrX3JlcG9fcmVsZWFzZXMgPC0gcXVlcnlfZXhlYyhmb3JrX3JlcG9fcmVsZWFzZXNfc3FsLCBwcm9qZWN0ID0gcHJvamVjdCkKCnNhdmVSRFMoZm9ya19yZXBvX3JlbGVhc2VzLCAiZm9ya19yZXBvX3JlbGVhc2VzLnJkcyIpCmBgYAoKYGBge3J9CmZvcmtfcmVwb19yZWFkbWVfc3FsIDwtCiAgJ3NlbGVjdCAqIGZyb20gW2Jvbm55Y2ktZ2l0aHViLWFyY2hpdmU6Y2lfcGx1bmRlcl9yZXBvX3NhbXBsZXNfZm9yay5yZXBvX3JlYWRtZV9idWlsZHN0YXR1c10nCgpmb3JrX3JlcG9fcmVhZG1lIDwtIHF1ZXJ5X2V4ZWMoZm9ya19yZXBvX3JlYWRtZV9zcWwsIHByb2plY3QgPSBwcm9qZWN0KQoKc2F2ZVJEUyhmb3JrX3JlcG9fcmVhZG1lLCAiZm9ya19yZXBvX3JlYWRtZS5yZHMiKQoKYGBgCgoKCiMjIFJlbGVhc2UgRXZlbnRzCgojIyMgUmFuZG9tIFNhbXBsZSBvZiBFdmVudHMKCmBgYApTRUxFQ1QgKiwgcmFuZCgpIGFzIHJhbmQKICBGUk9NIFtib25ueWNpLWdpdGh1Yi1hcmNoaXZlOmNpX3BsdW5kZXJfcmVwb19zYW1wbGVzLjIwMTdfMDJfMDNfMjFdCiAgd2hlcmUgdHlwZSA9PSAiUmVsZWFzZUV2ZW50IgogIG9yZGVyIGJ5IHJhbmQKICBsaW1pdCAxMDAKYGBgCgojIyMgRXZlbnRzIERhdGEKCmBgYHtyfQpyZWxlYXNlX2V2ZW50c19yZXBvX3N1bW1hcnlfc3FsIDwtCiAgJ3NlbGVjdCAqIGZyb20gW2Jvbm55Y2ktZ2l0aHViLWFyY2hpdmU6Y2lfcGx1bmRlcl9yZXBvX3NhbXBsZXNfcmVsZWFzZS5naGV2ZW50c19yZXBvX3N1bW1hcnldJwoKcmVsZWFzZV9ldmVudHNfcmVwb19zdW1tYXJ5IDwtIHF1ZXJ5X2V4ZWMocmVsZWFzZV9ldmVudHNfcmVwb19zdW1tYXJ5X3NxbCwgcHJvamVjdCA9IHByb2plY3QpCgpzYXZlUkRTKHJlbGVhc2VfZXZlbnRzX3JlcG9fc3VtbWFyeSwgInJlbGVhc2VfZXZlbnRzX3JlcG9fc3VtbWFyeS5yZHMiKQoKYGBgCgpgYGB7cn0KcmVsZWFzZV9ldmVudHNfcmVwb190eXBlX3N1bW1hcnlfc3FsIDwtCiAgJ3NlbGVjdCAqIGZyb20gW2Jvbm55Y2ktZ2l0aHViLWFyY2hpdmU6Y2lfcGx1bmRlcl9yZXBvX3NhbXBsZXNfcmVsZWFzZS5naGV2ZW50c19yZXBvX3R5cGVfc3VtbWFyeV0nCgpyZWxlYXNlX2V2ZW50c19yZXBvX3R5cGVfc3VtbWFyeSA8LSBxdWVyeV9leGVjKHJlbGVhc2VfZXZlbnRzX3JlcG9fdHlwZV9zdW1tYXJ5X3NxbCwgcHJvamVjdCA9IHByb2plY3QpCgpzYXZlUkRTKHJlbGVhc2VfZXZlbnRzX3JlcG9fdHlwZV9zdW1tYXJ5LCAicmVsZWFzZV9ldmVudHNfcmVwb190eXBlX3N1bW1hcnkucmRzIikKCmBgYAoK</div>
+<div id="rmd-source-code">LS0tCnRpdGxlOiAiU2FtcGxpbmcgTWV0aG9kbG9neSBEYXRhIgpvdXRwdXQ6IGh0bWxfbm90ZWJvb2sKLS0tCgpgYGB7cn0KbGlicmFyeShkcGx5cikKbGlicmFyeShiaWdycXVlcnkpCgpwcm9qZWN0IDwtICJib25ueWNpLWdpdGh1Yi1hcmNoaXZlIgpgYGAKCiMgRXhwZXJpbWVudHMKCiMjIFBvcHVsYXRpb24KCmBgYApTRUxFQ1QgKCopIEZST00gZ2l0aHViYXJjaGl2ZTptb250aC4yMDE3MDMsIGdpdGh1YmFyY2hpdmU6bW9udGguMjAxNzAyCmBgYAoKaHR0cHM6Ly9iaWdxdWVyeS5jbG91ZC5nb29nbGUuY29tOjQ0My9zYXZlZHF1ZXJ5Lzc4Nzc4NzU0NTY2MjoxODQ0YjZkMGRjMTY0YjBlYTIxMDNjYTI2NTNmNTc5MAoKYGBge3J9CiMgVE9ETyB0aW1lIHBlcmlvZCBzdW1tYXJ5IGJ5IGV2ZW50IHR5cGUgLSBudW1iZXIgb2YgZXZlbnRzLCBudW1iZXIgb2YgcmVwb3MsIG51bWJlciBvZiBhY3RvcnMsIG51bWJlciBvZiBpbmRlcGVuZGVudCByZXBvcyAobm90IHBhcnQgb2Ygc2FtZSB1c2VyL29yZykKYGBgCgoKIyMgQWxsIEV2ZW50cwoKIyMjIFJhbmRvbSBTYW1wbGUgb2YgRXZlbnRzCgpgYGAKU0VMRUNUICosIHJhbmQoKSBhcyByYW5kCiAgRlJPTSBbYm9ubnljaS1naXRodWItYXJjaGl2ZTpjaV9wbHVuZGVyX3JlcG9fc2FtcGxlcy4yMDE3XzAyXzAzXzIxXQogIG9yZGVyIGJ5IHJhbmQKICBsaW1pdCAxMDAKYGBgCgpodHRwczovL2JpZ3F1ZXJ5LmNsb3VkLmdvb2dsZS5jb206NDQzL3NhdmVkcXVlcnkvNzg3Nzg3NTQ1NjYyOjc0M2RkMDQxZmE5YzQ3OGJhNjZkYmIzMzZlNTg3Y2JlCgpgYGB7cn0KYWxsX2V2ZW50c19zYW1wbGVfc3FsIDwtCiAgJ3NlbGVjdCAqIGZyb20gW2Jvbm55Y2ktZ2l0aHViLWFyY2hpdmU6Y2lfcGx1bmRlcl9yZXBvX3NhbXBsZXMuYWxsX2V2ZW50c19zYW1wbGVdJwoKYWxsX2V2ZW50c19zYW1wbGUgPC0gcXVlcnlfZXhlYyhhbGxfZXZlbnRzX3NhbXBsZV9zcWwsIHByb2plY3QgPSBwcm9qZWN0KQoKc2F2ZVJEUyhhbGxfZXZlbnRzX3NhbXBsZSwgImFsbF9ldmVudHNfc2FtcGxlLnJkcyIpCgpgYGAKCiMjIyBFdmVudHMgRGF0YQoKIyMjIyBFdmVudCBUeXBlcyBpbiBTYW1wbGUKCmBgYHtyfQphbGxfc2FtcGxlX2V2ZW50X3R5cGVfZnJlcSA8LSBhbGxfZXZlbnRzX3NhbXBsZSAlPiUKICBncm91cF9ieSh0eXBlKSAlPiUKICBzdW1tYXJpc2UobnVtX2V2ZW50cyA9IG4oKSkKCnNhdmVSRFMoYWxsX3NhbXBsZV9ldmVudF90eXBlX2ZyZXEsICJhbGxfc2FtcGxlX2V2ZW50X3R5cGVfZnJlcS5yZHMiKQpgYGAKCgpgYGB7cn0KYWxsX2V2ZW50c19yZXBvX3N1bW1hcnlfc3FsIDwtCiAgJ3NlbGVjdCAqIGZyb20gW2Jvbm55Y2ktZ2l0aHViLWFyY2hpdmU6Y2lfcGx1bmRlcl9yZXBvX3NhbXBsZXNfYWxsLmdoZXZlbnRzX3JlcG9fc3VtbWFyeV0nCgphbGxfZXZlbnRzX3JlcG9fc3VtbWFyeSA8LSBxdWVyeV9leGVjKGFsbF9ldmVudHNfcmVwb19zdW1tYXJ5X3NxbCwgcHJvamVjdCA9IHByb2plY3QpCgpzYXZlUkRTKGFsbF9ldmVudHNfcmVwb19zdW1tYXJ5LCAiYWxsX2V2ZW50c19yZXBvX3N1bW1hcnkucmRzIikKCmBgYAoKYGBge3J9CmFsbF9ldmVudHNfcmVwb190eXBlX3N1bW1hcnlfc3FsIDwtCiAgJ3NlbGVjdCAqIGZyb20gW2Jvbm55Y2ktZ2l0aHViLWFyY2hpdmU6Y2lfcGx1bmRlcl9yZXBvX3NhbXBsZXNfYWxsLmdoZXZlbnRzX3JlcG9fdHlwZV9zdW1tYXJ5XScKCmFsbF9ldmVudHNfcmVwb190eXBlX3N1bW1hcnkgPC0gcXVlcnlfZXhlYyhhbGxfZXZlbnRzX3JlcG9fdHlwZV9zdW1tYXJ5X3NxbCwgcHJvamVjdCA9IHByb2plY3QpCgpzYXZlUkRTKGFsbF9ldmVudHNfcmVwb190eXBlX3N1bW1hcnksICJhbGxfZXZlbnRzX3JlcG9fdHlwZV9zdW1tYXJ5LnJkcyIpCgpgYGAKCiMjIyMgUmVwb3MgcGVyIE93bmVyIGluIFNhbXBsZQpIb3cgbWFueSBzZXBhcmF0ZSByZXBvcyBkaWQgcmVwbyBvd25lcnMgaW4gdGhlIHNhbXBsZSBjb250cmlidXRlIHRvPyBEaWQgYW55IGFjdG9ycyBjb250cmlidXRlIGFjcm9zcyBzYW1wbGVzPwoKYGBge3J9CmFsbF9hY3Rvcl9yZXBvX2ZyZXFfc3FsIDwtCiAgJ3NlbGVjdCAqIGZyb20gW2Jvbm55Y2ktZ2l0aHViLWFyY2hpdmU6Y2lfcGx1bmRlcl9yZXBvX3NhbXBsZXNfYWxsLmdoZXZlbnRzX2FjdG9yX3JlcG9fZnJlcV0nCgphbGxfYWN0b3JfcmVwb19mcmVxIDwtIHF1ZXJ5X2V4ZWMoYWxsX2FjdG9yX3JlcG9fZnJlcV9zcWwsIHByb2plY3QgPSBwcm9qZWN0KQoKc2F2ZVJEUyhhbGxfYWN0b3JfcmVwb19mcmVxLCAiYWxsX2FjdG9yX3JlcG9fZnJlcS5yZHMiKQpgYGAKCiMjIyBHaXRIdWIgQVBJIERhdGEKCmBgYHtyfQphbGxfcmVwb19kYXRhX3NxbCA8LQogICdzZWxlY3QgKiBmcm9tIFtib25ueWNpLWdpdGh1Yi1hcmNoaXZlOmNpX3BsdW5kZXJfcmVwb19zYW1wbGVzX2FsbC5yZXBvX2RhdGFfdHJpbW1lZF0nCgphbGxfcmVwb19kYXRhIDwtIHF1ZXJ5X2V4ZWMoYWxsX3JlcG9fZGF0YV9zcWwsIHByb2plY3QgPSBwcm9qZWN0KQoKc2F2ZVJEUyhhbGxfcmVwb19kYXRhLCAiYWxsX3JlcG9fZGF0YS5yZHMiKQoKYGBgCgojIyMjIFJlcG8gT3duZXIgRnJlcXVlbmN5CgpgYGB7cn0KIyBUT0RPIHN1bW1hcnkgc2hvdWxkIGNvbWUgZnJvbSBSIG5vdCBHQlEKYWxsX3JlcG9fb3duZXJfc3FsIDwtCiAgJ3NlbGVjdCAqIGZyb20gW2Jvbm55Y2ktZ2l0aHViLWFyY2hpdmU6Y2lfcGx1bmRlcl9yZXBvX3NhbXBsZXNfYWxsLnJlcG9fb3duZXJdJwoKYWxsX3JlcG9fb3duZXIgPC0gcXVlcnlfZXhlYyhhbGxfcmVwb19vd25lcl9zcWwsIHByb2plY3QgPSBwcm9qZWN0KQoKc2F2ZVJEUyhhbGxfcmVwb19vd25lciwgImFsbF9yZXBvX293bmVyLnJkcyIpCmBgYAoKCiMjIyMgUmVwbyBBZ2UKSG93IG9sZCBhcmUgdGhlIHJlcG9zIGluIHRoZSBzYW1wbGU/IEhvdyByZWNlbnRseSB3ZXJlIHRoZXkgbGFzdCB1cGRhdGVkPwoKSSBkaWQgc29tZSBleHBsb3JhdG9yeSBhbmFseXNpcyB3aXRoIHJhdGlvcyB0byBzZWUgaWYgSSBjb3VsZCBmaW5kIGFueSBpbnRlcmVzdGluZyBwYXR0ZXJucyBidXQgbm90aGluZyByZWFsbHkgc3R1Y2suIE9uZSB0aGluZyBJIGRpZCBmaW5kIGlzIGEgcmF0aW8gb2YgYWdlIHRvIHVwZGF0ZWRfc2luY2UgdGhhdCBpcyA8MSBzdWdnZXN0cyByZXBvcyB3ZXJlIG9ubHkgYWN0ZWQgdXBvbiB3aGVuIHRoZXkgd2VyZSBjcmVhdGVkLiBUaGVyZSBtYXkgYmUgZnVydGhlciBhbmFseXNpcyB0aGF0IGNvdWxkIGJlIGludGVyZXN0aW5nIGhlcmUgYnV0IEknbSBub3Qgc3VyZSB0aGF0IGl0J3MgdGVsbGluZyB1cyBhbnl0aGluZyB3ZSBjYW4ndCBsZWFybiBlbHNld2hlcmUuCgpgYGB7cn0KYWxsX3JlcG9fYWdlX3NxbCA8LQogICdzZWxlY3QgKiBmcm9tIFtib25ueWNpLWdpdGh1Yi1hcmNoaXZlOmNpX3BsdW5kZXJfcmVwb19zYW1wbGVzX2FsbC5yZXBvX2RhdGFfYWdlXScKCmFsbF9yZXBvX2FnZSA8LSBxdWVyeV9leGVjKGFsbF9yZXBvX2FnZV9zcWwsIHByb2plY3QgPSBwcm9qZWN0KQoKc2F2ZVJEUyhhbGxfcmVwb19hZ2UsICJhbGxfcmVwb19hZ2UucmRzIikKCmBgYAoKIyMjIyBSZXBvIExhbmd1YWdlIEZyZXF1ZW5jeQpXaGF0IGxhbmd1YWdlcyB3ZXJlIHJlcHJlc2VudGVkIGluIHRoZSByZXBvc2l0b3JpZXM/IFdoYXQgcHJvcG9ydGlvbiBvZiB0aGUgcmVwb3NpdG9yeSdzIGNvZGUgd2FzIGluIHRoYXQgbGFuZ3VhZ2U/CgpgYGB7cn0KYWxsX3JlcG9fbGFuZ3VhZ2VzX3NxbCA8LQogICdzZWxlY3QgKiBmcm9tIFtib25ueWNpLWdpdGh1Yi1hcmNoaXZlOmNpX3BsdW5kZXJfcmVwb19zYW1wbGVzX2FsbC5yZXBvX2xhbmd1YWdlc10nCgphbGxfcmVwb19sYW5ndWFnZXMgPC0gcXVlcnlfZXhlYyhhbGxfcmVwb19sYW5ndWFnZXNfc3FsLCBwcm9qZWN0ID0gcHJvamVjdCkKCmFsbF9yZXBvX2xhbmd1YWdlcyA8LSBhbGxfcmVwb19sYW5ndWFnZXMgJT4lCiAgZ3JvdXBfYnkocmVwb19zbHVnKSAlPiUKICBtdXRhdGUoCiAgICBsb2Nfc3VtID0gc3VtKGxvYyksCiAgICBsb2NfcGN0ID0gbG9jL2xvY19zdW0sCiAgICBsb2NfbG9nID0gcm91bmQobG9nKGxvY19wY3QpKQogICkKCnNhdmVSRFMoYWxsX3JlcG9fbGFuZ3VhZ2VzLCAiYWxsX3JlcG9fbGFuZ3VhZ2VzLnJkcyIpCgpgYGAKCgojIyMjIFJlbGVhc2VzCldoYXQgcHJvcG9ydGlvbiBvZiByZXBvcyBoYWQgUmVsZWFzZXM/IEhvdyBtYW55IHJlbGVhc2VzIGRpZCBlYWNoIHJlcG8gaGF2ZT8gV2hhdCB3ZXJlIHRoZSBjaGFyYWN0ZXJpc3RpY3Mgb2YgcmVwb3NpdG9yaWVzIHRoYXQgaGFkIHJlbGVhc2VzIGFuZCB0aGUgb25lcyB0aGF0IGRpZG4ndD8KCmBgYHtyfQphbGxfcmVwb19yZWxlYXNlc19zcWwgPC0KICAnc2VsZWN0ICogZnJvbSBbYm9ubnljaS1naXRodWItYXJjaGl2ZTpjaV9wbHVuZGVyX3JlcG9fc2FtcGxlc19hbGwucmVwb19yZWxlYXNlc10nCgphbGxfcmVwb19yZWxlYXNlcyA8LSBxdWVyeV9leGVjKGFsbF9yZXBvX3JlbGVhc2VzX3NxbCwgcHJvamVjdCA9IHByb2plY3QpCgpzYXZlUkRTKGFsbF9yZXBvX3JlbGVhc2VzLCAiYWxsX3JlcG9fcmVsZWFzZXMucmRzIikKCiMgY2hhcmFjdGVyaXN0aWNzIG9mIHJlcG9zIHdpdGggdnMgd2l0aG91dAojIGFnZQojIG51bWJlciBvZiBhY3RvcnMKIyBldmVudHMgdG8gYWN0b3IgcGVyY2VudAojIGxhbmd1YWdlcz8KCmBgYAoKIyMjIyBSZWFkbWUKV2hhdCBwcm9wb3J0aW9uIG9mIHJlcG9zIGhhZCBhIFJFQURNRSBkZXRlY3RlZCBieSBHaXRodWI/IFdoYXQgd2VyZSB0aGUgY2hhcmFjdGVyaXN0aWNzIG9mIHJlcG9zaXRvcmllcyB0aGF0IGhhZCBhIFJFQURNRSBhbmQgdGhlIG9uZXMgdGhhdCBkaWRuJ3Q/CgpPZiB0aG9zZSwgaG93IG1hbnkgaGFkIGEgQnVpbGQgc3RhdHVzIHRhZyAoaW5kaWNhdGVzIHBvc3NpYmxlIENJKT8gV2hhdCBhcmUgdGhlIGNoYXJhY3RlcnN0aWNzIG9mIHJlcG9zaXRvcmllcyB0aGF0IGhhZCBhIEJ1aWxkIHN0YXR1cyB0YWcgdnMgdGhvc2UgdGhhdCBkaWRuJ3Q/CgpgYGB7cn0KYWxsX3JlcG9fcmVhZG1lX3NxbCA8LQogICdzZWxlY3QgKiBmcm9tIFtib25ueWNpLWdpdGh1Yi1hcmNoaXZlOmNpX3BsdW5kZXJfcmVwb19zYW1wbGVzX2FsbC5yZXBvX3JlYWRtZV9idWlsZHN0YXR1c10nCgphbGxfcmVwb19yZWFkbWUgPC0gcXVlcnlfZXhlYyhhbGxfcmVwb19yZWFkbWVfc3FsLCBwcm9qZWN0ID0gcHJvamVjdCkKCnNhdmVSRFMoYWxsX3JlcG9fcmVhZG1lLCAiYWxsX3JlcG9fcmVhZG1lLnJkcyIpCgpgYGAKCgojIyBQdXNoIEV2ZW50cwoKIyMjIFJhbmRvbSBTYW1wbGUgb2YgRXZlbnRzCgpgYGAKU0VMRUNUICosIHJhbmQoKSBhcyByYW5kCiAgRlJPTSBbYm9ubnljaS1naXRodWItYXJjaGl2ZTpjaV9wbHVuZGVyX3JlcG9fc2FtcGxlcy4yMDE3XzAyXzAzXzIxXQogIHdoZXJlIHR5cGUgPT0gIlB1c2hFdmVudCIKICBvcmRlciBieSByYW5kCiAgbGltaXQgMTAwCmBgYAoKYGBge3J9CnB1c2hfZXZlbnRzX3NhbXBsZV9zcWwgPC0KICAnc2VsZWN0ICogZnJvbSBbYm9ubnljaS1naXRodWItYXJjaGl2ZTpjaV9wbHVuZGVyX3JlcG9fc2FtcGxlcy5wdXNoX2V2ZW50c19zYW1wbGVdJwoKcHVzaF9ldmVudHNfc2FtcGxlIDwtIHF1ZXJ5X2V4ZWMocHVzaF9ldmVudHNfc2FtcGxlX3NxbCwgcHJvamVjdCA9IHByb2plY3QpCgpzYXZlUkRTKHB1c2hfZXZlbnRzX3NhbXBsZSwgInB1c2hfZXZlbnRzX3NhbXBsZS5yZHMiKQoKYGBgCgoKIyMjIEV2ZW50cyBEYXRhCgpgYGB7cn0KcHVzaF9ldmVudHNfcmVwb19zdW1tYXJ5X3NxbCA8LQogICdzZWxlY3QgKiBmcm9tIFtib25ueWNpLWdpdGh1Yi1hcmNoaXZlOmNpX3BsdW5kZXJfcmVwb19zYW1wbGVzX3B1c2guZ2hldmVudHNfcmVwb19zdW1tYXJ5XScKCnB1c2hfZXZlbnRzX3JlcG9fc3VtbWFyeSA8LSBxdWVyeV9leGVjKHB1c2hfZXZlbnRzX3JlcG9fc3VtbWFyeV9zcWwsIHByb2plY3QgPSBwcm9qZWN0KQoKc2F2ZVJEUyhwdXNoX2V2ZW50c19yZXBvX3N1bW1hcnksICJwdXNoX2V2ZW50c19yZXBvX3N1bW1hcnkucmRzIikKCmBgYAoKYGBge3J9CnB1c2hfZXZlbnRzX3JlcG9fdHlwZV9zdW1tYXJ5X3NxbCA8LQogICdzZWxlY3QgKiBmcm9tIFtib25ueWNpLWdpdGh1Yi1hcmNoaXZlOmNpX3BsdW5kZXJfcmVwb19zYW1wbGVzX3B1c2guZ2hldmVudHNfcmVwb190eXBlX3N1bW1hcnldJwoKcHVzaF9ldmVudHNfcmVwb190eXBlX3N1bW1hcnkgPC0gcXVlcnlfZXhlYyhwdXNoX2V2ZW50c19yZXBvX3R5cGVfc3VtbWFyeV9zcWwsIHByb2plY3QgPSBwcm9qZWN0KQoKc2F2ZVJEUyhwdXNoX2V2ZW50c19yZXBvX3R5cGVfc3VtbWFyeSwgInB1c2hfZXZlbnRzX3JlcG9fdHlwZV9zdW1tYXJ5LnJkcyIpCgpgYGAKCiMjIyBHaXRodWIgQVBJCgpgYGB7cn0KcHVzaF9yZXBvX2RhdGFfc3FsIDwtCiAgJ3NlbGVjdCAqIGZyb20gW2Jvbm55Y2ktZ2l0aHViLWFyY2hpdmU6Y2lfcGx1bmRlcl9yZXBvX3NhbXBsZXNfcHVzaC5yZXBvX2RhdGFfdHJpbW1lZF0nCgpwdXNoX3JlcG9fZGF0YSA8LSBxdWVyeV9leGVjKHB1c2hfcmVwb19kYXRhX3NxbCwgcHJvamVjdCA9IHByb2plY3QpCgpzYXZlUkRTKHB1c2hfcmVwb19kYXRhLCAicHVzaF9yZXBvX2RhdGEucmRzIikKCmBgYAoKYGBge3J9CnB1c2hfcmVwb19vd25lcl9zcWwgPC0KICAnc2VsZWN0ICogZnJvbSBbYm9ubnljaS1naXRodWItYXJjaGl2ZTpjaV9wbHVuZGVyX3JlcG9fc2FtcGxlc19wdXNoLnJlcG9fb3duZXJdJwoKcHVzaF9yZXBvX293bmVyIDwtIHF1ZXJ5X2V4ZWMocHVzaF9yZXBvX293bmVyX3NxbCwgcHJvamVjdCA9IHByb2plY3QpCgpzYXZlUkRTKHB1c2hfcmVwb19vd25lciwgInB1c2hfcmVwb19vd25lci5yZHMiKQoKYGBgCgoKYGBge3J9CnB1c2hfcmVwb19sYW5ndWFnZXNfc3FsIDwtCiAgJ3NlbGVjdCAqIGZyb20gW2Jvbm55Y2ktZ2l0aHViLWFyY2hpdmU6Y2lfcGx1bmRlcl9yZXBvX3NhbXBsZXNfcHVzaC5yZXBvX2xhbmd1YWdlc10nCgpwdXNoX3JlcG9fbGFuZ3VhZ2VzIDwtIHF1ZXJ5X2V4ZWMocHVzaF9yZXBvX2xhbmd1YWdlc19zcWwsIHByb2plY3QgPSBwcm9qZWN0KQoKc2F2ZVJEUyhwdXNoX3JlcG9fbGFuZ3VhZ2VzLCAicHVzaF9yZXBvX2xhbmd1YWdlcy5yZHMiKQoKYGBgCgoKYGBge3J9CnB1c2hfcmVwb19hZ2Vfc3FsIDwtCiAgJ3NlbGVjdCAqIGZyb20gW2Jvbm55Y2ktZ2l0aHViLWFyY2hpdmU6Y2lfcGx1bmRlcl9yZXBvX3NhbXBsZXNfcHVzaC5yZXBvX2RhdGFfYWdlXScKCnB1c2hfcmVwb19hZ2UgPC0gcXVlcnlfZXhlYyhwdXNoX3JlcG9fYWdlX3NxbCwgcHJvamVjdCA9IHByb2plY3QpCgpzYXZlUkRTKHB1c2hfcmVwb19hZ2UsICJwdXNoX3JlcG9fYWdlLnJkcyIpCgpgYGAKCiMjIyMgUmVsZWFzZXMKV2hhdCBwcm9wb3J0aW9uIG9mIHJlcG9zIGhhZCBSZWxlYXNlcz8gSG93IG1hbnkgcmVsZWFzZXMgZGlkIGVhY2ggcmVwbyBoYXZlPyBXaGF0IHdlcmUgdGhlIGNoYXJhY3RlcmlzdGljcyBvZiByZXBvc2l0b3JpZXMgdGhhdCBoYWQgcmVsZWFzZXMgYW5kIHRoZSBvbmVzIHRoYXQgZGlkbid0PwoKYGBge3J9CnB1c2hfcmVwb19yZWxlYXNlc19zcWwgPC0KICAnc2VsZWN0ICogZnJvbSBbYm9ubnljaS1naXRodWItYXJjaGl2ZTpjaV9wbHVuZGVyX3JlcG9fc2FtcGxlc19wdXNoLnJlcG9fcmVsZWFzZXNdJwoKcHVzaF9yZXBvX3JlbGVhc2VzIDwtIHF1ZXJ5X2V4ZWMocHVzaF9yZXBvX3JlbGVhc2VzX3NxbCwgcHJvamVjdCA9IHByb2plY3QpCgpzYXZlUkRTKHB1c2hfcmVwb19yZWxlYXNlcywgInB1c2hfcmVwb19yZWxlYXNlcy5yZHMiKQpgYGAKCiMjIyMgUmVhZG1lCldoYXQgcHJvcG9ydGlvbiBvZiByZXBvcyBoYWQgYSBSRUFETUUgZGV0ZWN0ZWQgYnkgR2l0aHViPyBXaGF0IHdlcmUgdGhlIGNoYXJhY3RlcmlzdGljcyBvZiByZXBvc2l0b3JpZXMgdGhhdCBoYWQgYSBSRUFETUUgYW5kIHRoZSBvbmVzIHRoYXQgZGlkbid0PwoKT2YgdGhvc2UsIGhvdyBtYW55IGhhZCBhIEJ1aWxkIHN0YXR1cyB0YWcgKGluZGljYXRlcyBwb3NzaWJsZSBDSSk/IFdoYXQgYXJlIHRoZSBjaGFyYWN0ZXJzdGljcyBvZiByZXBvc2l0b3JpZXMgdGhhdCBoYWQgYSBCdWlsZCBzdGF0dXMgdGFnIHZzIHRob3NlIHRoYXQgZGlkbid0PwoKYGBge3J9CnB1c2hfcmVwb19yZWFkbWVfc3FsIDwtCiAgJ3NlbGVjdCAqIGZyb20gW2Jvbm55Y2ktZ2l0aHViLWFyY2hpdmU6Y2lfcGx1bmRlcl9yZXBvX3NhbXBsZXNfcHVzaC5yZXBvX3JlYWRtZV9idWlsZHN0YXR1c10nCgpwdXNoX3JlcG9fcmVhZG1lIDwtIHF1ZXJ5X2V4ZWMocHVzaF9yZXBvX3JlYWRtZV9zcWwsIHByb2plY3QgPSBwcm9qZWN0KQoKc2F2ZVJEUyhwdXNoX3JlcG9fcmVhZG1lLCAicHVzaF9yZXBvX3JlYWRtZS5yZHMiKQoKYGBgCgojIyBXYXRjaCBFdmVudHMKCiMjIyBSYW5kb20gU2FtcGxlIG9mIEV2ZW50cwoKYGBgClNFTEVDVCAqLCByYW5kKCkgYXMgcmFuZAogIEZST00gW2Jvbm55Y2ktZ2l0aHViLWFyY2hpdmU6Y2lfcGx1bmRlcl9yZXBvX3NhbXBsZXMuMjAxN18wMl8wM18yMV0KICB3aGVyZSB0eXBlID09ICJXYXRjaEV2ZW50IgogIG9yZGVyIGJ5IHJhbmQKICBsaW1pdCAxMDAKYGBgCiMjIyBFdmVudHMgRGF0YQoKYGBge3J9CndhdGNoX2V2ZW50c19yZXBvX3N1bW1hcnlfc3FsIDwtCiAgJ3NlbGVjdCAqIGZyb20gW2Jvbm55Y2ktZ2l0aHViLWFyY2hpdmU6Y2lfcGx1bmRlcl9yZXBvX3NhbXBsZXNfd2F0Y2guZ2hldmVudHNfcmVwb19zdW1tYXJ5XScKCndhdGNoX2V2ZW50c19yZXBvX3N1bW1hcnkgPC0gcXVlcnlfZXhlYyh3YXRjaF9ldmVudHNfcmVwb19zdW1tYXJ5X3NxbCwgcHJvamVjdCA9IHByb2plY3QpCgpzYXZlUkRTKHdhdGNoX2V2ZW50c19yZXBvX3N1bW1hcnksICJ3YXRjaF9ldmVudHNfcmVwb19zdW1tYXJ5LnJkcyIpCgpgYGAKCmBgYHtyfQp3YXRjaF9ldmVudHNfcmVwb190eXBlX3N1bW1hcnlfc3FsIDwtCiAgJ3NlbGVjdCAqIGZyb20gW2Jvbm55Y2ktZ2l0aHViLWFyY2hpdmU6Y2lfcGx1bmRlcl9yZXBvX3NhbXBsZXNfd2F0Y2guZ2hldmVudHNfcmVwb190eXBlX3N1bW1hcnldJwoKd2F0Y2hfZXZlbnRzX3JlcG9fdHlwZV9zdW1tYXJ5IDwtIHF1ZXJ5X2V4ZWMod2F0Y2hfZXZlbnRzX3JlcG9fdHlwZV9zdW1tYXJ5X3NxbCwgcHJvamVjdCA9IHByb2plY3QpCgpzYXZlUkRTKHdhdGNoX2V2ZW50c19yZXBvX3R5cGVfc3VtbWFyeSwgIndhdGNoX2V2ZW50c19yZXBvX3R5cGVfc3VtbWFyeS5yZHMiKQoKYGBgCgojIyMgR2l0aHViIEFQSQoKYGBge3J9CndhdGNoX3JlcG9fZGF0YV9zcWwgPC0KICAnc2VsZWN0ICogZnJvbSBbYm9ubnljaS1naXRodWItYXJjaGl2ZTpjaV9wbHVuZGVyX3JlcG9fc2FtcGxlc193YXRjaC5yZXBvX2RhdGFfdHJpbW1lZF0nCgp3YXRjaF9yZXBvX2RhdGEgPC0gcXVlcnlfZXhlYyh3YXRjaF9yZXBvX2RhdGFfc3FsLCBwcm9qZWN0ID0gcHJvamVjdCkKCnNhdmVSRFMod2F0Y2hfcmVwb19kYXRhLCAid2F0Y2hfcmVwb19kYXRhLnJkcyIpCgpgYGAKCmBgYHtyfQp3YXRjaF9yZXBvX293bmVyX3NxbCA8LQogICdzZWxlY3QgKiBmcm9tIFtib25ueWNpLWdpdGh1Yi1hcmNoaXZlOmNpX3BsdW5kZXJfcmVwb19zYW1wbGVzX3dhdGNoLnJlcG9fb3duZXJdJwoKd2F0Y2hfcmVwb19vd25lciA8LSBxdWVyeV9leGVjKHdhdGNoX3JlcG9fb3duZXJfc3FsLCBwcm9qZWN0ID0gcHJvamVjdCkKCnNhdmVSRFMod2F0Y2hfcmVwb19vd25lciwgIndhdGNoX3JlcG9fb3duZXIucmRzIikKCmBgYAoKCmBgYHtyfQp3YXRjaF9yZXBvX2xhbmd1YWdlc19zcWwgPC0KICAnc2VsZWN0ICogZnJvbSBbYm9ubnljaS1naXRodWItYXJjaGl2ZTpjaV9wbHVuZGVyX3JlcG9fc2FtcGxlc193YXRjaC5yZXBvX2xhbmd1YWdlc10nCgp3YXRjaF9yZXBvX2xhbmd1YWdlcyA8LSBxdWVyeV9leGVjKHdhdGNoX3JlcG9fbGFuZ3VhZ2VzX3NxbCwgcHJvamVjdCA9IHByb2plY3QpCgpzYXZlUkRTKHdhdGNoX3JlcG9fbGFuZ3VhZ2VzLCAid2F0Y2hfcmVwb19sYW5ndWFnZXMucmRzIikKCmBgYAoKCmBgYHtyfQp3YXRjaF9yZXBvX2FnZV9zcWwgPC0KICAnc2VsZWN0ICogZnJvbSBbYm9ubnljaS1naXRodWItYXJjaGl2ZTpjaV9wbHVuZGVyX3JlcG9fc2FtcGxlc193YXRjaC5yZXBvX2RhdGFfYWdlXScKCndhdGNoX3JlcG9fYWdlIDwtIHF1ZXJ5X2V4ZWMod2F0Y2hfcmVwb19hZ2Vfc3FsLCBwcm9qZWN0ID0gcHJvamVjdCkKCnNhdmVSRFMod2F0Y2hfcmVwb19hZ2UsICJ3YXRjaF9yZXBvX2FnZS5yZHMiKQoKYGBgCgpgYGB7cn0Kd2F0Y2hfcmVwb19yZWxlYXNlc19zcWwgPC0KICAnc2VsZWN0ICogZnJvbSBbYm9ubnljaS1naXRodWItYXJjaGl2ZTpjaV9wbHVuZGVyX3JlcG9fc2FtcGxlc193YXRjaC5yZXBvX3JlbGVhc2VzXScKCndhdGNoX3JlcG9fcmVsZWFzZXMgPC0gcXVlcnlfZXhlYyh3YXRjaF9yZXBvX3JlbGVhc2VzX3NxbCwgcHJvamVjdCA9IHByb2plY3QpCgpzYXZlUkRTKHdhdGNoX3JlcG9fcmVsZWFzZXMsICJ3YXRjaF9yZXBvX3JlbGVhc2VzLnJkcyIpCmBgYAoKYGBge3J9CndhdGNoX3JlcG9fcmVhZG1lX3NxbCA8LQogICdzZWxlY3QgKiBmcm9tIFtib25ueWNpLWdpdGh1Yi1hcmNoaXZlOmNpX3BsdW5kZXJfcmVwb19zYW1wbGVzX3dhdGNoLnJlcG9fcmVhZG1lX2J1aWxkc3RhdHVzXScKCndhdGNoX3JlcG9fcmVhZG1lIDwtIHF1ZXJ5X2V4ZWMod2F0Y2hfcmVwb19yZWFkbWVfc3FsLCBwcm9qZWN0ID0gcHJvamVjdCkKCnNhdmVSRFMod2F0Y2hfcmVwb19yZWFkbWUsICJ3YXRjaF9yZXBvX3JlYWRtZS5yZHMiKQoKYGBgCgojIyBGb3JrIEV2ZW50cwoKIyMjIFJhbmRvbSBTYW1wbGUgb2YgRXZlbnRzCmBgYApTRUxFQ1QgKiwgcmFuZCgpIGFzIHJhbmQKICBGUk9NIFtib25ueWNpLWdpdGh1Yi1hcmNoaXZlOmNpX3BsdW5kZXJfcmVwb19zYW1wbGVzLjIwMTdfMDJfMDNfMjFdCiAgd2hlcmUgdHlwZSA9PSAiRm9ya0V2ZW50IgogIG9yZGVyIGJ5IHJhbmQKICBsaW1pdCAxMDAKYGBgCgojIyMgRXZlbnRzIERhdGEKCmBgYHtyfQpmb3JrX2V2ZW50c19yZXBvX3N1bW1hcnlfc3FsIDwtCiAgJ3NlbGVjdCAqIGZyb20gW2Jvbm55Y2ktZ2l0aHViLWFyY2hpdmU6Y2lfcGx1bmRlcl9yZXBvX3NhbXBsZXNfZm9yay5naGV2ZW50c19yZXBvX3N1bW1hcnldJwoKZm9ya19ldmVudHNfcmVwb19zdW1tYXJ5IDwtIHF1ZXJ5X2V4ZWMoZm9ya19ldmVudHNfcmVwb19zdW1tYXJ5X3NxbCwgcHJvamVjdCA9IHByb2plY3QpCgpzYXZlUkRTKGZvcmtfZXZlbnRzX3JlcG9fc3VtbWFyeSwgImZvcmtfZXZlbnRzX3JlcG9fc3VtbWFyeS5yZHMiKQoKYGBgCgpgYGB7cn0KZm9ya19ldmVudHNfcmVwb190eXBlX3N1bW1hcnlfc3FsIDwtCiAgJ3NlbGVjdCAqIGZyb20gW2Jvbm55Y2ktZ2l0aHViLWFyY2hpdmU6Y2lfcGx1bmRlcl9yZXBvX3NhbXBsZXNfZm9yay5naGV2ZW50c19yZXBvX3R5cGVfc3VtbWFyeV0nCgpmb3JrX2V2ZW50c19yZXBvX3R5cGVfc3VtbWFyeSA8LSBxdWVyeV9leGVjKGZvcmtfZXZlbnRzX3JlcG9fdHlwZV9zdW1tYXJ5X3NxbCwgcHJvamVjdCA9IHByb2plY3QpCgpzYXZlUkRTKGZvcmtfZXZlbnRzX3JlcG9fdHlwZV9zdW1tYXJ5LCAiZm9ya19ldmVudHNfcmVwb190eXBlX3N1bW1hcnkucmRzIikKCmBgYAoKIyMjIEdpdGh1YiBBUEkKCmBgYHtyfQpmb3JrX3JlcG9fZGF0YV9zcWwgPC0KICAnc2VsZWN0ICogZnJvbSBbYm9ubnljaS1naXRodWItYXJjaGl2ZTpjaV9wbHVuZGVyX3JlcG9fc2FtcGxlc19mb3JrLnJlcG9fZGF0YV90cmltbWVkXScKCmZvcmtfcmVwb19kYXRhIDwtIHF1ZXJ5X2V4ZWMoZm9ya19yZXBvX2RhdGFfc3FsLCBwcm9qZWN0ID0gcHJvamVjdCkKCnNhdmVSRFMoZm9ya19yZXBvX2RhdGEsICJmb3JrX3JlcG9fZGF0YS5yZHMiKQoKYGBgCgpgYGB7cn0KZm9ya19yZXBvX293bmVyX3NxbCA8LQogICdzZWxlY3QgKiBmcm9tIFtib25ueWNpLWdpdGh1Yi1hcmNoaXZlOmNpX3BsdW5kZXJfcmVwb19zYW1wbGVzX2ZvcmsucmVwb19vd25lcl0nCgpmb3JrX3JlcG9fb3duZXIgPC0gcXVlcnlfZXhlYyhmb3JrX3JlcG9fb3duZXJfc3FsLCBwcm9qZWN0ID0gcHJvamVjdCkKCnNhdmVSRFMoZm9ya19yZXBvX293bmVyLCAiZm9ya19yZXBvX293bmVyLnJkcyIpCgpgYGAKCgpgYGB7cn0KZm9ya19yZXBvX2xhbmd1YWdlc19zcWwgPC0KICAnc2VsZWN0ICogZnJvbSBbYm9ubnljaS1naXRodWItYXJjaGl2ZTpjaV9wbHVuZGVyX3JlcG9fc2FtcGxlc19mb3JrLnJlcG9fbGFuZ3VhZ2VzXScKCmZvcmtfcmVwb19sYW5ndWFnZXMgPC0gcXVlcnlfZXhlYyhmb3JrX3JlcG9fbGFuZ3VhZ2VzX3NxbCwgcHJvamVjdCA9IHByb2plY3QpCgpzYXZlUkRTKGZvcmtfcmVwb19sYW5ndWFnZXMsICJmb3JrX3JlcG9fbGFuZ3VhZ2VzLnJkcyIpCgpgYGAKCgpgYGB7cn0KZm9ya19yZXBvX2FnZV9zcWwgPC0KICAnc2VsZWN0ICogZnJvbSBbYm9ubnljaS1naXRodWItYXJjaGl2ZTpjaV9wbHVuZGVyX3JlcG9fc2FtcGxlc19mb3JrLnJlcG9fZGF0YV9hZ2VdJwoKZm9ya19yZXBvX2FnZSA8LSBxdWVyeV9leGVjKGZvcmtfcmVwb19hZ2Vfc3FsLCBwcm9qZWN0ID0gcHJvamVjdCkKCnNhdmVSRFMoZm9ya19yZXBvX2FnZSwgImZvcmtfcmVwb19hZ2UucmRzIikKCmBgYAoKYGBge3J9CmZvcmtfcmVwb19yZWxlYXNlc19zcWwgPC0KICAnc2VsZWN0ICogZnJvbSBbYm9ubnljaS1naXRodWItYXJjaGl2ZTpjaV9wbHVuZGVyX3JlcG9fc2FtcGxlc19mb3JrLnJlcG9fcmVsZWFzZXNdJwoKZm9ya19yZXBvX3JlbGVhc2VzIDwtIHF1ZXJ5X2V4ZWMoZm9ya19yZXBvX3JlbGVhc2VzX3NxbCwgcHJvamVjdCA9IHByb2plY3QpCgpzYXZlUkRTKGZvcmtfcmVwb19yZWxlYXNlcywgImZvcmtfcmVwb19yZWxlYXNlcy5yZHMiKQpgYGAKCmBgYHtyfQpmb3JrX3JlcG9fcmVhZG1lX3NxbCA8LQogICdzZWxlY3QgKiBmcm9tIFtib25ueWNpLWdpdGh1Yi1hcmNoaXZlOmNpX3BsdW5kZXJfcmVwb19zYW1wbGVzX2ZvcmsucmVwb19yZWFkbWVfYnVpbGRzdGF0dXNdJwoKZm9ya19yZXBvX3JlYWRtZSA8LSBxdWVyeV9leGVjKGZvcmtfcmVwb19yZWFkbWVfc3FsLCBwcm9qZWN0ID0gcHJvamVjdCkKCnNhdmVSRFMoZm9ya19yZXBvX3JlYWRtZSwgImZvcmtfcmVwb19yZWFkbWUucmRzIikKCmBgYAoKCgojIyBSZWxlYXNlIEV2ZW50cwoKIyMjIFJhbmRvbSBTYW1wbGUgb2YgRXZlbnRzCgpgYGAKU0VMRUNUICosIHJhbmQoKSBhcyByYW5kCiAgRlJPTSBbYm9ubnljaS1naXRodWItYXJjaGl2ZTpjaV9wbHVuZGVyX3JlcG9fc2FtcGxlcy4yMDE3XzAyXzAzXzIxXQogIHdoZXJlIHR5cGUgPT0gIlJlbGVhc2VFdmVudCIKICBvcmRlciBieSByYW5kCiAgbGltaXQgMTAwCmBgYAoKIyMjIEV2ZW50cyBEYXRhCgpgYGB7cn0KcmVsZWFzZV9ldmVudHNfcmVwb19zdW1tYXJ5X3NxbCA8LQogICdzZWxlY3QgKiBmcm9tIFtib25ueWNpLWdpdGh1Yi1hcmNoaXZlOmNpX3BsdW5kZXJfcmVwb19zYW1wbGVzX3JlbGVhc2UuZ2hldmVudHNfcmVwb19zdW1tYXJ5XScKCnJlbGVhc2VfZXZlbnRzX3JlcG9fc3VtbWFyeSA8LSBxdWVyeV9leGVjKHJlbGVhc2VfZXZlbnRzX3JlcG9fc3VtbWFyeV9zcWwsIHByb2plY3QgPSBwcm9qZWN0KQoKc2F2ZVJEUyhyZWxlYXNlX2V2ZW50c19yZXBvX3N1bW1hcnksICJyZWxlYXNlX2V2ZW50c19yZXBvX3N1bW1hcnkucmRzIikKCmBgYAoKYGBge3J9CnJlbGVhc2VfZXZlbnRzX3JlcG9fdHlwZV9zdW1tYXJ5X3NxbCA8LQogICdzZWxlY3QgKiBmcm9tIFtib25ueWNpLWdpdGh1Yi1hcmNoaXZlOmNpX3BsdW5kZXJfcmVwb19zYW1wbGVzX3JlbGVhc2UuZ2hldmVudHNfcmVwb190eXBlX3N1bW1hcnldJwoKcmVsZWFzZV9ldmVudHNfcmVwb190eXBlX3N1bW1hcnkgPC0gcXVlcnlfZXhlYyhyZWxlYXNlX2V2ZW50c19yZXBvX3R5cGVfc3VtbWFyeV9zcWwsIHByb2plY3QgPSBwcm9qZWN0KQoKc2F2ZVJEUyhyZWxlYXNlX2V2ZW50c19yZXBvX3R5cGVfc3VtbWFyeSwgInJlbGVhc2VfZXZlbnRzX3JlcG9fdHlwZV9zdW1tYXJ5LnJkcyIpCgpgYGAKCiMjIyBHaXRodWIgQVBJCgpgYGB7cn0KcmVsZWFzZV9yZXBvX2RhdGFfc3FsIDwtCiAgJ3NlbGVjdCAqIGZyb20gW2Jvbm55Y2ktZ2l0aHViLWFyY2hpdmU6Y2lfcGx1bmRlcl9yZXBvX3NhbXBsZXNfcmVsZWFzZS5yZXBvX2RhdGFfdHJpbW1lZF0nCgpyZWxlYXNlX3JlcG9fZGF0YSA8LSBxdWVyeV9leGVjKHJlbGVhc2VfcmVwb19kYXRhX3NxbCwgcHJvamVjdCA9IHByb2plY3QpCgpzYXZlUkRTKHJlbGVhc2VfcmVwb19kYXRhLCAicmVsZWFzZV9yZXBvX2RhdGEucmRzIikKCmBgYAoKYGBge3J9CnJlbGVhc2VfcmVwb19vd25lcl9zcWwgPC0KICAnc2VsZWN0ICogZnJvbSBbYm9ubnljaS1naXRodWItYXJjaGl2ZTpjaV9wbHVuZGVyX3JlcG9fc2FtcGxlc19yZWxlYXNlLnJlcG9fb3duZXJdJwoKcmVsZWFzZV9yZXBvX293bmVyIDwtIHF1ZXJ5X2V4ZWMocmVsZWFzZV9yZXBvX293bmVyX3NxbCwgcHJvamVjdCA9IHByb2plY3QpCgpzYXZlUkRTKHJlbGVhc2VfcmVwb19vd25lciwgInJlbGVhc2VfcmVwb19vd25lci5yZHMiKQoKYGBgCgoKYGBge3J9CnJlbGVhc2VfcmVwb19sYW5ndWFnZXNfc3FsIDwtCiAgJ3NlbGVjdCAqIGZyb20gW2Jvbm55Y2ktZ2l0aHViLWFyY2hpdmU6Y2lfcGx1bmRlcl9yZXBvX3NhbXBsZXNfcmVsZWFzZS5yZXBvX2xhbmd1YWdlc10nCgpyZWxlYXNlX3JlcG9fbGFuZ3VhZ2VzIDwtIHF1ZXJ5X2V4ZWMocmVsZWFzZV9yZXBvX2xhbmd1YWdlc19zcWwsIHByb2plY3QgPSBwcm9qZWN0KQoKc2F2ZVJEUyhyZWxlYXNlX3JlcG9fbGFuZ3VhZ2VzLCAicmVsZWFzZV9yZXBvX2xhbmd1YWdlcy5yZHMiKQoKYGBgCgoKYGBge3J9CnJlbGVhc2VfcmVwb19hZ2Vfc3FsIDwtCiAgJ3NlbGVjdCAqIGZyb20gW2Jvbm55Y2ktZ2l0aHViLWFyY2hpdmU6Y2lfcGx1bmRlcl9yZXBvX3NhbXBsZXNfcmVsZWFzZS5yZXBvX2RhdGFfYWdlXScKCnJlbGVhc2VfcmVwb19hZ2UgPC0gcXVlcnlfZXhlYyhyZWxlYXNlX3JlcG9fYWdlX3NxbCwgcHJvamVjdCA9IHByb2plY3QpCgpzYXZlUkRTKHJlbGVhc2VfcmVwb19hZ2UsICJyZWxlYXNlX3JlcG9fYWdlLnJkcyIpCgpgYGAKCmBgYHtyfQpyZWxlYXNlX3JlcG9fcmVsZWFzZXNfc3FsIDwtCiAgJ3NlbGVjdCAqIGZyb20gW2Jvbm55Y2ktZ2l0aHViLWFyY2hpdmU6Y2lfcGx1bmRlcl9yZXBvX3NhbXBsZXNfcmVsZWFzZS5yZXBvX3JlbGVhc2VzXScKCnJlbGVhc2VfcmVwb19yZWxlYXNlcyA8LSBxdWVyeV9leGVjKHJlbGVhc2VfcmVwb19yZWxlYXNlc19zcWwsIHByb2plY3QgPSBwcm9qZWN0KQoKc2F2ZVJEUyhyZWxlYXNlX3JlcG9fcmVsZWFzZXMsICJyZWxlYXNlX3JlcG9fcmVsZWFzZXMucmRzIikKYGBgCgpgYGB7cn0KcmVsZWFzZV9yZXBvX3JlYWRtZV9zcWwgPC0KICAnc2VsZWN0ICogZnJvbSBbYm9ubnljaS1naXRodWItYXJjaGl2ZTpjaV9wbHVuZGVyX3JlcG9fc2FtcGxlc19yZWxlYXNlLnJlcG9fcmVhZG1lX2J1aWxkc3RhdHVzXScKCnJlbGVhc2VfcmVwb19yZWFkbWUgPC0gcXVlcnlfZXhlYyhyZWxlYXNlX3JlcG9fcmVhZG1lX3NxbCwgcHJvamVjdCA9IHByb2plY3QpCgpzYXZlUkRTKHJlbGVhc2VfcmVwb19yZWFkbWUsICJyZWxlYXNlX3JlcG9fcmVhZG1lLnJkcyIpCgpgYGAKCg==</div>
 
 
 
