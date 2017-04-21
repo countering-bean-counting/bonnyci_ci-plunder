@@ -730,123 +730,23 @@ ggsave("repo_actors_freq.png")
 ```
 
 ```{r}
-repo_actors_freq_summary <- repo_actors_freq %>%
-  group_by(sample, num_repos_log) %>%
-  summarise(
-    num_repos = sum(num_repos),
-    total_actors_min = min(total_actors_min),
-    total_actors_med = median(total_actors_min),
-    total_actors_max = max(total_actors_max),
-    total_actors_min_max = paste(total_actors_min, "-", total_actors_max),
-    total_actors_log_min = min(total_actors_log),
-    total_actors_log_med = median(total_actors_log),
-    total_actors_log_max = max(total_actors_log),
-    total_actors_log_min_max = paste(total_actors_log_min, "-", total_actors_log_max),
-    buckets = n()
-  )
-
-repo_actors_freq_summary_top <- repo_actors_freq_summary %>% 
-  ungroup() %>%
+repo_actors_freq <- repo_actors_freq %>%
   group_by(sample) %>%
-  slice(which.max(num_repos))
+  mutate(num_repos_log_max = max(num_repos_log))
 
-ggplot(data = repo_actors_freq_summary, 
-       aes(x=sample, y=num_repos, fill=factor(total_actors_med))) +
-  geom_bar(stat="identity", position="dodge") + 
-  ylab("Repos") +
-  xlab("Sample") +
-  theme(axis.text.x = element_text(angle = 90, hjust = 1))
+repo_actors_freq_summary_top <- repo_actors_freq %>%
+  filter(num_repos_log == num_repos_log_max)
 
-ggsave("repo_actors_freq_summary.png")
-```
-
-```{r}
-all_repo_actors_freq_summary <- repo_actors_freq_summary_top %>% ungroup() %>%
-  filter(sample == "all") %>%
-  group_by(sample) %>%
-  slice(which.max(num_repos)) %>%
-  mutate(control_total_actors_log_max = total_actors_log_max,
-         control_total_actors_log_min = total_actors_log_min,
-         control_total_actors_max = total_actors_max,
-         control_total_actors_med = total_actors_med,
-         control_num_repos = num_repos,
-         control_num_repos_log = num_repos_log) %>% ungroup() %>%
-  select(control_total_actors_log_min, control_total_actors_max, control_total_actors_med, control_total_actors_log_max, control_num_repos_log, control_num_repos)
-
-repo_actors_variability <- merge(repo_actors_freq_summary_top,
-                                     all_repo_actors_freq_summary)
-
-repo_actors_variability <- repo_actors_variability %>%
-  mutate(total_actors_log_max_diff = total_actors_log_max - control_total_actors_log_max,
-         total_actors_log_min_diff = total_actors_log_min - control_total_actors_log_min,
-         total_actors_med_diff = total_actors_med - control_total_actors_med,
-         total_actors_max_diff = total_actors_max - control_total_actors_max,
-         num_repos_diff = num_repos - control_num_repos,
-         num_repos_log_diff = num_repos_log - control_num_repos_log,
-         # does the sample deviate more from the control sample than the control sample deviates from pop?
-         total_actors_log_min_dev = ifelse(abs(total_actors_log_min_diff) > 0, 1, 0),
-         total_actors_log_max_dev = ifelse(abs(total_actors_log_max_diff) > 0, 1, 0),
-         num_repos_dev = ifelse(abs(num_repos_diff) > 0, 1, 0),
-         num_repos_log_dev = ifelse(abs(num_repos_log_diff) > 0, 1, 0)
-         ) %>%
-  filter(sample != "all")
-```
-
-```{r}
-
-repo_actors_variability_repos <- repo_actors_variability %>% 
-  filter(num_repos_log_dev == 1)
-
-ggplot(data = repo_actors_variability_repos, 
-       aes(x=sample, 
-       y=abs(num_repos_log_diff), 
-       fill=factor(total_actors_med_diff))) +
+ggplot(data = repo_actors_freq_summary_top, 
+       aes(x=sample, y=num_repos, fill=log_min_max)) +
   geom_bar(stat="identity", position="stack") + 
-  ylab("Most Repos Log Difference from Control") +
+  ylab("Events") +
   xlab("Sample") +
   theme(axis.text.x = element_text(angle = 90, hjust = 1))
 
-ggsave("repo_actors_variability_repos_log.png")
-
-ggplot(data = repo_actors_variability_repos, 
-       aes(x=sample, 
-       y=num_repos_diff, 
-       fill=factor(total_actors_med_diff))) +
-  geom_bar(stat="identity", position="dodge") + 
-  ylab("Most Repos Difference from Control") +
-  xlab("Sample") +
-  theme(axis.text.x = element_text(angle = 90, hjust = 1))
-
-ggsave("repo_actors_variability_repos.png")
+ggsave("repo_actors_freq_summary_top.png")
 ```
 
-```{r}
-
-repo_actors_variability_actors <- repo_actors_variability %>% 
-  filter(total_actors_log_max_dev == 1 | total_actors_log_min_dev == 1)
-
-ggplot(data = repo_actors_variability_actors, 
-       aes(x=sample, 
-       y=abs(total_actors_log_min_diff) + abs(total_actors_log_max_diff),
-       fill=sample)) +
-  geom_bar(stat="identity", position="stack") + 
-  ylab("Actors Log Difference from Control") +
-  xlab("Sample") +
-  theme(axis.text.x = element_text(angle = 90, hjust = 1))
-
-ggsave("repo_actors_variability_actors_log.png")
-
-ggplot(data = repo_actors_variability_actors, 
-       aes(x=sample, 
-       y=total_actors_max_diff,
-       fill=sample)) +
-  geom_bar(stat="identity", position="dodge") + 
-  ylab("Max Actors Difference from Control") +
-  xlab("Sample") +
-  theme(axis.text.x = element_text(angle = 90, hjust = 1))
-
-ggsave("repo_actors_variability_actors.png")
-```
 
 ## Actors per Event Type per Repo
 
@@ -1254,116 +1154,21 @@ ggsave("repo_e2a_pct_freq_summary.png")
 
 
 ```{r}
-repo_e2a_pct_freq_summary <- repo_e2a_pct_freq %>%
-  group_by(sample, num_repos_log) %>%
-  summarise(
-    num_repos = sum(num_repos),
-    events_per_actor_pct_min = round(min(events_per_actor_pct_min),3),
-    events_per_actor_pct_max = round(max(events_per_actor_pct_max),3),
-    events_per_actor_pct_log_min = min(events_per_actor_pct_log),
-    events_per_actor_pct_log_max = max(events_per_actor_pct_log),
-    buckets = n()
-  ) %>%
-  mutate(
-    events_per_actor_pct_min_max = ifelse(events_per_actor_pct_min == events_per_actor_pct_max,
-                                          events_per_actor_pct_max,
-                                          paste(events_per_actor_pct_min, "-", events_per_actor_pct_max))
-  )
-
-repo_e2a_pct_freq_summary_top <- repo_e2a_pct_freq_summary %>% 
-  ungroup() %>%
+repo_e2a_pct_freq <- repo_e2a_pct_freq %>%
   group_by(sample) %>%
-  slice(which.max(num_repos))
+  mutate(num_repos_log_max = max(num_repos_log))
+
+repo_e2a_pct_freq_summary_top <- repo_e2a_pct_freq %>%
+  filter(num_repos_log == num_repos_log_max)
 
 ggplot(data = repo_e2a_pct_freq_summary_top, 
-       aes(x=sample, y=num_repos, fill=events_per_actor_pct_min_max)) +
-  geom_bar(stat="identity", position="dodge") + 
-  ylab("Repos") +
+       aes(x=sample, y=num_repos, fill=log_min_max)) +
+  geom_bar(stat="identity", position="stack") + 
+  ylab("Events") +
   xlab("Sample") +
   theme(axis.text.x = element_text(angle = 90, hjust = 1))
 
 ggsave("repo_e2a_pct_freq_summary_top.png")
-```
-
-```{r}
-all_repo_e2a_pct_freq_summary <- repo_e2a_pct_freq_summary_top %>% ungroup() %>%
-  filter(sample == "all") %>%
-  group_by(sample) %>%
-  slice(which.max(num_repos)) %>%
-  mutate(control_e2a_pct_log_max = events_per_actor_pct_log_max,
-         control_e2a_pct_log_min = events_per_actor_pct_log_min,
-         control_e2a_pct_min = events_per_actor_pct_min,
-         control_e2a_pct_max = events_per_actor_pct_max,
-         control_num_repos = num_repos,
-         control_num_repos_log = num_repos_log) %>% ungroup() %>%
-  select(control_e2a_pct_log_min, control_e2a_pct_log_max, 
-         control_e2a_pct_min, control_e2a_pct_max, 
-         control_num_repos_log, control_num_repos)
-
-repo_e2a_pct_variability <- merge(repo_e2a_pct_freq_summary_top,
-                                     all_repo_e2a_pct_freq_summary)
-
-repo_e2a_pct_variability <- repo_e2a_pct_variability %>%
-  mutate(e2a_pct_log_max_diff = events_per_actor_pct_log_max - control_e2a_pct_log_max,
-         e2a_pct_log_min_diff = events_per_actor_pct_log_min - control_e2a_pct_log_min,
-         e2a_pct_min_diff = events_per_actor_pct_min - control_e2a_pct_min,
-         e2a_pct_max_diff = events_per_actor_pct_max - control_e2a_pct_max,
-         num_repos_diff = num_repos - control_num_repos,
-         num_repos_log_diff = num_repos_log - control_num_repos_log,
-         # does the sample deviate more from the control sample than the control sample deviates from pop?
-         e2a_pct_log_min_dev = ifelse(abs(e2a_pct_log_min_diff) > 0, 1, 0),
-         e2a_pct_log_max_dev = ifelse(abs(e2a_pct_log_max_diff) > 0, 1, 0),
-         num_repos_dev = ifelse(abs(num_repos_diff) > 0, 1, 0),
-         num_repos_log_dev = ifelse(abs(num_repos_log_diff) > 0, 1, 0),
-         e2a_pct_min_max_diff = ifelse(e2a_pct_min_diff == e2a_pct_max_diff,
-                                           e2a_pct_min_diff,
-                                           paste(e2a_pct_min_diff, "/", e2a_pct_max_diff))
-         )
-```
-
-```{r}
-
-repo_e2a_pct_variability_repos <- repo_e2a_pct_variability %>% 
-  filter(num_repos_log_dev == 1)
-
-ggplot(data = repo_e2a_pct_variability_repos, 
-       aes(x=sample, 
-       y=abs(num_repos_log_diff), 
-       fill=e2a_pct_min_max_diff)) +
-  geom_bar(stat="identity", position="stack") + 
-  ylab("Most Repos Log Difference from Control") +
-  xlab("Sample") +
-  theme(axis.text.x = element_text(angle = 90, hjust = 1))
-
-ggsave("repo_e2a_pct_variability_repos_log.png")
-
-ggplot(data = repo_e2a_pct_variability_repos, 
-       aes(x=sample, 
-       y=num_repos_diff, 
-       fill=e2a_pct_min_max_diff)) +
-  geom_bar(stat="identity", position="dodge") + 
-  ylab("Most Repos Difference from Control") +
-  xlab("Sample") +
-  theme(axis.text.x = element_text(angle = 90, hjust = 1))
-
-ggsave("repo_e2a_pct_variability_repos.png")
-```
-
-```{r}
-
-repo_e2a_pct_variability_e2a_pct <- repo_e2a_pct_variability %>% 
-  filter(e2a_pct_log_max_dev == 1 | e2a_pct_log_min_dev == 1)
-
-ggplot(data = repo_e2a_pct_variability_e2a_pct, 
-       aes(x=sample, 
-       y=abs(e2a_pct_log_min_diff) + abs(e2a_pct_log_max_diff),
-       fill=e2a_pct_min_max_diff)) +
-  geom_bar(stat="identity", position="stack") + 
-  ylab("Events per Actor Log Difference from Control") +
-  xlab("Sample") +
-  theme(axis.text.x = element_text(angle = 90, hjust = 1))
-
-ggsave("repo_e2a_pct_variability_e2a_log.png")
 ```
 
 ## Repos per Owner
