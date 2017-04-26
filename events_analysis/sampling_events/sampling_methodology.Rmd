@@ -2987,7 +2987,9 @@ all_repo_readme_size_freq <- all_repo_readme %>%
     num_repos = n(),
     size_min = min(size),
     size_max = max(size),
-    size_min_max = ifelse(is.na(size_min), paste(NA), paste(size_min, "-", size_max))
+    size_min_max = ifelse(is.na(size_min), paste(NA), paste(size_min, "-", size_max)),
+    num_repos_log = round(log(num_repos)),
+    sample = "all"
   )
 
 ggplot(data = all_repo_readme_size_freq, 
@@ -3003,6 +3005,7 @@ ggplot(data = all_repo_readme_size_freq,
 ggsave("all_repo_readme_size_freq.png")
 
 ```
+
 ```{r}
 
 # repos with a build status in the readme
@@ -3064,7 +3067,9 @@ push_repo_readme_size_freq <- push_repo_readme %>%
     num_repos = n(),
     size_min = min(size),
     size_max = max(size),
-    size_min_max = ifelse(is.na(size_min), paste(NA), paste(size_min, "-", size_max))
+    size_min_max = ifelse(is.na(size_min), paste(NA), paste(size_min, "-", size_max)),
+    num_repos_log = round(log(num_repos)),
+    sample = "push"
   )
 
 ggplot(data = push_repo_readme_size_freq, 
@@ -3143,7 +3148,9 @@ watch_repo_readme_size_freq <- watch_repo_readme %>%
     num_repos = n(),
     size_min = min(size),
     size_max = max(size),
-    size_min_max = ifelse(is.na(size_min), paste(NA), paste(size_min, "-", size_max))
+    size_min_max = ifelse(is.na(size_min), paste(NA), paste(size_min, "-", size_max)),
+    num_repos_log = round(log(num_repos)),
+    sample = "watch"
   )
 
 ggplot(data = watch_repo_readme_size_freq, 
@@ -3222,7 +3229,9 @@ fork_repo_readme_size_freq <- fork_repo_readme %>%
     num_repos = n(),
     size_min = min(size),
     size_max = max(size),
-    size_min_max = ifelse(is.na(size_min), paste(NA), paste(size_min, "-", size_max))
+    size_min_max = ifelse(is.na(size_min), paste(NA), paste(size_min, "-", size_max)),
+    num_repos_log = round(log(num_repos)),
+    sample = "fork"
   )
 
 ggplot(data = fork_repo_readme_size_freq, 
@@ -3301,7 +3310,9 @@ release_repo_readme_size_freq <- release_repo_readme %>%
     num_repos = n(),
     size_min = min(size),
     size_max = max(size),
-    size_min_max = ifelse(is.na(size_min), paste(NA), paste(size_min, "-", size_max))
+    size_min_max = ifelse(is.na(size_min), paste(NA), paste(size_min, "-", size_max)),
+    num_repos_log = round(log(num_repos)),
+    sample = "release"
   )
 
 ggplot(data = release_repo_readme_size_freq, 
@@ -3354,7 +3365,58 @@ ggplot(data = release_repo_readme_releases_true,
 ggsave("release_repo_readme_buildstatus_host.png")
 ```
 
-## Event Samples Summary
+### Summary
+
+```{r}
+repo_readme_size_freq <- bind_rows(all_repo_readme_size_freq, push_repo_readme_size_freq, 
+                        watch_repo_readme_size_freq, fork_repo_readme_size_freq, release_repo_readme_size_freq)
+
+repo_readme_size_freq <- repo_readme_size_freq %>%
+  mutate(num_repos_log = round(log(num_repos)))
+
+repo_readme_size_freq_log <- repo_readme_size_freq %>%
+  group_by(size_log) %>%
+  summarise(
+    log_min = min(size_min),
+    log_max = max(size_max)) %>%
+  mutate(log_min_max = ifelse(log_min == log_max, 
+                         log_max, 
+                         paste(log_min,"-",log_max)))
+
+repo_readme_size_freq <- merge(repo_readme_size_freq_log, repo_readme_size_freq, by="size_log")
+
+repo_readme_size_freq$log_min_max <- factor(repo_readme_size_freq$log_min_max,
+                                       levels=unique(
+                                           repo_readme_size_freq$log_min_max[
+                                             order(repo_readme_size_freq$size_log)]))
+
+ggplot(data = repo_readme_size_freq, 
+       aes(x=sample, y=num_repos, fill=log_min_max)) +
+  geom_bar(stat="identity", position="dodge") + 
+  ylab("Repos") +
+  xlab("Sample") +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1))
+
+ggsave("repo_readme_size_freq.png")
+```
+
+```{r}
+repo_readme_size_freq <- repo_readme_size_freq %>%
+  group_by(sample) %>%
+  mutate(num_repos_log_max = max(num_repos_log))
+
+repo_readme_size_freq_summary_top <- repo_readme_size_freq %>%
+  filter(num_repos_log == num_repos_log_max)
+
+ggplot(data = repo_readme_size_freq_summary_top, 
+       aes(x=sample, y=num_repos, fill=log_min_max)) +
+  geom_bar(stat="identity", position="stack") + 
+  ylab("Repos") +
+  xlab("Sample") +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1))
+
+ggsave("repo_readme_size_freq_top.png")
+```
 
 # Conclusions
 
