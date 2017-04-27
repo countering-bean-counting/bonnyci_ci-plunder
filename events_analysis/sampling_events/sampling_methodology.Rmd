@@ -740,7 +740,7 @@ repo_actors_freq_summary_top <- repo_actors_freq %>%
 ggplot(data = repo_actors_freq_summary_top, 
        aes(x=sample, y=num_repos, fill=log_min_max)) +
   geom_bar(stat="identity", position="stack") + 
-  ylab("Events") +
+  ylab("Repos") +
   xlab("Sample") +
   theme(axis.text.x = element_text(angle = 90, hjust = 1))
 
@@ -2322,9 +2322,7 @@ all_repo_releases_freq <- all_repo_releases_change %>%
     published_at_interval_min = ifelse(release_count == 1, 0, min(published_at_interval, na.rm=TRUE)),
     published_at_interval_mean = ifelse(release_count == 1, 0, round(mean(published_at_interval, na.rm=TRUE))),
     published_at_interval_mean = ifelse(release_count == 0, mean(published_at_interval), published_at_interval_mean),
-    published_at_interval_med = ifelse(release_count == 1, 0, round(median(published_at_interval, na.rm=TRUE))),
-    published_at_interval_log_min = min(published_at_interval_log),
-    published_at_interval_log_max = max(published_at_interval_log)
+    published_at_interval_med = ifelse(release_count == 1, 0, round(median(published_at_interval, na.rm=TRUE)))
   )  %>%
   mutate(
     release_count_log = round(log(release_count))
@@ -2933,32 +2931,6 @@ ggsave("repo_release_time_between_summary.png")
 ```
 
 
-
-```{r}
-repo_releases_time_between_freq_repo_summary <- repo_releases_time_between_freq_repo_summary %>%
-  group_by(sample) %>%
-  mutate(num_repos_log_max = max(num_repos_log))
-
-repo_releases_time_between_freq_repo_summary_top <- repo_releases_time_between_freq_repo_summary %>%
-  filter(num_repos_log == num_repos_log_max)
-
-ggplot(data = repo_releases_time_between_freq_repo_summary_top, 
-       aes(x=sample, y=num_repos, fill=num_releases_min_max)) +
-  geom_bar(stat="identity", position="stack") + 
-  ylab("Repos") +
-  xlab("Sample") +
-  theme(axis.text.x = element_text(angle = 90, hjust = 1))
-
-ggplot(data = repo_releases_time_between_freq_repo_summary_top, 
-       aes(x=sample, y=num_repos, fill=)) +
-  geom_bar(stat="identity", position="stack") + 
-  ylab("Repos") +
-  xlab("Sample") +
-  theme(axis.text.x = element_text(angle = 90, hjust = 1))
-
-#ggsave("repo_releases_time_between_freq_summary_top.png")
-```
-
 ## README
 
 ### All Events
@@ -3015,8 +2987,12 @@ ggplot(data = all_repo_readme,
   theme(legend.position="none") +
   xlab("Build Status Host") +
   theme(axis.text.x = element_text(angle = 90, hjust = 1))
+
+all_repo_readme <- all_repo_readme %>%
+  mutate(sample = "all")
   
 ```
+
 ```{r}
 # did any of the repos with build status do releases?
 all_repo_has_releases <- all_repo_releases_freq %>%
@@ -3095,6 +3071,9 @@ ggplot(data = push_repo_readme,
   theme(legend.position="none") +
   xlab("Build Status Host") +
   theme(axis.text.x = element_text(angle = 90, hjust = 1))
+
+push_repo_readme <- push_repo_readme %>%
+  mutate(sample = "push")
   
 ```
 
@@ -3176,6 +3155,9 @@ ggplot(data = watch_repo_readme,
   theme(legend.position="none") +
   xlab("Build Status Host") +
   theme(axis.text.x = element_text(angle = 90, hjust = 1))
+
+watch_repo_readme <- watch_repo_readme %>%
+  mutate(sample = "watch")
   
 ```
 
@@ -3257,6 +3239,9 @@ ggplot(data = fork_repo_readme,
   theme(legend.position="none") +
   xlab("Build Status Host") +
   theme(axis.text.x = element_text(angle = 90, hjust = 1))
+
+fork_repo_readme <- fork_repo_readme %>%
+  mutate(sample = "fork")
   
 ```
 
@@ -3338,6 +3323,9 @@ ggplot(data = release_repo_readme,
   theme(legend.position="none") +
   xlab("Build Status Host") +
   theme(axis.text.x = element_text(angle = 90, hjust = 1))
+
+release_repo_readme <- release_repo_readme %>%
+  mutate(sample = "release")
   
 ```
 
@@ -3416,6 +3404,18 @@ ggplot(data = repo_readme_size_freq_summary_top,
   theme(axis.text.x = element_text(angle = 90, hjust = 1))
 
 ggsave("repo_readme_size_freq_top.png")
+```
+
+```{r}
+repo_readme <- bind_rows(all_repo_readme, push_repo_readme, 
+                        watch_repo_readme, fork_repo_readme, release_repo_readme)
+ggplot(data = repo_readme, 
+       aes(x = sample, fill=build_status_host)) +
+  geom_bar(position="dodge") +
+  xlab("Build Status Host") +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1))
+
+ggsave("repo_readme_host.png")
 ```
 
 # Conclusions
