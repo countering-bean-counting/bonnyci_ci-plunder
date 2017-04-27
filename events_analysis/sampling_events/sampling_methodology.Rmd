@@ -1,6 +1,8 @@
 ---
 title: "Participation Rate based on Github Repository Public Events"
-output: html_notebook
+output:
+  pdf_document: default
+  html_notebook: default
 ---
 
 ```{r}
