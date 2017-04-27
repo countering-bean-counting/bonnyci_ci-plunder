@@ -3420,14 +3420,6 @@ ggsave("repo_readme_host.png")
 
 # Conclusions
 
-(Recap from above as a writing aid): 
-A sample drawn from repositories with a similar events-to-actor proportion will be less variable than a sample drawn from the entire Github population.
+Some Github API parameters unrelated to the event data showed a consistent pattern that correlated with the event type. Specifically, Age, Readme size, Releases, Build status in Readme (somewhat) had the strongest correlation to event type.
 
-A sample drawn from an event type occurring most frequently for repositories in a given events-to-actor proportions will result in a larger proportion of repositories in the sample with that events-to-actor proportion. Therefore if one is interested in researching higher participation repositories active in the past month, one could take a random sample of events corresponding to the type occuring most frequently in high participation repositories.
-
-Samples based on event type will be more variable than samples based on events-to-actor proportion but still less variable than samples taken from the entire event population.
-
-Drawing repository samples from event types correlated with certain events-to-actor proportion results in a larger proportion of repositories matching the events-to-actor proportion.
-
-
-
+The Watch sample showed a consistent skew throughout all parameters. Therefore, a sample of repos using Watch events will bias towards the type of repos we are interested in studying while still representing the overall Github population in a way that can be accounted for.
