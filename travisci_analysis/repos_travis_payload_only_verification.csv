@@ -1,0 +1,12 @@
+repo_slug,uses_travisci,payload_context
+abdulhaq-e/ngrx-json-api,No,Dependent Library
+dlang/phobos,No,Request to Add
+eliasdaler/imgui-sfml,No,Dependent Library
+flycheck/flycheck-rust,No,Dependent Library
+fsharp/fslang-design,No,Person's Name
+gilt/sundial,No,Request to Add
+harrelfe/Hmisc,No,Dependent Library
+jmaupetit/md2pdf,No,Request to Add
+lamestation/packthing,No,Request to Add
+nkbt/esnext-quickstart,No,Dependent Library
+tribbloid/spookystuff,No,Removed
