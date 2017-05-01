@@ -1,0 +1,162 @@
+---
+title: "Participation Analysis"
+output: html_notebook
+---
+
+Initially a broad stroke was done to eyeball participation in the repositories. This analysis looks more closely at participation by breaking it down by type and by month, and also by looking at actor activity. Additionally, some event types may be stronger indicators of participation than others. We should attempt to develop a scoring model by weighting the event types.
+
+```{r}
+library(dplyr)
+library(bigrquery)
+library(ggplot2)
+
+project <- "bonnyci-github-archive"
+```
+
+# Events Per Month Distribution
+
+Which event types were best represented across the repos in the sample? What event frequency per type was most represented for repos in the sample?
+
+## Overall
+
+```{r}
+# events_per_month_sql <- 
+#   'SELECT * FROM [bonnyci-github-archive:ci_plunder_travisci.num_events_by_type_month]'
+
+# events_per_month <- query_exec(events_per_month_sql, project = project)
+
+events_per_month <- events_per_month %>%
+  mutate(
+    event_year_month = ifelse(event_month < 10, 
+                              paste(event_year, "-", "0", event_month, sep=""), 
+                              paste(event_year, event_month, sep="-")),
+    events_per_month_log = round(log(num_events_per_type_month)),
+    type = ifelse(type == "PullRequestReviewCommentEvent", "PRRevCommentEvent", type)
+)
+
+events_per_month_repo_max <- events_per_month %>%
+  group_by(repo_name) %>%
+  summarise(events_per_month_log_max = max(events_per_month_log))
+
+events_per_month <- merge(events_per_month, events_per_month_repo_max, by="repo_name")
+
+saveRDS(events_per_month, "events_per_month.rds")
+```
+
+```{r}
+events_per_month <- readRDS("events_per_month.rds")
+
+events_per_month_summary <- events_per_month %>%
+  group_by(type, event_year_month) %>%
+  summarise(num_events_per_type_month_sum = sum(num_events_per_type_month))
+
+ggplot(data = events_per_month_summary, 
+       aes(x=event_year_month, y = num_events_per_type_month_sum, 
+           fill=reorder(type, -num_events_per_type_month_sum))) +
+  geom_bar(stat="identity", position="stack") +
+  ylab("Number of Events") +
+  xlab("Month") +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
+  labs(fill='Type')
+
+```
+
+## Top Event Types Per Month
+
+```{r}
+events_per_month_summary <- events_per_month_summary %>%
+  mutate(
+    quartile = ntile(num_events_per_type_month_sum, 4)
+  )
+
+ggplot(data = events_per_month_summary %>% filter(quartile==4), 
+       aes(x=event_year_month, y = num_events_per_type_month_sum, 
+           fill=reorder(type, -num_events_per_type_month_sum))) +
+  geom_bar(stat="identity", position="dodge") +
+  ylab("Number of Events") +
+  xlab("Month") +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
+  labs(fill='Type')
+
+```
+
+## Grouped by Repo Frequency
+```{r}
+events_per_month <- readRDS("events_per_month.rds")
+
+events_per_month_log_summary <- events_per_month %>%
+  group_by(events_per_month_log) %>%
+  summarise(num_events_per_type_month_log_min = min(num_events_per_type_month),
+            num_events_per_type_month_log_max = max(num_events_per_type_month)) %>%
+  mutate(
+    num_events_per_type_month_min_max = ifelse(
+      num_events_per_type_month_log_min == num_events_per_type_month_log_max,
+      num_events_per_type_month_log_min,
+      paste(num_events_per_type_month_log_min, "-", num_events_per_type_month_log_max))
+  )
+
+events_per_month_repo_summary <- events_per_month %>%
+  group_by(type, event_year_month, events_per_month_log) %>%
+  summarise(num_repos = n(),
+            num_repos_log = round(log(num_repos)),
+            num_events_per_type_month_min = min(num_events_per_type_month),
+            num_events_per_type_month_max = max(num_events_per_type_month)
+            )
+
+events_per_month_repo_summary <- merge(events_per_month_repo_summary, 
+                                  events_per_month_repo_summary, 
+                                  by="events_per_month_log")
+
+events_per_month_repo_summary$num_events_per_type_month_min_max <- factor(
+  events_per_month_repo_summary$num_events_per_type_month_min_max, 
+  levels = unique(events_per_month_repo_summary$num_events_per_type_month_min_max[
+    order(events_per_month_repo_summary$events_per_month_log)]))
+
+ggplot(data = events_per_month_repo_summary, 
+       aes(x=event_year_month, y = num_repos, fill=num_events_per_type_month_min_max)) +
+  geom_bar(stat="identity", position="dodge") +
+  ylab("Number of Repos") +
+  xlab("Month") +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
+  labs(fill='Events')
+
+ggplot(data = events_per_month_repo_summary, 
+       aes(x=event_year_month, y = num_repos, fill=type)) +
+  geom_bar(stat="identity", position="dodge") +
+  ylab("Number of Repos") +
+  xlab("Month") +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
+  labs(fill='Types')
+
+
+```
+
+```{r}
+events_per_month_repo_summary_max_repos <- events_per_month_repo_summary %>%
+  group_by(type) %>%
+  summarise(
+    num_repos_log_max = max(num_repos_log)
+  )
+
+events_per_month_repo_summary <- merge(events_per_month_repo_summary, 
+                                  events_per_month_repo_summary_max_repos, 
+                                  by="type")
+
+events_per_month_repo_summary_most_repos <- events_per_month_repo_summary %>%
+  filter(num_repos_log == num_repos_log_max)
+```
+
+```{r}
+ggplot(data = events_per_month_repo_summary_most_repos, 
+       aes(x=event_year_month, y = num_repos, fill=reorder(type, -num_repos))) +
+  geom_bar(stat="identity", position="dodge") +
+  ylab("Number of Repos") +
+  xlab("Month") +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
+  labs(fill='Types')
+
+```
+
+
+
+
